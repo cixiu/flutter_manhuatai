@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_manhuatai/api/api.dart';
+
 class HomeIndex extends StatefulWidget {
   @override
   _HomeIndexState createState() => _HomeIndexState();
@@ -8,6 +10,7 @@ class HomeIndex extends StatefulWidget {
 class _HomeIndexState extends State<HomeIndex>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   TabController tabController;
+  bool hasLoadRecomment = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -15,7 +18,24 @@ class _HomeIndexState extends State<HomeIndex>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(vsync: this, length: 9);
+    tabController = TabController(vsync: this, initialIndex: 1, length: 9);
+    tabController.addListener(_tabControllerListener);
+    print('初始化推荐页面');
+    _getRecommentList();
+  }
+
+  // 监听tabBar的切换
+  _tabControllerListener() {
+    print('当前tabIndex ${tabController.index}');
+  }
+
+  _getRecommentList() async {
+    await Api.getRecommentList().then((res) {
+      print(res);
+      setState(() {
+        hasLoadRecomment = true;
+      });
+    });
   }
 
   @override
@@ -89,7 +109,8 @@ class _HomeIndexState extends State<HomeIndex>
         children: <Widget>[
           RefreshIndicator(
             onRefresh: () async {
-              return Future.delayed(const Duration(milliseconds: 2000)).then((res) {
+              return Future.delayed(const Duration(milliseconds: 2000))
+                  .then((res) {
                 print('下拉刷新成功');
               });
             },
@@ -101,9 +122,18 @@ class _HomeIndexState extends State<HomeIndex>
                   ),
             ),
           ),
-          Text(
+          hasLoadRecomment ? Text(
             '这是推荐的TabBarItem',
             style: TextStyle(color: Colors.green),
+          ) : Stack(
+            children: <Widget>[
+              Container(
+                width: 50.0,
+                height: 50.0,
+                color: Colors.red,
+                child: CircularProgressIndicator(),
+              )
+            ],
           ),
           Text(
             '这是日更的TabBarItem',
