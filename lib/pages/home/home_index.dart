@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_manhuatai/components/refresh_loading.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 
 class HomeIndex extends StatefulWidget {
@@ -30,10 +32,12 @@ class _HomeIndexState extends State<HomeIndex>
   }
 
   _getRecommentList() async {
-    await Api.getRecommentList().then((res) {
-      print(res);
-      setState(() {
-        hasLoadRecomment = true;
+    Future.delayed(Duration(milliseconds: 2000)).then((res1) async {
+      await Api.getRecommentList().then((res) {
+        print(res);
+        setState(() {
+          hasLoadRecomment = true;
+        });
       });
     });
   }
@@ -122,19 +126,44 @@ class _HomeIndexState extends State<HomeIndex>
                   ),
             ),
           ),
-          hasLoadRecomment ? Text(
+          /* hasLoadRecomment ? Text(
             '这是推荐的TabBarItem',
             style: TextStyle(color: Colors.green),
-          ) : Stack(
+          ) : */
+          Container(
+            color: Colors.green,
+            child: hasLoadRecomment
+                    ? ListView.builder(
+                        itemCount: 1000,
+                        itemBuilder: (context, index) => Text(
+                              '这是排行的TabBarItem $index',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                      )
+                    : RefreshLoading() /* Stack(
+              alignment: AlignmentDirectional.topCenter,
+              children: <Widget>[
+                Positioned(
+                  top: 40.0,
+                  child: ScaleTransition(
+                    scale: ,
+                    child: RefreshProgressIndicator(),
+                  )
+                ),
+              ],
+            ) */
+                ,
+          ),
+          /*  Stack(
             children: <Widget>[
               Container(
                 width: 50.0,
                 height: 50.0,
                 color: Colors.red,
-                child: CircularProgressIndicator(),
+                child: RefreshProgressIndicator(),
               )
             ],
-          ),
+          ), */
           Text(
             '这是日更的TabBarItem',
             style: TextStyle(color: Colors.blue),
