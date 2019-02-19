@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_manhuatai/pages/home/home_index.dart';
-import 'package:flutter_manhuatai/pages/home/home_update.dart';
-import 'package:flutter_manhuatai/pages/home/home_manhuatai.dart';
-import 'package:flutter_manhuatai/pages/home/home_bookshelf.dart';
-import 'package:flutter_manhuatai/pages/home/home_mine.dart';
+import 'package:flutter_manhuatai/pages/update/update.dart';
+import 'package:flutter_manhuatai/pages/manhuatai/manhuatai.dart';
+import 'package:flutter_manhuatai/pages/bookshelf/bookshelf.dart';
+import 'package:flutter_manhuatai/pages/mine/mine.dart';
 
 import 'package:flutter_manhuatai/components/bottom_navigation.dart';
 

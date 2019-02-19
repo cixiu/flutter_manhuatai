@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter_manhuatai/components/refresh_loading.dart';
 
@@ -133,37 +134,24 @@ class _HomeIndexState extends State<HomeIndex>
           Container(
             color: Colors.green,
             child: hasLoadRecomment
-                    ? ListView.builder(
-                        itemCount: 1000,
-                        itemBuilder: (context, index) => Text(
-                              '这是排行的TabBarItem $index',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                      )
-                    : RefreshLoading() /* Stack(
-              alignment: AlignmentDirectional.topCenter,
-              children: <Widget>[
-                Positioned(
-                  top: 40.0,
-                  child: ScaleTransition(
-                    scale: ,
-                    child: RefreshProgressIndicator(),
+                ? ListView.builder(
+                    itemCount: 1000,
+                    itemBuilder: (context, index) => Text(
+                          '这是排行的TabBarItem $index',
+                          style: TextStyle(color: Colors.white),
+                        ),
                   )
-                ),
-              ],
-            ) */
-                ,
+                : Stack(
+                    alignment: AlignmentDirectional.topCenter,
+                    children: <Widget>[
+                      Positioned(top: 40.0, child: SpinKitWave(color: Colors.white, duration: const Duration(milliseconds: 1000),)),
+                      // child: ScaleTransition(
+                      //   // scale: ,
+                      //   child: RefreshProgressIndicator(),
+                      // )),
+                    ],
+                  ),
           ),
-          /*  Stack(
-            children: <Widget>[
-              Container(
-                width: 50.0,
-                height: 50.0,
-                color: Colors.red,
-                child: RefreshProgressIndicator(),
-              )
-            ],
-          ), */
           Text(
             '这是日更的TabBarItem',
             style: TextStyle(color: Colors.blue),
