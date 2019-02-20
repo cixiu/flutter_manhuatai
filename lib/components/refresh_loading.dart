@@ -7,13 +7,25 @@ class RefreshLoading extends StatefulWidget {
 class _RefreshLoadingState extends State<RefreshLoading>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
+  Animation<double> animation;
 
   void initState() {
     super.initState();
     _controller = new AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 200),
-    )..forward();
+      duration: const Duration(milliseconds: 2000),
+    );
+
+    animation =Tween(begin: 0.0, end: 40.0).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut
+    ))..addListener(() {
+      setState(() {
+        
+      });
+    });
+
+    _controller.forward();
   }
 
   @override
@@ -31,9 +43,19 @@ class _RefreshLoadingState extends State<RefreshLoading>
             top: 40.0,
             child: ScaleTransition(
               scale: CurvedAnimation(
-                  parent: _controller, curve: Curves.fastOutSlowIn),
+                  parent: _controller, curve: Curves.fastOutSlowIn, reverseCurve: Curves.easeOut),
               child: RefreshProgressIndicator(),
             )),
+            // child: Container(
+            //   width: animation.value,
+            //   height: animation.value,
+            //   decoration: BoxDecoration(
+            //     // color: Colors.red,
+            //     shape: BoxShape.circle
+            //   ),
+            //   child: RefreshProgressIndicator(),
+            // ),
+        // )
       ],
     );
   }

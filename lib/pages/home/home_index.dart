@@ -14,6 +14,10 @@ class _HomeIndexState extends State<HomeIndex>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   TabController tabController;
   bool hasLoadRecomment = false;
+  int start_time;
+
+  final GlobalKey<RefreshIndicatorState> refreshKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -24,7 +28,18 @@ class _HomeIndexState extends State<HomeIndex>
     tabController = TabController(vsync: this, initialIndex: 1, length: 9);
     tabController.addListener(_tabControllerListener);
     print('初始化推荐页面');
-    _getRecommentList();
+    // _getRecommentList();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    new Future.delayed(const Duration(seconds: 0), () {
+      print('------------------ showRefreshLoading ------------------');
+      start_time = DateTime.now().millisecondsSinceEpoch;
+      refreshKey.currentState.show().then((e) {});
+      // return true;
+    });
   }
 
   // 监听tabBar的切换
@@ -32,14 +47,16 @@ class _HomeIndexState extends State<HomeIndex>
     print('当前tabIndex ${tabController.index}');
   }
 
-  _getRecommentList() async {
-    Future.delayed(Duration(milliseconds: 2000)).then((res1) async {
-      await Api.getRecommentList().then((res) {
-        print(res);
-        setState(() {
-          hasLoadRecomment = true;
-        });
+  Future<void> _getRecommentList() async {
+
+    Future.delayed(Duration(milliseconds: 500)).then((res1) async {
+      var data = await Api.getRecommentList();
+      print('RefreshIndicator显示的时间 ${DateTime.now().millisecondsSinceEpoch - start_time}');
+      print(data);
+      setState(() {
+        hasLoadRecomment = true;
       });
+      
     });
   }
 
@@ -131,27 +148,38 @@ class _HomeIndexState extends State<HomeIndex>
             '这是推荐的TabBarItem',
             style: TextStyle(color: Colors.green),
           ) : */
-          Container(
-            color: Colors.green,
-            child: hasLoadRecomment
-                ? ListView.builder(
-                    itemCount: 1000,
-                    itemBuilder: (context, index) => Text(
-                          '这是排行的TabBarItem $index',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                  )
-                : Stack(
-                    alignment: AlignmentDirectional.topCenter,
-                    children: <Widget>[
-                      Positioned(top: 40.0, child: SpinKitWave(color: Colors.white, duration: const Duration(milliseconds: 1000),)),
-                      // child: ScaleTransition(
-                      //   // scale: ,
-                      //   child: RefreshProgressIndicator(),
-                      // )),
-                    ],
+          RefreshIndicator(
+            key: refreshKey,
+            onRefresh: _getRecommentList,
+            child: hasLoadRecomment ? ListView.builder(
+              itemCount: 1000,
+              itemBuilder: (context, index) => Text(
+                    '这是排行的TabBarItem $index',
+                    style: TextStyle(color: Colors.red),
                   ),
+            ) : Container(),
           ),
+          // Container(
+          //   color: Colors.green,
+          //   child: hasLoadRecomment
+          //       ? ListView.builder(
+          //           itemCount: 1000,
+          //           itemBuilder: (context, index) => Text(
+          //                 '这是排行的TabBarItem $index',
+          //                 style: TextStyle(color: Colors.white),
+          //               ),
+          //         )
+          //       : RefreshLoading() /*  Stack(
+          //           alignment: AlignmentDirectional.topCenter,
+          //           children: <Widget>[
+          //             Positioned(top: 40.0, child: SpinKitWave(color: Colors.white, duration: const Duration(milliseconds: 1000),)),
+          //             // child: ScaleTransition(
+          //             //   // scale: ,
+          //             //   child: RefreshProgressIndicator(),
+          //             // )),
+          //           ],
+          //         ) */,
+          // ),
           Text(
             '这是日更的TabBarItem',
             style: TextStyle(color: Colors.blue),
