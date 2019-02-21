@@ -1,4 +1,6 @@
 import './http.dart';
+import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 
 class Api {
   /// 获取首页的推荐推荐列表数据

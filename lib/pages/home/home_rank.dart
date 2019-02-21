@@ -51,16 +51,11 @@ class _HomeRankState extends State<HomeRank>
   }
 
   Future<void> handleRefrsh() async {
-    var response = await _getRankList();
-    print(response);
-  }
-
-  _getRankList() async {
     var response = await Api.getRankList();
+    print(response);
     setState(() {
       isLoading = false;
     });
-    return response;
   }
 
   @override
@@ -69,13 +64,9 @@ class _HomeRankState extends State<HomeRank>
     print('build Rank ..................');
     if (isFirstShow) {
       return Container(
-        // color: Colors.red,
+        color: Colors.red,
       );
     }
-    // return isLoading ? RefreshLoading() : Container(
-    //   child: Text(
-    //       '排行11111111111111111111111111111111111111111111111111111111111111111'),
-    // );
 
     return RefreshIndicator(
       key: refreshIndicatorKey,
