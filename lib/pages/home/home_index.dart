@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+import './home_rank.dart';
+import './home_recommend.dart';
+
 import 'package:flutter_manhuatai/components/refresh_loading.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 
@@ -14,7 +19,6 @@ class _HomeIndexState extends State<HomeIndex>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   TabController tabController;
   bool hasLoadRecomment = false;
-  int start_time;
 
   final GlobalKey<RefreshIndicatorState> refreshKey =
       GlobalKey<RefreshIndicatorState>();
@@ -25,40 +29,47 @@ class _HomeIndexState extends State<HomeIndex>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(vsync: this, initialIndex: 1, length: 9);
+    tabController = TabController(vsync: this, initialIndex: 1, length: 2);
     tabController.addListener(_tabControllerListener);
-    print('初始化推荐页面');
     // _getRecommentList();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    new Future.delayed(const Duration(seconds: 0), () {
-      print('------------------ showRefreshLoading ------------------');
-      start_time = DateTime.now().millisecondsSinceEpoch;
-      refreshKey.currentState.show().then((e) {});
-      // return true;
-    });
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   new Future.delayed(const Duration(seconds: 0), () {
+  //     print('------------------ showRefreshLoading ------------------');
+  //     start_time = DateTime.now().millisecondsSinceEpoch;
+  //     refreshKey.currentState.show().then((e) {});
+  //     // return true;
+  //   });
+  //   print('afterrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
+  // }
 
   // 监听tabBar的切换
   _tabControllerListener() {
     print('当前tabIndex ${tabController.index}');
-  }
-
-  Future<void> _getRecommentList() async {
-
-    Future.delayed(Duration(milliseconds: 500)).then((res1) async {
-      var data = await Api.getRecommentList();
-      print('RefreshIndicator显示的时间 ${DateTime.now().millisecondsSinceEpoch - start_time}');
-      print(data);
+    // print(tabController.previousIndex);
+    if (tabController.index != tabController.previousIndex) {
       setState(() {
-        hasLoadRecomment = true;
+        // _currentIndex = '排行';
       });
-      
-    });
+    }
   }
+
+  // Future<void> _getRecommentList() async {
+
+  //   var data = await Api.getRecommentList();
+  //   print('RefreshIndicator显示的时间 ${DateTime.now().millisecondsSinceEpoch - start_time}');
+  //   print(data);
+  //   setState(() {
+  //     hasLoadRecomment = true;
+  //   });
+
+    // Future.delayed(Duration(milliseconds: 0)).then((res1) async {
+      
+    // });
+  // }
 
   @override
   void dispose() {
@@ -90,8 +101,8 @@ class _HomeIndexState extends State<HomeIndex>
                 controller: tabController,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 12.5),
                 labelStyle: TextStyle(fontSize: 16.0),
-                indicatorSize: TabBarIndicatorSize.label,
-                isScrollable: true,
+                // indicatorSize: TabBarIndicatorSize.label,
+                // isScrollable: true,
                 tabs: <Widget>[
                   Tab(
                     child: Text('排行'),
@@ -99,27 +110,27 @@ class _HomeIndexState extends State<HomeIndex>
                   Tab(
                     child: Text('推荐'),
                   ),
-                  Tab(
-                    child: Text('日更'),
-                  ),
-                  Tab(
-                    child: Text('后宫'),
-                  ),
-                  Tab(
-                    child: Text('萝莉'),
-                  ),
-                  Tab(
-                    child: Text('玄幻'),
-                  ),
-                  Tab(
-                    child: Text('漫改'),
-                  ),
-                  Tab(
-                    child: Text('社会'),
-                  ),
-                  Tab(
-                    child: Text('生活'),
-                  ),
+                  // Tab(
+                  //   child: Text('日更'),
+                  // ),
+                  // Tab(
+                  //   child: Text('后宫'),
+                  // ),
+                  // Tab(
+                  //   child: Text('萝莉'),
+                  // ),
+                  // Tab(
+                  //   child: Text('玄幻'),
+                  // ),
+                  // Tab(
+                  //   child: Text('漫改'),
+                  // ),
+                  // Tab(
+                  //   child: Text('社会'),
+                  // ),
+                  // Tab(
+                  //   child: Text('生活'),
+                  // ),
                 ],
               ),
             ),
@@ -129,86 +140,15 @@ class _HomeIndexState extends State<HomeIndex>
       body: TabBarView(
         controller: tabController,
         children: <Widget>[
-          RefreshIndicator(
-            onRefresh: () async {
-              return Future.delayed(const Duration(milliseconds: 2000))
-                  .then((res) {
-                print('下拉刷新成功');
-              });
-            },
-            child: ListView.builder(
-              itemCount: 1000,
-              itemBuilder: (context, index) => Text(
-                    '这是排行的TabBarItem $index',
-                    style: TextStyle(color: Colors.red),
-                  ),
-            ),
-          ),
-          /* hasLoadRecomment ? Text(
-            '这是推荐的TabBarItem',
-            style: TextStyle(color: Colors.green),
-          ) : */
-          RefreshIndicator(
-            key: refreshKey,
-            onRefresh: _getRecommentList,
-            child: hasLoadRecomment ? ListView.builder(
-              itemCount: 1000,
-              itemBuilder: (context, index) => Text(
-                    '这是排行的TabBarItem $index',
-                    style: TextStyle(color: Colors.red),
-                  ),
-            ) : Container(),
-          ),
-          // Container(
-          //   color: Colors.green,
-          //   child: hasLoadRecomment
-          //       ? ListView.builder(
-          //           itemCount: 1000,
-          //           itemBuilder: (context, index) => Text(
-          //                 '这是排行的TabBarItem $index',
-          //                 style: TextStyle(color: Colors.white),
-          //               ),
-          //         )
-          //       : RefreshLoading() /*  Stack(
-          //           alignment: AlignmentDirectional.topCenter,
-          //           children: <Widget>[
-          //             Positioned(top: 40.0, child: SpinKitWave(color: Colors.white, duration: const Duration(milliseconds: 1000),)),
-          //             // child: ScaleTransition(
-          //             //   // scale: ,
-          //             //   child: RefreshProgressIndicator(),
-          //             // )),
-          //           ],
-          //         ) */,
-          // ),
-          Text(
-            '这是日更的TabBarItem',
-            style: TextStyle(color: Colors.blue),
-          ),
-          Text(
-            '这是后宫的TabBarItem',
-            style: TextStyle(color: Colors.cyan),
-          ),
-          Text(
-            '这是萝莉的TabBarItem',
-            style: TextStyle(color: Colors.pink),
-          ),
-          Text(
-            '这是玄幻的TabBarItem',
-            style: TextStyle(color: Colors.purple),
-          ),
-          Text(
-            '这是漫改的TabBarItem',
-            style: TextStyle(color: Colors.orange),
-          ),
-          Text(
-            '这是社会的TabBarItem',
-            style: TextStyle(color: Colors.black),
-          ),
-          Text(
-            '这是生活的TabBarItem',
-            style: TextStyle(color: Colors.yellow),
-          ),
+          HomeRank(),
+          HomeRecommend()
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Text('Test'),
+        onPressed: () {
+          Application.router.navigateTo(context, '/test', transition: TransitionType.inFromRight);
+        },
       ),
     );
   }
