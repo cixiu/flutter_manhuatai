@@ -190,13 +190,13 @@ class Comic_info extends Object {
   String comicName;
 
   @JsonKey(name: 'total_view_num')
-  String totalViewNum;
+  dynamic totalViewNum; // total_view_num 可能是int 或者 String
 
   @JsonKey(name: 'update_time')
   String updateTime;
 
   @JsonKey(name: 'score')
-  String score;
+  dynamic score; // score 可能是int 或者 String
 
   @JsonKey(name: 'url')
   String url;
