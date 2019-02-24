@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 /// http请求
 class HttpRequest {
   static Dio dio = Dio(BaseOptions(
-    connectTimeout: 10000,
-    receiveTimeout: 10000,
+    connectTimeout: 30000,
+    receiveTimeout: 30000,
   ))
     ..interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions request) {
       print('正在 request');

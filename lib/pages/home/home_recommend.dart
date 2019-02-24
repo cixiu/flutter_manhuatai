@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper.dart';
-import 'package:flutter_manhuatai/common/refresh_common_state.dart';
+import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/common/const/app_const.dart';
 
 class HomeRecommend extends StatefulWidget {
   // final int currentIndex;
@@ -57,18 +59,11 @@ class _HomeRecommendState extends State<HomeRecommend>
     return bannerList.take(6).map((item) {
       return Column(
         children: <Widget>[
-          ClipOval(
-            child: ImageWrapper(
-              width: 33.0,
-              height: 33.0,
-              url: 'https://image.samanlehua.com/3/${item.imgUrl}',
-            )
-          ),
-
           ImageWrapper(
             width: MediaQuery.of(context).size.width,
             height: 220.0,
-            url: 'https://image.samanlehua.com/${item.imgUrl}',
+            url:
+                '${AppConst.img_host}/${item.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
           ),
 
           // Image.network('https://image.samanlehua.com/${item.imgUrl}', height: 200.0, color: Colors.grey,),
@@ -89,11 +84,66 @@ class _HomeRecommendState extends State<HomeRecommend>
             ? Container()
             : ListView(
                 children: <Widget>[
+                  SizedBox(
+                    height: 236.0,
+                    child: Swiper(
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        return Column(
+                          children: <Widget>[
+                            ImageWrapper(
+                              url:
+                                  '${AppConst.img_host}/${this.recommendList.data.book[0].comicInfo[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
+                              width: MediaQuery.of(context).size.width,
+                              height:
+                                  236.0 - 36.0,
+                              fit: BoxFit.fill,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(this
+                                        .recommendList
+                                        .data
+                                        .book[0]
+                                        .comicInfo[index]
+                                        .comicName),
+                                    Text(this
+                                        .recommendList
+                                        .data
+                                        .book[0]
+                                        .comicInfo[index]
+                                        .lastComicChapterName,
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.grey[500],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                      // itemWidth: MediaQuery.of(context).size.width,
+                      itemHeight: 236.0,
+                      pagination: SwiperPagination(
+                          margin: const EdgeInsets.only(bottom: 46.0)),
+                      // controller: SwiperController(),
+                      autoplay: true,
+                    ),
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:
                         buildItem(this.recommendList.data.book[0].comicInfo),
-                  ),
+                  )
                 ],
               ));
   }

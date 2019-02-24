@@ -6,8 +6,9 @@ class ImageWrapper extends StatelessWidget {
   final double height;
   final String url;
   final BoxFit fit;
+  final Duration fadeInDuration;
 
-  ImageWrapper({this.width, this.height, this.url, this.fit = BoxFit.cover});
+  ImageWrapper({this.width, this.height, this.url, this.fit = BoxFit.cover, this.fadeInDuration = const Duration(milliseconds: 500)});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class ImageWrapper extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        fadeInDuration: fadeInDuration
       ),
     );
   }

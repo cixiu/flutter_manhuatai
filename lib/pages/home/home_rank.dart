@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import 'package:flutter_manhuatai/components/refresh_loading.dart';
-
-import 'package:flutter_manhuatai/common/refresh_common_state.dart';
+import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 
