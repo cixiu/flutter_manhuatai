@@ -13,6 +13,8 @@ class ImageWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // width: MediaQuery.of(context).size.width,
+      // height: height,
       child: CachedNetworkImage(
         // placeholder: (context, url) => Icon(Icons.toys),
         imageUrl: url,

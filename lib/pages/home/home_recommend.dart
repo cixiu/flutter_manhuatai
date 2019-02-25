@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
-import 'package:flutter_manhuatai/components/image_wrapper.dart';
+import 'package:flutter_manhuatai/components/banner_swipper/banner_swipper.dart';
+import 'package:flutter_manhuatai/components/book_item/book_item.dart';
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
@@ -49,28 +51,42 @@ class _HomeRecommendState extends State<HomeRecommend>
 
   Future<void> handleRefrsh() async {
     Map<String, dynamic> data = await Api.getRecommentList();
+    recommendList = RecommendList.RecommendList.fromJson(data);
+    recommendList.data.book.removeWhere((item) {
+      // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
+      return item.bookId == 5035 ||
+          item.bookId == 4938 ||
+          item.bookId == 5072 ||
+          item.bookId == 3743;
+    });
+
     setState(() {
-      recommendList = RecommendList.RecommendList.fromJson(data);
+      recommendList = recommendList;
       isLoading = false;
     });
+    // print(recommendList.data.book[1].title);
   }
 
-  List<Widget> buildItem(List<RecommendList.Comic_info> bannerList) {
-    return bannerList.take(6).map((item) {
-      return Column(
-        children: <Widget>[
-          ImageWrapper(
-            width: MediaQuery.of(context).size.width,
-            height: 220.0,
-            url:
-                '${AppConst.img_host}/${item.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
-          ),
-
-          // Image.network('https://image.samanlehua.com/${item.imgUrl}', height: 200.0, color: Colors.grey,),
-          Text('${item.comicName}'),
-        ],
-      );
+  List<Widget> buildItem(List<RecommendList.Book> bookList) {
+    return bookList.map((item) {
+      return BookItem(book: item,);
     }).toList();
+    // return bannerList.take(6).map((item) {
+    //   return Column(
+    //     children: <Widget>[
+    //       Text(),
+    //       ImageWrapper(
+    //         width: MediaQuery.of(context).size.width,
+    //         height: 220.0,
+    //         url:
+    //             '${AppConst.img_host}/${item.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
+    //       ),
+
+    //       // Image.network('https://image.samanlehua.com/${item.imgUrl}', height: 200.0, color: Colors.grey,),
+    //       Text('${item.comicName}'),
+    //     ],
+    //   );
+    // }).toList();
   }
 
   @override
@@ -84,65 +100,19 @@ class _HomeRecommendState extends State<HomeRecommend>
             ? Container()
             : ListView(
                 children: <Widget>[
-                  SizedBox(
-                    height: 236.0,
-                    child: Swiper(
-                      itemCount: 6,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: <Widget>[
-                            ImageWrapper(
-                              url:
-                                  '${AppConst.img_host}/${this.recommendList.data.book[0].comicInfo[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
-                              width: MediaQuery.of(context).size.width,
-                              height:
-                                  236.0 - 36.0,
-                              fit: BoxFit.fill,
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(this
-                                        .recommendList
-                                        .data
-                                        .book[0]
-                                        .comicInfo[index]
-                                        .comicName),
-                                    Text(this
-                                        .recommendList
-                                        .data
-                                        .book[0]
-                                        .comicInfo[index]
-                                        .lastComicChapterName,
-                                      style: TextStyle(
-                                        fontSize: 12.0,
-                                        color: Colors.grey[500],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        );
-                      },
-                      // itemWidth: MediaQuery.of(context).size.width,
-                      itemHeight: 236.0,
-                      pagination: SwiperPagination(
-                          margin: const EdgeInsets.only(bottom: 46.0)),
-                      // controller: SwiperController(),
-                      autoplay: true,
-                    ),
+                  BannerSwipper(
+                    bannerList: this
+                        .recommendList
+                        .data
+                        .book[0]
+                        .comicInfo
+                        .take(6)
+                        .toList(),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:
-                        buildItem(this.recommendList.data.book[0].comicInfo),
+                        buildItem(this.recommendList.data.book.getRange(1, this.recommendList.data.book.length).toList()),
                   )
                 ],
               ));

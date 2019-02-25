@@ -3,7 +3,7 @@ import 'dart:io';
 class AppConst {
   static const img_host = 'https://image.mhxk.com';
 
-  // ios使用jpg格式图片
+  // ios使用jpg格式图片 android使用webp格式图片
   static ImageSizeSuffix imageSizeSuffix = ImageSizeSuffix.fromJson({
     "h1x1": Platform.isIOS ? "-600x600.jpg" : "-600x600.jpg.webp",
     "m1x1": Platform.isIOS ? "-480x480.jpg" : "-480x480.jpg",

@@ -6,7 +6,7 @@ import 'package:flutter_manhuatai/pages/manhuatai/manhuatai.dart';
 import 'package:flutter_manhuatai/pages/bookshelf/bookshelf.dart';
 import 'package:flutter_manhuatai/pages/mine/mine.dart';
 
-import 'package:flutter_manhuatai/components/bottom_navigation.dart';
+import 'package:flutter_manhuatai/components/bottom_navigation/bottom_navigation.dart';
 
 class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
@@ -17,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   PageController _controller = PageController(initialPage: 0);
 
   @override
-  void dispose() { 
+  void dispose() {
     super.dispose();
     _controller.dispose();
   }
