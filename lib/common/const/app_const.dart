@@ -4,7 +4,10 @@ class AppConst {
   static const img_host = 'https://image.mhxk.com';
 
   // ios使用jpg格式图片 android使用webp格式图片
-  static ImageSizeSuffix imageSizeSuffix = ImageSizeSuffix.fromJson({
+  static ImageSizeSuffix imageSizeSuffix =
+      ImageSizeSuffix.fromJson(imageSizeSuffixMap);
+
+  static Map<String, String> imageSizeSuffixMap = {
     "h1x1": Platform.isIOS ? "-600x600.jpg" : "-600x600.jpg.webp",
     "m1x1": Platform.isIOS ? "-480x480.jpg" : "-480x480.jpg",
     "l1x1": Platform.isIOS ? "-300x300.jpg" : "-300x300.jpg",
@@ -25,7 +28,7 @@ class AppConst {
     "l16x9": Platform.isIOS ? "-400x225.jpg" : "-400x225.jpg",
     "head": Platform.isIOS ? "-100x100.webp" : "-100x100.jpg",
     "default": Platform.isIOS ? "-noresize" : "-noresize.webp",
-  });
+  };
 
   // android使用webp格式图片
   // static ImageSizeSuffix imageSizeWebp = ImageSizeSuffix.fromJson({

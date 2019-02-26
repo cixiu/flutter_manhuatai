@@ -24,7 +24,8 @@ class _HomeRecommendState extends State<HomeRecommend>
         RefreshCommonState,
         WidgetsBindingObserver {
   bool isLoading = true;
-  RecommendList.RecommendList recommendList;
+  RecommendList.RecommendList _recommendList;
+  List<RecommendList.Comic_info> _bannerList;
 
   @override
   bool get wantKeepAlive => true;
@@ -51,7 +52,14 @@ class _HomeRecommendState extends State<HomeRecommend>
 
   Future<void> handleRefrsh() async {
     Map<String, dynamic> data = await Api.getRecommentList();
-    recommendList = RecommendList.RecommendList.fromJson(data);
+    RecommendList.RecommendList recommendList =
+        RecommendList.RecommendList.fromJson(data);
+    // bookId == 7414 代表bannerList
+    List<RecommendList.Comic_info> bannerList =
+        recommendList.data.book[0].bookId == 7414
+            ? recommendList.data.book[0].comicInfo.take(6).toList()
+            : [];
+
     recommendList.data.book.removeWhere((item) {
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
       return item.bookId == 5035 ||
@@ -59,34 +67,24 @@ class _HomeRecommendState extends State<HomeRecommend>
           item.bookId == 5072 ||
           item.bookId == 3743;
     });
-
     setState(() {
-      recommendList = recommendList;
+      _recommendList = recommendList;
+      _bannerList = bannerList;
       isLoading = false;
     });
-    // print(recommendList.data.book[1].title);
   }
 
-  List<Widget> buildItem(List<RecommendList.Book> bookList) {
-    return bookList.map((item) {
-      return BookItem(book: item,);
-    }).toList();
-    // return bannerList.take(6).map((item) {
-    //   return Column(
-    //     children: <Widget>[
-    //       Text(),
-    //       ImageWrapper(
-    //         width: MediaQuery.of(context).size.width,
-    //         height: 220.0,
-    //         url:
-    //             '${AppConst.img_host}/${item.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
-    //       ),
+  List<Widget> buildBookItem() {
+    int start = _bannerList.length != 0 ? 1 : 0;
+    int lenth = _recommendList.data.book.length;
+    List<RecommendList.Book> bookList =
+        _recommendList.data.book.getRange(start, lenth).toList();
 
-    //       // Image.network('https://image.samanlehua.com/${item.imgUrl}', height: 200.0, color: Colors.grey,),
-    //       Text('${item.comicName}'),
-    //     ],
-    //   );
-    // }).toList();
+    return bookList.map((item) {
+      return BookItem(
+        book: item,
+      );
+    }).toList();
   }
 
   @override
@@ -100,19 +98,14 @@ class _HomeRecommendState extends State<HomeRecommend>
             ? Container()
             : ListView(
                 children: <Widget>[
-                  BannerSwipper(
-                    bannerList: this
-                        .recommendList
-                        .data
-                        .book[0]
-                        .comicInfo
-                        .take(6)
-                        .toList(),
-                  ),
+                  this._bannerList.length != 0
+                      ? BannerSwipper(
+                          bannerList: this._bannerList,
+                        )
+                      : Container(),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        buildItem(this.recommendList.data.book.getRange(1, this.recommendList.data.book.length).toList()),
+                    children: buildBookItem(),
                   )
                 ],
               ));

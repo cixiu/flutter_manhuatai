@@ -12,9 +12,25 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   PageController _controller = PageController(initialPage: 0);
+  List<Widget> pages = List();
+
+  // @override
+  // bool get wantKeepAlive => true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    pages
+      ..add(HomeIndex())
+      ..add(HomeUpdate())
+      ..add(HomeManhuatai())
+      ..add(HomeBookshelf())
+      ..add(HomeMine());
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -37,13 +53,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       // ),
       body: PageView(
         controller: _controller,
-        children: <Widget>[
-          HomeIndex(),
-          HomeUpdate(),
-          HomeManhuatai(),
-          HomeBookshelf(),
-          HomeMine(),
-        ],
+        children: pages,
         physics: NeverScrollableScrollPhysics(),
       ),
       bottomNavigationBar: BottomNavigation(
