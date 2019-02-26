@@ -18,6 +18,75 @@ class BookItemDisplay61 extends StatelessWidget {
       this.horizontalPadding = 20.0})
       : super(key: key);
 
+  List<Widget> buildListWidget(BuildContext context, RecommendList.Book book,
+      {double width, double horizonratio, double spacing}) {
+    List<Widget> _listChildren = [];
+    String customHorizonratio;
+    double height;
+    // 盒子的 width, 去除了左右 padding
+    double boxWidth = MediaQuery.of(context).size.width - horizontalPadding;
+    int len = this.count != null ? count : this.book.comicInfo.length;
+
+    for (int i = 0; i < len; i++) {
+      // 占11份中的8份 -- 通过计算得来
+      if (i == 0 || i == 3) {
+        width = (boxWidth - spacing) * (8 / 11);
+        height = width / 2;
+        customHorizonratio = '2:1';
+      }
+      // 占11份中的3份 -- 通过计算得来
+      if (i == 1 || i == 2) {
+        width = (boxWidth - spacing) * (3 / 11);
+        height = width * (4 / 3);
+        customHorizonratio = '3:4';
+      }
+
+      RecommendList.Comic_info item = book.comicInfo[i];
+      String imgUrl = Utils.formatBookImgUrl(
+          comicInfo: item,
+          config: book.config,
+          customHorizonratio: customHorizonratio);
+
+      Widget child = Container(
+        width: width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ImageWrapper(
+                url: imgUrl, width: width, height: height, fit: BoxFit.fill),
+            Container(
+              width: width,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: i.isEven
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      item.comicName,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    book.config.isshowdetail != 0
+                        ? Text(
+                            item.content,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.grey, fontSize: 10.0),
+                          )
+                        : Text(''),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      _listChildren.add(child);
+    }
+
+    return _listChildren;
+  }
+
   @override
   Widget build(BuildContext context) {
     double horizonratio = Utils.computedRatio(book.config.horizonratio);
@@ -32,31 +101,8 @@ class BookItemDisplay61 extends StatelessWidget {
     return Wrap(
       runSpacing: 10.0,
       spacing: spacing,
-      children: book.comicInfo.take(this.count).map((item) {
-        print(Utils.formatBookImgUrl(comicInfo: item, config: book.config, useDefalut: true));
-        return Container(
-            width: width,
-            child: Column(
-              children: <Widget>[
-                ImageWrapper(
-                    url: Utils.formatBookImgUrl(
-                        comicInfo: item, config: book.config, useDefalut: true),
-                    width: width,
-                    height: width / horizonratio,
-                    fit: BoxFit.fitWidth),
-                Container(
-                  width: width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item.comicName,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
-              ],
-            ));
-      }).toList(),
+      children: buildListWidget(context, book,
+          width: width, horizonratio: horizonratio, spacing: spacing),
     );
   }
 }
