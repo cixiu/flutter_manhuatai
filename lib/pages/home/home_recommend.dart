@@ -56,7 +56,8 @@ class _HomeRecommendState extends State<HomeRecommend>
         RecommendList.RecommendList.fromJson(data);
     // bookId == 7414 代表bannerList
     List<RecommendList.Comic_info> bannerList =
-        recommendList.data.book[0].bookId == 7414
+        recommendList.data.book[0].bookId == 7529 ||
+                recommendList.data.book[0].bookId == 7414
             ? recommendList.data.book[0].comicInfo.take(6).toList()
             : [];
 

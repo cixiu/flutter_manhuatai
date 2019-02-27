@@ -38,7 +38,7 @@ class _BookItemState extends State<BookItem> {
   @override
   Widget build(BuildContext context) {
     double horizonratio = Utils.computedRatio(widget.book.config.horizonratio);
-    print('${widget.book.title} ${horizonratio}');
+    print('${widget.book.title} $horizonratio');
 
     return Column(
       children: <Widget>[

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_manhuatai/components/rank/rank_all.dart';
+
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 
 class HomeRank extends StatefulWidget {
-  // final int currentIndex;
-
-  // HomeRank(this.currentIndex);
 
   _HomeRankState createState() => _HomeRankState();
 }
@@ -68,12 +67,14 @@ class _HomeRankState extends State<HomeRank>
     return RefreshIndicator(
       key: refreshIndicatorKey,
       onRefresh: handleRefrsh,
-      child: isLoading ? Container() : ListView.builder(
-        itemCount: 1000,
-        itemBuilder: (context, index) {
-          return Text('这是第 $index 个item');
-        },
-      ),
+      child: isLoading
+          ? Container()
+          : ListView.builder(
+              itemCount: 1,
+              itemBuilder: (context, index) {
+                return RankAll();
+              },
+            ),
     );
   }
 }
