@@ -1,13 +1,20 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_manhuatai/components/rank/rank_all.dart';
+import 'package:flutter_manhuatai/components/rank/rank_self.dart';
+import 'package:flutter_manhuatai/components/rank/rank_new.dart';
+import 'package:flutter_manhuatai/components/rank/rank_dark.dart';
+import 'package:flutter_manhuatai/components/rank/rank_charge.dart';
+import 'package:flutter_manhuatai/components/rank/rank_boy.dart';
+import 'package:flutter_manhuatai/components/rank/rank_girl.dart';
 
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 
 class HomeRank extends StatefulWidget {
-
   _HomeRankState createState() => _HomeRankState();
 }
 
@@ -15,7 +22,7 @@ class _HomeRankState extends State<HomeRank>
     with AutomaticKeepAliveClientMixin, RefreshCommonState<HomeRank> {
   bool isFirstShow = true;
   bool isLoading = true;
-  String title = '排行页';
+  List<RankList.Data> rankList;
 
   @override
   bool get wantKeepAlive => true;
@@ -48,9 +55,11 @@ class _HomeRankState extends State<HomeRank>
 
   Future<void> handleRefrsh() async {
     var response = await Api.getRankList();
-    print(response);
+    RankList.RankList rankData = RankList.RankList.fromJson(response);
+    print(rankData.data);
     setState(() {
       isLoading = false;
+      rankList = rankData.data;
     });
   }
 
@@ -59,9 +68,37 @@ class _HomeRankState extends State<HomeRank>
     super.build(context);
     print('build Rank ..................');
     if (isFirstShow) {
-      return Container(
-        color: Colors.red,
-      );
+      return Container();
+    }
+
+    Widget itemBuilder(BuildContext context, int index) {
+      var data = rankList[index];
+      // TODO:使用switch
+      // switch (data.type) {
+      //   case '':
+
+      //     break;
+      //   default:
+      // }
+      if (index == 1) {
+        return RankSelf(
+          data: data,
+        );
+      } else if (index == 2) {
+        return RankNew(data: data);
+      } else if (index == 3) {
+        return RankDark(data: data);
+      } else if (index == 4) {
+        return RankCharge(data: data);
+      } else if (index == 5) {
+        return RankBoy(data: data);
+      } else if (index == 6) {
+        return RankGirl(data: data);
+      } else {
+        return RankAll(
+          data: data,
+        );
+      }
     }
 
     return RefreshIndicator(
@@ -70,10 +107,8 @@ class _HomeRankState extends State<HomeRank>
       child: isLoading
           ? Container()
           : ListView.builder(
-              itemCount: 1,
-              itemBuilder: (context, index) {
-                return RankAll();
-              },
+              itemCount: rankList.length,
+              itemBuilder: itemBuilder,
             ),
     );
   }

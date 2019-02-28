@@ -8,7 +8,7 @@ class ImageWrapper extends StatelessWidget {
   final BoxFit fit;
   final Duration fadeInDuration;
 
-  ImageWrapper({this.width, this.height, this.url, this.fit = BoxFit.cover, this.fadeInDuration = const Duration(milliseconds: 500)});
+  ImageWrapper({this.width, this.height, @required this.url, this.fit = BoxFit.cover, this.fadeInDuration = const Duration(milliseconds: 500)});
 
   @override
   Widget build(BuildContext context) {

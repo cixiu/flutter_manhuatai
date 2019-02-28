@@ -4,14 +4,14 @@ import 'rank_item_img.dart';
 import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 import 'package:flutter_manhuatai/utils/utils.dart';
 
-// 排行榜 - 综合榜
-class RankAll extends StatelessWidget {
+// 排行榜 - 黑马榜
+class RankDark extends StatelessWidget {
   final RankList.Data data;
   final int _count = 5;
   final double _spacing = 10.0;
   final double _horizontalPadding = 20.0;
 
-  RankAll({Key key, @required this.data}) : super(key: key);
+  RankDark({Key key, @required this.data}) : super(key: key);
 
   List<Widget> buildListWidget(
     BuildContext context,
@@ -24,22 +24,13 @@ class RankAll extends StatelessWidget {
     // 计算宽高
     for (int i = 0; i < _count; i++) {
       String aspectRatio = '3:4';
-      // i = 0 ~ 2的宽高比是3:4
-      if (i == 0) {
-        width = (boxWidth - 2 * _spacing) * 0.38;
-        height = width / (3 / 4);
-      }
-
-      if (i == 1 || i == 2) {
-        width = (boxWidth - 2 * _spacing) * 0.31;
-        height = width / (3 / 4);
-      }
-
-      // 索引大于3后的漫画，每行排2个
-      if (i >= 3) {
-        width = (boxWidth - 10.0) / 2;
+      if (i < 2) {
+        width = (boxWidth - 1 * _spacing) / 2;
         height = width / 2;
         aspectRatio = '2:1';
+      } else {
+        width = (boxWidth - 2 * _spacing) / 3;
+        height = width;
       }
 
       RankList.ListSub item = data.list[i];
@@ -56,8 +47,7 @@ class RankAll extends StatelessWidget {
 
       _listChildren.add(child);
     }
-    // 将索引为 0 和 1 的Widget对换位置
-    _listChildren.insert(1, _listChildren.removeAt(0));
+
     return _listChildren;
   }
 

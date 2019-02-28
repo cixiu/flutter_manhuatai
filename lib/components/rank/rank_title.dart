@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class RankTitle extends StatelessWidget {
   final String type;
-  final String title;
+  final String name;
 
   final Map<String, String> titleImg = {
     'all': 'lib/images/icon_comicrank_zhb28.png',
@@ -17,7 +17,7 @@ class RankTitle extends StatelessWidget {
     'free': 'lib/images/icon_comicrank_mfb28.png',
   };
 
-  RankTitle({Key key, @required this.type, @required this.title})
+  RankTitle({Key key, @required this.type, @required this.name})
       : super(key: key);
 
   @override
@@ -37,7 +37,7 @@ class RankTitle extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(left: 8.0),
                 child: Text(
-                  title,
+                  name,
                   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 ),
               )
