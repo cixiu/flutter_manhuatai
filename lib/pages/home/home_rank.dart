@@ -8,6 +8,9 @@ import 'package:flutter_manhuatai/components/rank/rank_dark.dart';
 import 'package:flutter_manhuatai/components/rank/rank_charge.dart';
 import 'package:flutter_manhuatai/components/rank/rank_boy.dart';
 import 'package:flutter_manhuatai/components/rank/rank_girl.dart';
+import 'package:flutter_manhuatai/components/rank/rank_serialize.dart';
+import 'package:flutter_manhuatai/components/rank/rank_finish.dart';
+import 'package:flutter_manhuatai/components/rank/rank_free.dart';
 
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
@@ -73,31 +76,30 @@ class _HomeRankState extends State<HomeRank>
 
     Widget itemBuilder(BuildContext context, int index) {
       var data = rankList[index];
-      // TODO:使用switch
-      // switch (data.type) {
-      //   case '':
+      var type = data.type;
 
-      //     break;
-      //   default:
-      // }
-      if (index == 1) {
-        return RankSelf(
-          data: data,
-        );
-      } else if (index == 2) {
+      if (type == 'all') {
+        return RankAll(data: data);
+      } else if (type == 'self') {
+        return RankSelf(data: data);
+      } else if (type == 'new') {
         return RankNew(data: data);
-      } else if (index == 3) {
+      } else if (type == 'dark') {
         return RankDark(data: data);
-      } else if (index == 4) {
+      } else if (type == 'charge') {
         return RankCharge(data: data);
-      } else if (index == 5) {
+      } else if (type == 'boy') {
         return RankBoy(data: data);
-      } else if (index == 6) {
+      } else if (type == 'girl') {
         return RankGirl(data: data);
+      } else if (type == 'serialize') {
+        return RankSerialize(data: data);
+      } else if (type == 'finish') {
+        return RankFinish(data: data);
+      } else if (type == 'free') {
+        return RankFree(data: data);
       } else {
-        return RankAll(
-          data: data,
-        );
+        return RankAll(data: data);
       }
     }
 

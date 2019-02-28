@@ -4,14 +4,14 @@ import 'rank_item_img.dart';
 import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 import 'package:flutter_manhuatai/utils/utils.dart';
 
-// 排行榜 - 少女榜
-class RankGirl extends StatelessWidget {
+// 排行榜 - 连载榜
+class RankSerialize extends StatelessWidget {
   final RankList.Data data;
-  final int _count = 5;
+  final int _count = 4;
   final double _spacing = 10.0;
   final double _horizontalPadding = 20.0;
 
-  RankGirl({Key key, @required this.data}) : super(key: key);
+  RankSerialize({Key key, @required this.data}) : super(key: key);
 
   List<Widget> buildListWidget(
     BuildContext context,
@@ -23,17 +23,10 @@ class RankGirl extends StatelessWidget {
 
     // 计算宽高
     for (int i = 0; i < _count; i++) {
-      String aspectRatio = '2:1';
+      String aspectRatio = '3:4';
 
-      if (i == 0) {
-        width = boxWidth - 1 * _spacing;
-        height = width / 2;
-      } else {
-        width = (boxWidth - 3 * _spacing) / 4;
-        height = width / (3 / 4);
-        aspectRatio = '3:4';
-
-      }
+      width = (boxWidth - 3 * _spacing) / 4;
+      height = width / (3 / 4);
 
       RankList.ListSub item = data.list[i];
       String imgUrl = Utils.generateImgUrlFromId(

@@ -4,7 +4,7 @@ import 'rank_item_img.dart';
 import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 import 'package:flutter_manhuatai/utils/utils.dart';
 
-// 排行榜 - 付费榜
+// 排行榜 - 少年榜
 class RankBoy extends StatelessWidget {
   final RankList.Data data;
   final int _count = 3;
