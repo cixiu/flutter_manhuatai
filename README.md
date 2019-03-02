@@ -17,3 +17,6 @@ flutter packages get
 # run project
 flutter run
 ```
+
+## Problems encountered
+1. [FloatingActionButton 的 heroTag 必须唯一， 或者为null](https://stackoverflow.com/questions/53265299/flutter-gridview-causes-navigator-push-error)

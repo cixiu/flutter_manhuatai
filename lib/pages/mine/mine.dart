@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluro/fluro.dart';
+
+import 'package:flutter_manhuatai/routes/application.dart';
 
 class HomeMine extends StatefulWidget {
   @override
@@ -24,77 +27,91 @@ class _HomeMineState extends State<HomeMine>
             overflow: Overflow.visible,
             children: <Widget>[
               Container(
-                color: Colors.blue,
-                child: Image.asset(
-                  'lib/images/star_home_bg.png',
-                ),
-              ),
-              Positioned(
-                bottom: -50.0,
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
-                  overflow: Overflow.visible,
+                child: Column(
                   children: <Widget>[
                     Container(
-                      width: 100.0,
-                      height: 100.0,
-                      padding: EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(100.0),
+                      color: Colors.blue,
+                      child: Image.asset(
+                        'lib/images/star_home_bg.png',
                       ),
                     ),
                     Container(
-                      width: 80.0,
-                      height: 80.0,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(100.0),
-                        image: DecorationImage(
-                          image: AssetImage('lib/images/ic_default_avatar.png'),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: -10.0,
-                      bottom: 10.0,
-                      child: Container(
-                        width: 20.0,
-                        height: 20.0,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              'lib/images/icon_userhome_boy4.png',
+                      height: 50.0,
+                      padding: EdgeInsets.symmetric(horizontal: 40.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            '粉丝',
+                            style: TextStyle(
+                              fontSize: 12.0,
                             ),
                           ),
-                        ),
+                          Text(
+                            '关注',
+                            style: TextStyle(
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
+              Positioned(
+                child: GestureDetector(
+                  onTap: () {
+                    Application.router.navigateTo(
+                      context,
+                      '/login',
+                      transition: TransitionType.inFromRight,
+                    );
+                  },
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    overflow: Overflow.visible,
+                    children: <Widget>[
+                      Container(
+                        width: 100.0,
+                        height: 100.0,
+                        padding: EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100.0),
+                        ),
+                      ),
+                      Container(
+                        width: 80.0,
+                        height: 80.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100.0),
+                          image: DecorationImage(
+                            image:
+                                AssetImage('lib/images/ic_default_avatar.png'),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: -10.0,
+                        bottom: 10.0,
+                        child: Container(
+                          width: 20.0,
+                          height: 20.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(
+                                'lib/images/icon_userhome_boy4.png',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          ),
-          Container(
-            height: 50.0,
-            padding: EdgeInsets.symmetric(horizontal: 40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  '粉丝',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                  ),
-                ),
-                Text(
-                  '关注',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                  ),
-                ),
-              ],
-            ),
           ),
           Container(
             margin: EdgeInsets.symmetric(vertical: 20.0),
@@ -145,7 +162,7 @@ class _HomeMineState extends State<HomeMine>
                       Image.asset('lib/images/icon_mine_wow2.png'),
                       Container(
                         margin: EdgeInsets.only(left: 8.0),
-                        child: Text('5000'),
+                        child: Text('0'),
                       ),
                     ],
                   ),
@@ -157,7 +174,7 @@ class _HomeMineState extends State<HomeMine>
                       Image.asset('lib/images/icon_mine_wow3.png'),
                       Container(
                         margin: EdgeInsets.only(left: 8.0),
-                        child: Text('5000'),
+                        child: Text('0'),
                       ),
                     ],
                   ),
@@ -169,7 +186,7 @@ class _HomeMineState extends State<HomeMine>
                       Image.asset('lib/images/icon_mine_wow4.png'),
                       Container(
                         margin: EdgeInsets.only(left: 8.0),
-                        child: Text('5000'),
+                        child: Text('0'),
                       ),
                     ],
                   ),

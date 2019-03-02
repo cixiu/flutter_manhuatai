@@ -13,16 +13,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   PageController _controller = PageController(initialPage: 0);
   List<Widget> pages = List();
 
-  // @override
-  // bool get wantKeepAlive => true;
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
-    // TODO: implement initState
     pages
       ..add(HomeIndex())
       ..add(HomeUpdate())
@@ -47,10 +47,9 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('都是'),
-      // ),
       body: PageView(
         controller: _controller,
         children: pages,

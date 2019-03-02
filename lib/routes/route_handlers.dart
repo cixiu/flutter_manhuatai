@@ -1,10 +1,10 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_manhuatai/pages/test/test_page.dart';
+import 'package:flutter_manhuatai/pages/login/login.dart';
 
-var testHandler = Handler(
+var loginHandler =Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    return TestPage();
+    return LoginPage();
   }
 );

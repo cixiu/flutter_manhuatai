@@ -5,9 +5,9 @@ import './route_handlers.dart';
 
 class Routes {
   static String root = '/';
-  static String test = '/test';
+  static String login = '/login';
 
   static configureRoutes(Router router) {
-    router.define(test, handler: testHandler);
+    router.define(login, handler: loginHandler);
   }
 }

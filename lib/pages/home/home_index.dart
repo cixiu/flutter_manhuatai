@@ -59,9 +59,6 @@ class _HomeIndexState extends State<HomeIndex>
             color: Colors.grey,
             child: Text('搜索框，进入搜索页'),
           ),
-          // flexibleSpace: Container(
-          //   color: Colors.greenAccent,
-          // ),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(30.0),
             child: Container(
@@ -88,14 +85,10 @@ class _HomeIndexState extends State<HomeIndex>
       ),
       body: TabBarView(
         controller: tabController,
-        children: <Widget>[HomeRank(), HomeRecommend()],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Text('Test'),
-        onPressed: () {
-          Application.router.navigateTo(context, '/test',
-              transition: TransitionType.inFromRight);
-        },
+        children: [
+          HomeRank(),
+          HomeRecommend(),
+        ],
       ),
     );
   }
