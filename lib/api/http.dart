@@ -32,17 +32,31 @@ class HttpRequest {
     };
   }
 
-  static Future<T> get<T>(String url, {Map<String, dynamic> params}) async {
+  static Future<T> get<T>(
+    String url, {
+    Map<String, dynamic> params,
+  }) async {
     // _proxyClient();
-    Response<T> response = await dio.get(url, queryParameters: params);
+    Response<T> response = await dio.get(
+      url,
+      queryParameters: params,
+    );
     return response.data;
   }
 
-  static Future<T> post<T>(String url,
-      {Map<String, dynamic> data, Map<String, dynamic> params}) async {
-    _proxyClient();
-    Response<T> response =
-        await dio.post(url, data: data, queryParameters: params);
+  static Future<T> post<T>(
+    String url, {
+    Map<String, dynamic> data,
+    Map<String, dynamic> params,
+    Options options,
+  }) async {
+    // _proxyClient();
+    Response<T> response = await dio.post(
+      url,
+      data: data,
+      queryParameters: params,
+      options: options,
+    );
     return response.data;
   }
 }

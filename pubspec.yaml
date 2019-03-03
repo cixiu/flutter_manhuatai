@@ -29,6 +29,8 @@ dependencies:
   cached_network_image: ^0.6.0+1
   flutter_swiper : ^1.1.4
   shared_preferences: ^0.5.1+1
+  oktoast: ^2.1.5
+
 
 dev_dependencies:
   flutter_test:

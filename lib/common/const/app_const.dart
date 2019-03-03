@@ -30,6 +30,10 @@ class AppConst {
     "default": Platform.isIOS ? "-noresize" : "-noresize.webp",
   };
 
+  /// 匹配所有支持短信功能的号码（手机卡 + 上网卡）
+  static RegExp phoneReg = RegExp(
+      r'^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[01356789]\d{2}|4(?:0\d|1[0-2]|9\d))|9[189]\d{2}|6[567]\d{2}|4[579]\d{2})\d{6}$');
+
   // android使用webp格式图片
   // static ImageSizeSuffix imageSizeWebp = ImageSizeSuffix.fromJson({
   //   "h1x1": "-500x500.jpg.webp",
