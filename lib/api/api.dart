@@ -72,7 +72,7 @@ class Api {
   }) async {
     final String url = 'https://mkxq.zymk.cn/user/v1/mobilebind/';
 
-    Map<String, dynamic> response = await HttpRequest.post(
+    Map<String, dynamic> response = await HttpRequest.post<Map>(
       url,
       data: {
         'mobile': mobile ?? '',
@@ -84,6 +84,7 @@ class Api {
       },
       options: Options(
         contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        responseType: ResponseType.json,
       ),
     );
 

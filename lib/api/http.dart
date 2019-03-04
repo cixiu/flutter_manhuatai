@@ -51,7 +51,7 @@ class HttpRequest {
     Options options,
   }) async {
     // _proxyClient();
-    Response<T> response = await dio.post(
+    Response<T> response = await dio.post<T>(
       url,
       data: data,
       queryParameters: params,

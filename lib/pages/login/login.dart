@@ -51,11 +51,22 @@ class _LoginPageState extends State<LoginPage> {
       mobile: _phone,
       vcode: _validateCode,
     );
-    print(response);
+
+    if (response['status'] == 0) {
+      print(response);
+    } else {
+      showToast(response['msg']);
+      print(response);
+    }
   }
 
   // 获取短信验证码
   _getValidateCode() async {
+    // 验证手机号码是否符合手机格式
+    if (!AppConst.phoneReg.hasMatch(_phone)) {
+      return _showToast();
+    }
+
     // 正则发送请求，则直接返回
     if (_hasSendSms || _isRequestValidateCode) {
       return;
@@ -64,10 +75,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _isRequestValidateCode = true;
     });
-
-    if (!AppConst.phoneReg.hasMatch(_phone)) {
-      return _showToast();
-    }
 
     try {
       var response = await Api.sendSms(
