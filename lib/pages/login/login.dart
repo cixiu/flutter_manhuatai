@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './components/input_phone.dart';
 import './components/input_validate_code.dart';
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/models/user_info.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 
 class LoginPage extends StatefulWidget {
@@ -47,12 +49,22 @@ class _LoginPageState extends State<LoginPage> {
 
     print(_phone);
     print(_validateCode);
+    // 发送数据 获取用户登录所需的token
     var response = await Api.mobileBind(
       mobile: _phone,
       vcode: _validateCode,
     );
 
+    // 拿到返回的token即可进行登录获取用户信息
     if (response['status'] == 0) {
+      String token = response['data']['appToken'];
+      var userInfoMap = await Api.getUserInfo(token: token);
+      var userInfoString = json.encode(userInfoMap);
+      var userInfo = UserInfo.fromJson(userInfoMap);
+      // 将登录的用户存入SharedPreferences缓存且存入redux中
+      print(userInfoString);
+      // userInfo.commerceauth.
+      print(userInfo);
       print(response);
     } else {
       showToast(response['msg']);
