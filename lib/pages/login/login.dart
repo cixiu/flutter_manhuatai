@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
       return _showToast();
     }
 
-    // 正则发送请求，则直接返回
+    // 正在发送请求，则直接返回
     if (_hasSendSms || _isRequestValidateCode) {
       return;
     }

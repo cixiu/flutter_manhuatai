@@ -89,4 +89,35 @@ class Api {
 
     return response;
   }
+
+  /// 获取用户的信息
+  static Future<Map<String, dynamic>> getUserInfo({
+    String token,
+    String openid,
+    String myuid,
+    String autologo,
+  }) async {
+    final String url =
+        'https://getuserinfo-globalapi.yyhao.com/app_api/v5/getuserinfo/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'type': 'mkxq',
+        'token': token,
+        'openid': openid,
+        'myuid': myuid,
+        'autologo': autologo,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'productname': 'mht',
+        'client-type': 'android',
+        'platformname': 'android',
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+
+    return response;
+  }
 }
