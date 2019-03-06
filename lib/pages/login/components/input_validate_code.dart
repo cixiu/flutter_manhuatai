@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 typedef void InputOnChange(String val);
-typedef void GetValidateCode();
+typedef void GetValidateCode(BuildContext context);
 
 class InputValidateCode extends StatefulWidget {
   final String validateCode;
@@ -82,7 +82,7 @@ class _InputValidateCodeState extends State<InputValidateCode> {
                 ),
               ),
               onPressed:
-                  widget.hasGetValidateCode ? null : widget.getValidateCode,
+                  widget.hasGetValidateCode ? null : () {widget.getValidateCode(context);},
             ),
           )
         ],
