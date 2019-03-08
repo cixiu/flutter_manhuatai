@@ -1,5 +1,9 @@
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
+
+import 'package:flutter_manhuatai/api/api.dart';
 
 /// 一般的Dialog需要添加布局结构Material这个Widget
 ///
@@ -7,19 +11,158 @@ import 'package:flutter/material.dart';
 /// 由于此处有溢出的图片，点击溢出的图片的左右2侧也需要关闭Dialog,
 /// 所以此处没有加入Material，Scaffold等布局结构，所以build方法里的widget是没有Theme主题的，
 /// 对于Text这种Widget,则需要手动设置一些样式，否则会没有默认的样式（红色大号字体+黄色下划线）
-class ImgCodeDialog extends StatelessWidget {
+class ImgCodeDialog extends StatefulWidget {
   final Uint8List imgCodeBytes;
+  final String content;
+  final String phone;
+  final Function success;
 
-  ImgCodeDialog({Key key, this.imgCodeBytes}) : super(key: key);
+  ImgCodeDialog({
+    Key key,
+    this.imgCodeBytes,
+    this.content,
+    this.phone,
+    this.success,
+  }) : super(key: key);
+
+  @override
+  _ImgCodeDialogState createState() => _ImgCodeDialogState();
+}
+
+class _ImgCodeDialogState extends State<ImgCodeDialog> {
+  GlobalKey _imgKey = GlobalKey();
+  Uint8List _imgCodeBytes;
+  String _content;
+  int _imgTapTimes = 0;
+  Map<String, dynamic> imgCodeData;
+  bool showFirstPointer = false;
+  double firstLeft = 0.0;
+  double firstTop = 0.0;
+  bool showSecondPointer = false;
+  double secondLeft = 0.0;
+  double secondTop = 0.0;
+
+  void initState() {
+    super.initState();
+    _imgCodeBytes = widget.imgCodeBytes;
+    _content = widget.content;
+    imgCodeData = {
+      'appId': 2,
+      'fontPoints': [],
+      'userIdentifier': widget.phone,
+      'verificaType': 2,
+    };
+  }
+
+  // 点击图片验证码
+  void _tapImgCode(TapUpDetails details) {
+    _imgTapTimes++;
+    if (_imgTapTimes > 2) {
+      _imgTapTimes--;
+      return;
+    }
+
+    RenderBox imgBox = _imgKey.currentContext.findRenderObject();
+    Offset imgPosition = imgBox.localToGlobal(Offset.zero);
+
+    // 在验证码图片中点击的位置(相对于屏幕左上角)
+    double pointX = details.globalPosition.dx;
+    double pointY = details.globalPosition.dy;
+
+    // 验证码图片的尺寸大小
+    double imgClientX = imgBox.size.width;
+    double imgClientY = imgBox.size.height;
+
+    // 验证码图片尺寸大小，相对于原始图片的尺寸比例
+    double ratioX = 460 / imgClientX;
+    double ratioY = 200 / imgClientY;
+
+    // 验证码图片相对于屏幕左上角的位置
+    double imgPositionX = imgPosition.dx;
+    double imgPositionY = imgPosition.dy;
+
+    // 在验证码图片中点击的位置
+    double diffX = pointX - imgPositionX;
+    double diffY = pointY - imgPositionY;
+
+    // 在验证码图片中点击的原始位置（相对于图片的原始尺寸）
+    int x = (diffX * ratioX).floor();
+    int y = (diffY * ratioY).floor();
+
+    (imgCodeData['fontPoints'] as List).add({'x': x, 'y': y});
+
+    if (_imgTapTimes == 1) {
+      setState(() {
+        showFirstPointer = true;
+        firstLeft = diffX;
+        firstTop = diffY;
+      });
+    }
+
+    if (_imgTapTimes == 2) {
+      setState(() {
+        showSecondPointer = true;
+        secondLeft = diffX;
+        secondTop = diffY;
+      });
+    }
+    print(imgCodeData);
+  }
+
+  // 刷新图片验证码
+  void _refreshImgCode() async {
+    var res = await Api.sendSms(mobile: widget.phone);
+
+    _resetState(res);
+  }
+
+  // 验证图形验证码
+  void _validateImgCode() async {
+    var res = await Api.sendSms(
+      mobile: widget.phone,
+      imgCode: json.encode(imgCodeData),
+      refresh: '0',
+    );
+
+    _resetState(res);
+  }
+
+  // 重置state
+  void _resetState(res) {
+    print(res);
+    if (res['data'] is Map) {
+      String imgCode = res['data']['Image'];
+      // 更新图形码
+      if (imgCode != null && imgCode.isNotEmpty) {
+        _imgTapTimes = 0;
+        imgCodeData['fontPoints'] = [];
+        setState(() {
+          _imgCodeBytes = base64.decode(res['data']['Image']);
+          _content = res['data']['Content'];
+          showFirstPointer = false;
+          showSecondPointer = false;
+        });
+      }
+    }
+
+    if (res['status'] == 0) {
+      widget.success();
+      Navigator.pop(context);
+    } else {
+      showToast(res['msg']);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+
     return Center(
       child: Stack(
         alignment: AlignmentDirectional.topCenter,
         children: <Widget>[
           Container(
-            width: MediaQuery.of(context).size.width - 90.0,
+            width: screenSize.width - 90.0,
             margin: EdgeInsets.only(
               top: 55.0,
             ),
@@ -36,19 +179,16 @@ class ImgCodeDialog extends StatelessWidget {
                     right: 20.0,
                     left: 20.0,
                   ),
-                  width: MediaQuery.of(context).size.width - 90.0 - 40.0,
-                  height: (MediaQuery.of(context).size.width - 90.0 - 40.0) *
-                      200 /
-                      460,
+                  width: screenSize.width - 90.0 - 40.0,
+                  height: (screenSize.width - 90.0 - 40.0) * 200 / 460,
                   child: Stack(
                     alignment: AlignmentDirectional.bottomEnd,
                     children: <Widget>[
                       GestureDetector(
-                        onTap: () {
-                          print('点击了验证码图片区域');
-                        },
+                        onTapUp: _tapImgCode,
                         child: Image.memory(
-                          imgCodeBytes,
+                          _imgCodeBytes,
+                          key: _imgKey,
                         ),
                       ),
                       Container(
@@ -65,11 +205,55 @@ class ImgCodeDialog extends StatelessWidget {
                             color: Colors.white,
                             size: 30.0,
                           ),
-                          onPressed: () {
-                            print('点击了refresh button区域');
-                          },
+                          onPressed: _refreshImgCode,
                         ),
                       ),
+                      showFirstPointer
+                          ? Positioned(
+                              top: firstTop - 15.0 / 2,
+                              left: firstLeft - 15.0 / 2,
+                              child: ClipOval(
+                                child: Container(
+                                  width: 15.0,
+                                  height: 15.0,
+                                  color: Colors.green,
+                                  child: Text(
+                                    '1',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.normal,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      showSecondPointer
+                          ? Positioned(
+                              top: secondTop - 15.0 / 2,
+                              left: secondLeft - 15.0 / 2,
+                              child: ClipOval(
+                                child: Container(
+                                  width: 15.0,
+                                  height: 15.0,
+                                  color: Colors.green,
+                                  child: Text(
+                                    '2',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.normal,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),
@@ -107,7 +291,7 @@ class ImgCodeDialog extends StatelessWidget {
                         ),
                         child: FlatButton(
                           child: Text(
-                            '云彩',
+                            _content,
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
@@ -121,7 +305,7 @@ class ImgCodeDialog extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width - 90.0,
+                  width: screenSize.width - 90.0,
                   height: 45.0,
                   decoration: BoxDecoration(
                     border: Border(
@@ -137,10 +321,7 @@ class ImgCodeDialog extends StatelessWidget {
                         fontSize: 16.0,
                       ),
                     ),
-                    onPressed: () {
-                      print('点击了确定按钮');
-                      Navigator.pop(context);
-                    },
+                    onPressed: _validateImgCode,
                   ),
                 )
               ],
