@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/requset_loading.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,13 +18,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var _phone = '';
-  var _validateCode = '';
-  int _countSeconds = 60;
-  bool _hasSendSms = false;
-  bool _isRequestValidateCode = false;
-  Uint8List imgCodeBytes;
-  String content = '';
+  var _phone = ''; // 手机号码
+  var _validateCode = ''; // 短信验证码
+  int _countSeconds = 60; // 倒计时
+  bool _hasSendSms = false; // 是否已经发送了短信
+  bool _isRequestValidateCode = false; // 是否正在请求验证码
+  Uint8List imgCodeBytes; // 图形验证码
+  String content = ''; // 图形验证码的文字
+  Timer timer; // 短信验证码倒计时的定时器
 
   final _phoneController = TextEditingController();
   final _codeController = TextEditingController();
@@ -58,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
       mobile: _phone,
       vcode: _validateCode,
     );
+    print(response);
 
     // 拿到返回的token即可进行登录获取用户信息
     if (response['status'] == 0) {
@@ -69,9 +72,11 @@ class _LoginPageState extends State<LoginPage> {
       print(userInfoString);
       // userInfo.commerceauth.
       print(userInfo);
-      print(response);
     } else {
-      showToast(response['msg']);
+      showToast(
+        response['msg'],
+        position: ToastPosition.bottom,
+      );
       print(response);
     }
   }
@@ -93,12 +98,15 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      // // 显示请求的loading
+      showLoading(context, message: '正在发送。。。');
       var response = await Api.sendSms(
         mobile: _phone,
         refresh: '0',
       );
 
       print(response);
+      hideLoading(context);
 
       setState(() {
         _isRequestValidateCode = false;
@@ -107,8 +115,12 @@ class _LoginPageState extends State<LoginPage> {
       // 短信验证码获取成功，
       if (response['status'] == 0) {
         print(response);
-        if (response['data'] is Map && (response['data']['Image'] as String).isNotEmpty) {
-          showToast(response['msg']);
+        if (response['data'] is Map &&
+            (response['data']['Image'] as String).isNotEmpty) {
+          showToast(
+            response['msg'],
+            position: ToastPosition.bottom,
+          );
         } else {
           return _countDownSms();
         }
@@ -118,19 +130,23 @@ class _LoginPageState extends State<LoginPage> {
             imgCodeBytes = base64.decode('${response['data']['Image']}');
             content = response['data']['Content'];
           });
-          _showDialog(context);
+          _showImgValidateDialog(context);
         }
-        showToast(response['msg']);
+        showToast(
+          response['msg'],
+          position: ToastPosition.bottom,
+        );
       }
     } catch (e) {
       setState(() {
         _isRequestValidateCode = false;
       });
+      hideLoading(context);
     }
   }
 
   // 显示图形验证码Dialog
-  _showDialog(BuildContext context) {
+  _showImgValidateDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -162,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     showToast('短信发送成功');
 
-    Timer timer = Timer.periodic(Duration(seconds: 1), (Timer _) {
+    timer = Timer.periodic(Duration(seconds: 1), (Timer _) {
       i--;
       setState(() {
         _countSeconds = i;
@@ -178,6 +194,12 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -197,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
-                      _showDialog(context);
+                      _showImgValidateDialog(context);
                     },
                     child: Container(
                       width: 90.0,

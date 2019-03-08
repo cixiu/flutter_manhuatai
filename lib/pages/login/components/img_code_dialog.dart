@@ -34,6 +34,7 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
   Uint8List _imgCodeBytes;
   String _content;
   int _imgTapTimes = 0;
+  bool _isValidating = false;
   Map<String, dynamic> imgCodeData;
   bool showFirstPointer = false;
   double firstLeft = 0.0;
@@ -118,12 +119,23 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
 
   // 验证图形验证码
   void _validateImgCode() async {
+    if (_isValidating) {
+      return;
+    }
+    _isValidating = true;
+    if (!showFirstPointer && !showSecondPointer) {
+      showToast(
+        '请在上图中点击正确的示例文字',
+        position: ToastPosition.bottom,
+      );
+      return;
+    }
     var res = await Api.sendSms(
       mobile: widget.phone,
       imgCode: json.encode(imgCodeData),
       refresh: '0',
     );
-
+    _isValidating = false;
     _resetState(res);
   }
 
@@ -149,7 +161,10 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
       widget.success();
       Navigator.pop(context);
     } else {
-      showToast(res['msg']);
+      showToast(
+        res['msg'],
+        position: ToastPosition.bottom,
+      );
     }
   }
 

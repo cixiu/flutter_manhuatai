@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 /// http请求
 class HttpRequest {
   static Dio dio = Dio(BaseOptions(
-    connectTimeout: 30000,
-    receiveTimeout: 30000,
+    connectTimeout: 60000,
+    receiveTimeout: 60000,
   ))
     ..interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions request) {
       print('正在 request');
@@ -36,7 +36,7 @@ class HttpRequest {
     String url, {
     Map<String, dynamic> params,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.get<Map>(
       url,
       queryParameters: params,
@@ -50,7 +50,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.post<Map>(
       url,
       data: data,
