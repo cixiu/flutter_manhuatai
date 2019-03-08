@@ -30,6 +30,7 @@ dependencies:
   flutter_swiper : ^1.1.4
   shared_preferences: ^0.5.1+1
   oktoast: ^2.1.5
+  flutter_screenutil: ^0.5.1
 
 
 dev_dependencies:

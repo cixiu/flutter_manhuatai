@@ -21,3 +21,4 @@ flutter run
 ## Problems encountered
 1. [FloatingActionButton 的 heroTag 必须唯一， 或者为null](https://stackoverflow.com/questions/53265299/flutter-gridview-causes-navigator-push-error)
 2. [Widgets in the overflow of stack do not respond to gestures](https://github.com/flutter/flutter/issues/19445)
+3. [手机适配问题-Flutter screen adaptation, font adaptation, get screen information](https://github.com/OpenFlutter/flutter_screenutil)

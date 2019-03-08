@@ -280,9 +280,8 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Container(
-                        constraints: BoxConstraints(maxWidth: 150.0),
-                        child: Text(
+                      Expanded(
+                                              child: Text(
                           '请在上图中点击正确的示例文字:',
                           style: TextStyle(
                             fontSize: 14.0,
@@ -293,7 +292,7 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
                         ),
                       ),
                       Container(
-                        width: 82.0,
+                        width: 77.0,
                         height: 46.0,
                         margin: EdgeInsets.only(left: 12.0),
                         decoration: BoxDecoration(
@@ -305,12 +304,13 @@ class _ImgCodeDialogState extends State<ImgCodeDialog> {
                           ),
                         ),
                         child: FlatButton(
+                          padding: EdgeInsets.all(0.0),
                           child: Text(
                             _content,
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue[700],
+                              color: Colors.red[700],
                             ),
                           ),
                           onPressed: () {},
