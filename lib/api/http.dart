@@ -36,7 +36,7 @@ class HttpRequest {
     String url, {
     Map<String, dynamic> params,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.get<Map>(
       url,
       queryParameters: params,
@@ -50,7 +50,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.post<Map>(
       url,
       data: data,

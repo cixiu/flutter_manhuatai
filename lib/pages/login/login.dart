@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/components/requset_loading.dart';
+import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,8 +67,9 @@ class _LoginPageState extends State<LoginPage> {
     if (response['status'] == 0) {
       String token = response['data']['appToken'];
       var userInfoMap = await Api.getUserInfo(token: token);
+      var userInfo = await SpUtils.saveUserInfo(userInfoMap);
       var userInfoString = json.encode(userInfoMap);
-      var userInfo = UserInfo.fromJson(userInfoMap);
+      // var userInfo = UserInfo.fromJson(userInfoMap);
       // 将登录的用户存入SharedPreferences缓存且存入redux中
       print(userInfoString);
       // userInfo.commerceauth.
@@ -125,13 +127,15 @@ class _LoginPageState extends State<LoginPage> {
           return _countDownSms();
         }
       } else {
-        if ((response['data']['Content'] as String).isNotEmpty) {
+        if (response['data'] is Map &&
+            (response['data']['Content'] as String).isNotEmpty) {
           setState(() {
             imgCodeBytes = base64.decode('${response['data']['Image']}');
             content = response['data']['Content'];
           });
           _showImgValidateDialog(context);
         }
+
         showToast(
           response['msg'],
           position: ToastPosition.bottom,
@@ -198,7 +202,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    timer.cancel();
+    if (timer != null) {
+      timer.cancel();
+    }
     super.dispose();
   }
 

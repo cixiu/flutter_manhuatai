@@ -52,5 +52,5 @@ showLoading(BuildContext context, {String message}) {
 }
 
 hideLoading(BuildContext context) {
-  return Navigator.pop(context);
+  return Navigator.of(context, rootNavigator: true).pop();
 }

@@ -99,20 +99,27 @@ class Api {
   }) async {
     final String url =
         'https://getuserinfo-globalapi.yyhao.com/app_api/v5/getuserinfo/';
+    var data = {
+      'type': 'mkxq',
+      'localtime': DateTime.now().millisecondsSinceEpoch,
+      'productname': 'mht',
+      'client-type': 'android',
+      'platformname': 'android',
+    };
+
+    if (token != null) {
+      data['token'] = token;
+    }
+
+    if (openid != null && myuid != null && autologo != null) {
+      data['openid'] = openid;
+      data['myuid'] = myuid;
+      data['autologo'] = autologo;
+    }
 
     Map<String, dynamic> response = await HttpRequest.post(
       url,
-      data: {
-        'type': 'mkxq',
-        'token': token ?? '',
-        'openid': openid ?? '',
-        'myuid': myuid ?? '',
-        'autologo': autologo ?? '',
-        'localtime': DateTime.now().millisecondsSinceEpoch,
-        'productname': 'mht',
-        'client-type': 'android',
-        'platformname': 'android',
-      },
+      data: data,
       options: Options(
         contentType: ContentType.parse('application/x-www-form-urlencoded'),
       ),
