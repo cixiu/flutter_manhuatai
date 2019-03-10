@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'package:flutter_manhuatai/utils/sp.dart';
+import 'package:redux/redux.dart';
+
 import 'package:flutter_manhuatai/models/user_info.dart';
 import './user_info.dart';
 
@@ -12,5 +16,12 @@ class AppState {
 AppState rootReducer(AppState state, action) {
   return AppState(
     userInfo: userInfoReducer(state.userInfo, action),
+  );
+}
+
+Future<AppState> initState() async {
+  var userInfo = await SpUtils.loadUserInfo();
+  return AppState(
+    userInfo: userInfo,
   );
 }

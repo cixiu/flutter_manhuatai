@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/components/requset_loading.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,46 +41,49 @@ class _LoginPageState extends State<LoginPage> {
   void _showToast() {
     showToast(
       '无效的手机号码',
-      radius: 20.0,
-      backgroundColor: Colors.black.withOpacity(0.8),
     );
   }
 
   // 登录操作
   void onPressLogin() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // print(prefs.getKeys());
     // 无效的手机号码
     if (!AppConst.phoneReg.hasMatch(_phone)) {
       return _showToast();
     }
+    // 验证手机验证码
+    if (_validateCode.isEmpty) {
+      showToast('验证码不能为空');
+      return;
+    }
 
-    print(_phone);
-    print(_validateCode);
-    // 发送数据 获取用户登录所需的token
-    var response = await Api.mobileBind(
-      mobile: _phone,
-      vcode: _validateCode,
-    );
-    print(response);
-
-    // 拿到返回的token即可进行登录获取用户信息
-    if (response['status'] == 0) {
-      String token = response['data']['appToken'];
-      var userInfoMap = await Api.getUserInfo(token: token);
-      var userInfo = await SpUtils.saveUserInfo(userInfoMap);
-      var userInfoString = json.encode(userInfoMap);
-      // var userInfo = UserInfo.fromJson(userInfoMap);
-      // 将登录的用户存入SharedPreferences缓存且存入redux中
-      print(userInfoString);
-      // userInfo.commerceauth.
-      print(userInfo);
-    } else {
-      showToast(
-        response['msg'],
-        position: ToastPosition.bottom,
+    try {
+      // // 显示请求的loading
+      showLoading(context, message: '请稍候...');
+      // 发送数据 获取用户登录所需的token
+      var response = await Api.mobileBind(
+        mobile: _phone,
+        vcode: _validateCode,
       );
       print(response);
+
+      // 拿到返回的token即可进行登录获取用户信息
+      if (response['status'] == 0) {
+        String token = response['data']['appToken'];
+        var userInfoMap = await Api.getUserInfo(token: token);
+        // 将登陆的用户信息存入缓存并放入redux中
+        var userInfo = await SpUtils.saveUserInfo(userInfoMap);
+        print(userInfo);
+        hideLoading(context);
+        Application.router.pop(context);
+      } else {
+        showToast(
+          response['msg'],
+        );
+        print(response);
+        hideLoading(context);
+      }
+    } catch (e) {
+      hideLoading(context);
     }
   }
 

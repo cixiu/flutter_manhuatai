@@ -19,26 +19,36 @@ class BookItem extends StatefulWidget {
 }
 
 class _BookItemState extends State<BookItem> {
-
   /// 根据不同的 book.displayType 呈现不同的布局
   Widget buildBookItem() {
     if (widget.book.config.displayType == 29) {
-      return BookItemDisplay29(book: widget.book,);
+      return BookItemDisplay29(
+        book: widget.book,
+      );
     } else if (widget.book.config.displayType == 3) {
-      return BookItemDisplay3(book: widget.book,);
+      return BookItemDisplay3(
+        book: widget.book,
+      );
     } else if (widget.book.config.displayType == 11) {
-      return BookItemDisplay3(book: widget.book, count: 6,);
+      return BookItemDisplay3(
+        book: widget.book,
+        count: 6,
+      );
     } else if (widget.book.config.displayType == 61) {
-      return BookItemDisplay61(book: widget.book,);
+      return BookItemDisplay61(
+        book: widget.book,
+      );
     } else {
-      return BookItemDisplay1(book: widget.book,);
+      return BookItemDisplay1(
+        book: widget.book,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    double horizonratio = Utils.computedRatio(widget.book.config.horizonratio);
-    print('${widget.book.title} $horizonratio');
+    // double horizonratio = Utils.computedRatio(widget.book.config.horizonratio);
+    // print('${widget.book.title} $horizonratio');
 
     return Column(
       children: <Widget>[
