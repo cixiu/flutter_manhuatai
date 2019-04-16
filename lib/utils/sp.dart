@@ -14,15 +14,19 @@ class SpUtils {
   static Future<UserInfo> saveUserInfo(Map userInfoMap) async {
     var spf = await SharedPreferences.getInstance();
     spf.setString(SpKey.USER_INFO, json.encode(userInfoMap));
-
+    print('存入缓存中成功，$userInfoMap');
     return UserInfo.fromJson(userInfoMap);
   }
 
   /// 读取登录的用户信息
   static Future<UserInfo> loadUserInfo() async {
     var spf = await SharedPreferences.getInstance();
-    String userInfoStr = spf.getString(SpKey.USER_INFO);
+    var userInfoStr = spf.getString(SpKey.USER_INFO);
+    if (userInfoStr == null) {
+      return UserInfo.fromJson({});
+    }
     Map userInfoMap = json.decode(userInfoStr);
+    print(userInfoMap);
 
     return UserInfo.fromJson(userInfoMap);
   }

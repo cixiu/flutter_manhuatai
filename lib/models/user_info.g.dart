@@ -37,8 +37,8 @@ UserInfo _$UserInfoFromJson(Map<String, dynamic> json) {
       json['Cactive'] as int,
       json['Cnewmsg'] as int,
       json['Cdiamonds'] as int,
-      json['ecy_coin_nouse'] as String,
-      json['ecy_coin_ios_nouse'] as String,
+      json['ecy_coin_nouse'] as int,
+      json['ecy_coin_ios_nouse'] as int,
       json['card_adblock'] as int,
       json['discount_total'] as int,
       json['ecy_coin'] as int,
@@ -98,14 +98,15 @@ UserInfo _$UserInfoFromJson(Map<String, dynamic> json) {
           : Commerceauth.fromJson(json['commerceauth'] as Map<String, dynamic>),
       json['auth_data'] == null
           ? null
-          : AuthData.fromJson(json['auth_data'] as Map<String, dynamic>),
+          : Auth_data.fromJson(json['auth_data'] as Map<String, dynamic>),
       json['task_data'] == null
           ? null
-          : AuthData.fromJson(json['task_data'] as Map<String, dynamic>),
+          : Task_data.fromJson(json['task_data'] as Map<String, dynamic>),
       json['mkxqaes'] as String,
       json['community_data'] == null
           ? null
-          : AuthData.fromJson(json['community_data'] as Map<String, dynamic>),
+          : Community_data.fromJson(
+              json['community_data'] as Map<String, dynamic>),
       json['roleinfo'] as List,
       json['view_keywords'] as int);
 }
@@ -228,8 +229,8 @@ Map<String, dynamic> _$CommerceauthToJson(Commerceauth instance) =>
       'imagelimit': instance.imagelimit
     };
 
-AuthData _$AuthDataFromJson(Map<String, dynamic> json) {
-  return AuthData(
+Auth_data _$Auth_dataFromJson(Map<String, dynamic> json) {
+  return Auth_data(
       json['expiry'] as int,
       json['appid'] as String,
       json['authcode'] as String,
@@ -237,7 +238,36 @@ AuthData _$AuthDataFromJson(Map<String, dynamic> json) {
       json['imagelimit'] as String);
 }
 
-Map<String, dynamic> _$AuthDataToJson(AuthData instance) => <String, dynamic>{
+Map<String, dynamic> _$Auth_dataToJson(Auth_data instance) => <String, dynamic>{
+      'expiry': instance.expiry,
+      'appid': instance.appid,
+      'authcode': instance.authcode,
+      'imagedomain': instance.imagedomain,
+      'imagelimit': instance.imagelimit
+    };
+
+Task_data _$Task_dataFromJson(Map<String, dynamic> json) {
+  return Task_data(json['expires'] as int, json['appid'] as String,
+      json['authcode'] as String);
+}
+
+Map<String, dynamic> _$Task_dataToJson(Task_data instance) => <String, dynamic>{
+      'expires': instance.expires,
+      'appid': instance.appid,
+      'authcode': instance.authcode
+    };
+
+Community_data _$Community_dataFromJson(Map<String, dynamic> json) {
+  return Community_data(
+      json['expiry'] as int,
+      json['appid'] as String,
+      json['authcode'] as String,
+      json['imagedomain'] as String,
+      json['imagelimit'] as String);
+}
+
+Map<String, dynamic> _$Community_dataToJson(Community_data instance) =>
+    <String, dynamic>{
       'expiry': instance.expiry,
       'appid': instance.appid,
       'authcode': instance.authcode,

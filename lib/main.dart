@@ -5,7 +5,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/pages/home/home.dart';

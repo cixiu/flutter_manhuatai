@@ -20,7 +20,7 @@ class _HomeMineState extends State<HomeMine>
   bool get wantKeepAlive => true;
 
   void _goLogin(UserInfo userInfo) {
-    if (userInfo == null) {
+    if (userInfo.uname == null) {
       Application.router.navigateTo(
         context,
         '/login',
@@ -38,12 +38,13 @@ class _HomeMineState extends State<HomeMine>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    print('我的页面build');
 
     return Scaffold(
       body: StoreBuilder<AppState>(
         builder: (context, store) {
           var userInfo = store.state.userInfo;
-
+          print(userInfo.uname);
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
@@ -67,13 +68,13 @@ class _HomeMineState extends State<HomeMine>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                '粉丝 ${userInfo?.uname.isNotEmpty ? userInfo.cfans : 0}',
+                                '粉丝 ${userInfo?.uname != null ? userInfo.cfans : 0}',
                                 style: TextStyle(
                                   fontSize: 12.0,
                                 ),
                               ),
                               Text(
-                                '关注 ${userInfo?.uname.isNotEmpty ? userInfo.cfocus : 0}',
+                                '关注 ${userInfo?.uname != null ? userInfo.cfocus : 0}',
                                 style: TextStyle(
                                   fontSize: 12.0,
                                 ),
@@ -160,7 +161,7 @@ class _HomeMineState extends State<HomeMine>
                       ),
                     ),
                     Text(
-                      userInfo?.usign?.isNotEmpty
+                      userInfo?.usign != null
                           ? userInfo?.usign
                           : '这个家伙很懒，什么都没留下',
                       style: TextStyle(
@@ -185,7 +186,7 @@ class _HomeMineState extends State<HomeMine>
                           Container(
                             margin: EdgeInsets.only(left: 8.0),
                             child: Text(
-                              userInfo?.uname?.isNotEmpty
+                              userInfo?.uname != null
                                   ? userInfo.cgold.toString()
                                   : '5000',
                             ),
@@ -201,7 +202,7 @@ class _HomeMineState extends State<HomeMine>
                           Container(
                             margin: EdgeInsets.only(left: 8.0),
                             child: Text(
-                              userInfo?.uname?.isNotEmpty
+                              userInfo?.uname != null
                                   ? userInfo.coins.toString()
                                   : '0',
                             ),
@@ -217,7 +218,7 @@ class _HomeMineState extends State<HomeMine>
                           Container(
                             margin: EdgeInsets.only(left: 8.0),
                             child: Text(
-                              userInfo?.uname?.isNotEmpty
+                              userInfo?.uname != null
                                   ? userInfo.recommend.toString()
                                   : '0',
                             ),
@@ -233,7 +234,7 @@ class _HomeMineState extends State<HomeMine>
                           Container(
                             margin: EdgeInsets.only(left: 8.0),
                             child: Text(
-                              userInfo?.uname?.isNotEmpty
+                              userInfo?.uname != null
                                   ? userInfo.cticket.toString()
                                   : '0',
                             ),

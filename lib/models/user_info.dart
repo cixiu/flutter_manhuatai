@@ -92,10 +92,10 @@ class UserInfo extends Object {
   int cdiamonds;
 
   @JsonKey(name: 'ecy_coin_nouse')
-  String ecyCoinNouse;
+  int ecyCoinNouse;
 
   @JsonKey(name: 'ecy_coin_ios_nouse')
-  String ecyCoinIosNouse;
+  int ecyCoinIosNouse;
 
   @JsonKey(name: 'card_adblock')
   int cardAdblock;
@@ -257,16 +257,16 @@ class UserInfo extends Object {
   Commerceauth commerceauth;
 
   @JsonKey(name: 'auth_data')
-  AuthData authData;
+  Auth_data authData;
 
   @JsonKey(name: 'task_data')
-  AuthData taskData;
+  Task_data taskData;
 
   @JsonKey(name: 'mkxqaes')
   String mkxqaes;
 
   @JsonKey(name: 'community_data')
-  AuthData communityData;
+  Community_data communityData;
 
   @JsonKey(name: 'roleinfo')
   List<dynamic> roleinfo;
@@ -424,7 +424,7 @@ class Commerceauth extends Object {
 }
 
 @JsonSerializable()
-class AuthData extends Object {
+class Auth_data extends Object {
   @JsonKey(name: 'expiry')
   int expiry;
 
@@ -440,7 +440,7 @@ class AuthData extends Object {
   @JsonKey(name: 'imagelimit')
   String imagelimit;
 
-  AuthData(
+  Auth_data(
     this.expiry,
     this.appid,
     this.authcode,
@@ -448,8 +448,62 @@ class AuthData extends Object {
     this.imagelimit,
   );
 
-  factory AuthData.fromJson(Map<String, dynamic> srcJson) =>
-      _$AuthDataFromJson(srcJson);
+  factory Auth_data.fromJson(Map<String, dynamic> srcJson) =>
+      _$Auth_dataFromJson(srcJson);
 
-  Map<String, dynamic> toJson() => _$AuthDataToJson(this);
+  Map<String, dynamic> toJson() => _$Auth_dataToJson(this);
+}
+
+@JsonSerializable()
+class Task_data extends Object {
+  @JsonKey(name: 'expires')
+  int expires;
+
+  @JsonKey(name: 'appid')
+  String appid;
+
+  @JsonKey(name: 'authcode')
+  String authcode;
+
+  Task_data(
+    this.expires,
+    this.appid,
+    this.authcode,
+  );
+
+  factory Task_data.fromJson(Map<String, dynamic> srcJson) =>
+      _$Task_dataFromJson(srcJson);
+
+  Map<String, dynamic> toJson() => _$Task_dataToJson(this);
+}
+
+@JsonSerializable()
+class Community_data extends Object {
+  @JsonKey(name: 'expiry')
+  int expiry;
+
+  @JsonKey(name: 'appid')
+  String appid;
+
+  @JsonKey(name: 'authcode')
+  String authcode;
+
+  @JsonKey(name: 'imagedomain')
+  String imagedomain;
+
+  @JsonKey(name: 'imagelimit')
+  String imagelimit;
+
+  Community_data(
+    this.expiry,
+    this.appid,
+    this.authcode,
+    this.imagedomain,
+    this.imagelimit,
+  );
+
+  factory Community_data.fromJson(Map<String, dynamic> srcJson) =>
+      _$Community_dataFromJson(srcJson);
+
+  Map<String, dynamic> toJson() => _$Community_dataToJson(this);
 }

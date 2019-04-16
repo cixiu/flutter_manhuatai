@@ -65,8 +65,11 @@ class _HomeRecommendState extends State<HomeRecommend>
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
       return item.bookId == 5035 ||
           item.bookId == 4938 ||
+          item.bookId == 6669 ||
           item.bookId == 5072 ||
-          item.bookId == 3743;
+          item.bookId == 3743 ||
+          item.bookId == 9669 ||
+          item.bookId == 8833;
     });
     setState(() {
       _recommendList = recommendList;
