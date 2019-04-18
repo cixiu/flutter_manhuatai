@@ -26,7 +26,7 @@ class RankGirl extends StatelessWidget {
       String aspectRatio = '2:1';
 
       if (i == 0) {
-        width = boxWidth - 1 * _spacing;
+        width = boxWidth;
         height = width / 2;
       } else {
         width = (boxWidth - 3 * _spacing) / 4;

@@ -20,6 +20,7 @@ class SpUtils {
 
   /// 读取登录的用户信息
   static Future<UserInfo> loadUserInfo() async {
+    // clearUserInfo();
     var spf = await SharedPreferences.getInstance();
     var userInfoStr = spf.getString(SpKey.USER_INFO);
     if (userInfoStr == null) {
