@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
@@ -35,6 +36,23 @@ class _HomeMineState extends State<HomeMine>
     }
   }
 
+  Widget _getGiftItem({String assetIcon, String text}) {
+    return Container(
+      height: ScreenUtil().setHeight(60),
+      child: Row(
+        children: <Widget>[
+          Image.asset(assetIcon),
+          Container(
+            margin: EdgeInsets.only(left: ScreenUtil().setWidth(16)),
+            child: Text(
+              text,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -59,24 +77,27 @@ class _HomeMineState extends State<HomeMine>
                           color: Colors.blue,
                           child: Image.asset(
                             'lib/images/star_home_bg.png',
+                            width: ScreenUtil.screenWidth,
+                            height: ScreenUtil().setHeight(300),
                           ),
                         ),
                         Container(
-                          height: 50.0,
-                          padding: EdgeInsets.symmetric(horizontal: 40.0),
+                          height: ScreenUtil().setHeight(100),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil().setWidth(80)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
                                 '粉丝 ${userInfo?.uname != null ? userInfo.cfans : 0}',
                                 style: TextStyle(
-                                  fontSize: 12.0,
+                                  fontSize: ScreenUtil().setSp(24),
                                 ),
                               ),
                               Text(
                                 '关注 ${userInfo?.uname != null ? userInfo.cfocus : 0}',
                                 style: TextStyle(
-                                  fontSize: 12.0,
+                                  fontSize: ScreenUtil().setSp(24),
                                 ),
                               ),
                             ],
@@ -95,19 +116,25 @@ class _HomeMineState extends State<HomeMine>
                         overflow: Overflow.visible,
                         children: <Widget>[
                           Container(
-                            width: 100.0,
-                            height: 100.0,
-                            padding: EdgeInsets.all(10.0),
+                            width: ScreenUtil().setHeight(200),
+                            height: ScreenUtil().setHeight(200),
+                            padding: EdgeInsets.all(
+                              ScreenUtil().setHeight(20),
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(100.0),
+                              borderRadius: BorderRadius.circular(
+                                ScreenUtil().setHeight(200),
+                              ),
                             ),
                           ),
                           Container(
-                            width: 80.0,
-                            height: 80.0,
+                            width: ScreenUtil().setHeight(160),
+                            height: ScreenUtil().setHeight(160),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(80.0),
+                              borderRadius: BorderRadius.circular(
+                                ScreenUtil().setHeight(160),
+                              ),
                             ),
                             child: userInfo.uid != null
                                 ? ClipOval(
@@ -117,8 +144,8 @@ class _HomeMineState extends State<HomeMine>
                                         aspectRatio: '1:1',
                                         type: 'head',
                                       ),
-                                      width: 80.0,
-                                      height: 80.0,
+                                      width: ScreenUtil().setHeight(160),
+                                      height: ScreenUtil().setHeight(160),
                                     ),
                                   )
                                 : Image.asset(
@@ -126,11 +153,11 @@ class _HomeMineState extends State<HomeMine>
                                   ),
                           ),
                           Positioned(
-                            right: -10.0,
-                            bottom: 10.0,
+                            right: -ScreenUtil().setHeight(20),
+                            bottom: ScreenUtil().setHeight(20),
                             child: Container(
-                              width: 20.0,
-                              height: 20.0,
+                              width: ScreenUtil().setHeight(40),
+                              height: ScreenUtil().setHeight(40),
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: AssetImage(
@@ -147,15 +174,19 @@ class _HomeMineState extends State<HomeMine>
                 ],
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 20.0),
+                margin: EdgeInsets.symmetric(
+                  vertical: ScreenUtil().setHeight(40),
+                ),
                 child: Column(
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(bottom: 10.0),
+                      margin: EdgeInsets.only(
+                        bottom: ScreenUtil().setHeight(20),
+                      ),
                       child: Text(
                         userInfo?.uname ?? '游客',
                         style: TextStyle(
-                          fontSize: 16.0,
+                          fontSize: ScreenUtil().setSp(32),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -165,7 +196,7 @@ class _HomeMineState extends State<HomeMine>
                           ? userInfo?.usign
                           : '这个家伙很懒，什么都没留下',
                       style: TextStyle(
-                        fontSize: 12.0,
+                        fontSize: ScreenUtil().setSp(24),
                         color: Colors.grey,
                       ),
                     ),
@@ -173,80 +204,44 @@ class _HomeMineState extends State<HomeMine>
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 24.0),
-                margin: EdgeInsets.only(bottom: 20.0),
+                padding: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil().setWidth(48),
+                ),
+                margin: EdgeInsets.only(
+                  bottom: ScreenUtil().setHeight(40),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Container(
-                      height: 30.0,
-                      child: Row(
-                        children: <Widget>[
-                          Image.asset('lib/images/icon_mine_wow1.png'),
-                          Container(
-                            margin: EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              userInfo?.uname != null
-                                  ? userInfo.cgold.toString()
-                                  : '5000',
-                            ),
-                          ),
-                        ],
-                      ),
+                    _getGiftItem(
+                      assetIcon: 'lib/images/icon_mine_wow1.png',
+                      text: userInfo?.uname != null
+                          ? userInfo.cgold.toString()
+                          : '5000',
                     ),
-                    Container(
-                      height: 30.0,
-                      child: Row(
-                        children: <Widget>[
-                          Image.asset('lib/images/icon_mine_wow2.png'),
-                          Container(
-                            margin: EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              userInfo?.uname != null
-                                  ? userInfo.coins.toString()
-                                  : '0',
-                            ),
-                          ),
-                        ],
-                      ),
+                    _getGiftItem(
+                      assetIcon: 'lib/images/icon_mine_wow2.png',
+                      text: userInfo?.uname != null
+                          ? userInfo.coins.toString()
+                          : '0',
                     ),
-                    Container(
-                      height: 30.0,
-                      child: Row(
-                        children: <Widget>[
-                          Image.asset('lib/images/icon_mine_wow3.png'),
-                          Container(
-                            margin: EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              userInfo?.uname != null
-                                  ? userInfo.recommend.toString()
-                                  : '0',
-                            ),
-                          ),
-                        ],
-                      ),
+                    _getGiftItem(
+                      assetIcon: 'lib/images/icon_mine_wow3.png',
+                      text: userInfo?.uname != null
+                          ? userInfo.recommend.toString()
+                          : '0',
                     ),
-                    Container(
-                      height: 30.0,
-                      child: Row(
-                        children: <Widget>[
-                          Image.asset('lib/images/icon_mine_wow4.png'),
-                          Container(
-                            margin: EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              userInfo?.uname != null
-                                  ? userInfo.cticket.toString()
-                                  : '0',
-                            ),
-                          ),
-                        ],
-                      ),
+                    _getGiftItem(
+                      assetIcon: 'lib/images/icon_mine_wow4.png',
+                      text: userInfo?.uname != null
+                          ? userInfo.cticket.toString()
+                          : '0',
                     ),
                   ],
                 ),
               ),
               Container(
-                height: 10.0,
+                height: ScreenUtil().setHeight(20),
                 color: Colors.grey[200],
               ),
             ],
