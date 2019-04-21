@@ -1,21 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 
+import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper.dart';
 import 'package:flutter_manhuatai/components/banner_swipper/banner_swipper.dart';
 import 'package:flutter_manhuatai/components/book_item/book_item.dart';
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
-import 'package:flutter_manhuatai/common/const/app_const.dart';
 
 class HomeRecommend extends StatefulWidget {
-  // final int currentIndex;
-
-  // HomeRecommend(this.currentIndex);
-
+  @override
   _HomeRecommendState createState() => _HomeRecommendState();
 }
 
@@ -24,8 +19,9 @@ class _HomeRecommendState extends State<HomeRecommend>
         AutomaticKeepAliveClientMixin,
         RefreshCommonState,
         WidgetsBindingObserver {
+  final recommendPageControl = PullLoadWrapperControl();
   bool isLoading = true;
-  RecommendList.RecommendList _recommendList;
+  List<RecommendList.Book> _bookList;
   List<RecommendList.Comic_info> _bannerList;
 
   @override
@@ -34,6 +30,8 @@ class _HomeRecommendState extends State<HomeRecommend>
   @override
   void initState() {
     super.initState();
+    // 需要头部
+    recommendPageControl.needHeader = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
@@ -71,47 +69,39 @@ class _HomeRecommendState extends State<HomeRecommend>
           item.bookId == 9669 ||
           item.bookId == 8833;
     });
+
+    int start = bannerList.length != 0 ? 1 : 0;
+    int length = recommendList.data.book.length;
+    var bookList = recommendList.data.book.getRange(start, length).toList();
+
     setState(() {
-      _recommendList = recommendList;
       _bannerList = bannerList;
+      _bookList = bookList;
+      recommendPageControl.dataListLength = bookList.length;
       isLoading = false;
     });
-  }
-
-  List<Widget> buildBookItem() {
-    int start = _bannerList.length != 0 ? 1 : 0;
-    int lenth = _recommendList.data.book.length;
-    List<RecommendList.Book> bookList =
-        _recommendList.data.book.getRange(start, lenth).toList();
-
-    return bookList.map((item) {
-      return BookItem(
-        book: item,
-      );
-    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    return RefreshIndicator(
-        key: refreshIndicatorKey,
-        onRefresh: handleRefrsh,
-        child: isLoading
-            ? Container()
-            : ListView(
-                children: <Widget>[
-                  this._bannerList.length != 0
-                      ? BannerSwipper(
-                          bannerList: this._bannerList,
-                        )
-                      : Container(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildBookItem(),
-                  )
-                ],
-              ));
+    return PullLoadWrapper(
+      refreshKey: refreshIndicatorKey,
+      control: recommendPageControl,
+      isFirstLoading: isLoading,
+      onRefresh: handleRefrsh,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _bannerList.length != 0
+              ? BannerSwipper(
+                  bannerList: _bannerList,
+                )
+              : Container();
+        } else {
+          return BookItem(book: _bookList[index - 1]);
+        }
+      },
+    );
   }
 }

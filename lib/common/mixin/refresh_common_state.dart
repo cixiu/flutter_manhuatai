@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 mixin RefreshCommonState<T extends StatefulWidget> on State<T>, AutomaticKeepAliveClientMixin<T> {
-  final GlobalKey<RefreshIndicatorState> refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  final refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -15,8 +16,8 @@ mixin RefreshCommonState<T extends StatefulWidget> on State<T>, AutomaticKeepAli
   }
 
   // @override
-  // void initState() { 
+  // void initState() {
   //   super.initState();
-    
+
   // }
 }
