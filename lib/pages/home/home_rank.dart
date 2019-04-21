@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper.dart';
 import 'package:flutter_manhuatai/components/rank/rank_all.dart';
 import 'package:flutter_manhuatai/components/rank/rank_self.dart';
 import 'package:flutter_manhuatai/components/rank/rank_new.dart';
@@ -23,6 +24,7 @@ class HomeRank extends StatefulWidget {
 
 class _HomeRankState extends State<HomeRank>
     with AutomaticKeepAliveClientMixin, RefreshCommonState<HomeRank> {
+  final rankPageControl = PullLoadWrapperControl();
   bool isFirstShow = true;
   bool isLoading = true;
   List<RankList.Data> rankList;
@@ -32,6 +34,7 @@ class _HomeRankState extends State<HomeRank>
 
   @override
   void initState() {
+    rankPageControl.needHeader = false;
     super.initState();
     print('初始化排行页面');
   }
@@ -59,10 +62,10 @@ class _HomeRankState extends State<HomeRank>
   Future<void> handleRefrsh() async {
     var response = await Api.getRankList();
     RankList.RankList rankData = RankList.RankList.fromJson(response);
-    print(rankData.data);
     setState(() {
       isLoading = false;
       rankList = rankData.data;
+      rankPageControl.dataListLength = rankData.data.length;
     });
   }
 
@@ -103,15 +106,12 @@ class _HomeRankState extends State<HomeRank>
       }
     }
 
-    return RefreshIndicator(
-      key: refreshIndicatorKey,
+    return PullLoadWrapper(
+      isFirstLoading: isLoading,
+      refreshKey: refreshIndicatorKey,
       onRefresh: handleRefrsh,
-      child: isLoading
-          ? Container()
-          : ListView.builder(
-              itemCount: rankList.length,
-              itemBuilder: itemBuilder,
-            ),
+      control: rankPageControl,
+      itemBuilder: itemBuilder,
     );
   }
 }

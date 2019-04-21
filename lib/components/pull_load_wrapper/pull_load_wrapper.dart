@@ -79,12 +79,10 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
     if (!widget.control.needHeader &&
         index == widget.control.dataListLength &&
         widget.control.dataListLength != 0) {
-      return Container(
-        child: Text('正在加载...'),
-      );
+      return _buildProgressIndicator();
     }
     // 如果不需要头部，且数据为0，渲染空页面
-    if (!widget.control.needHeader && widget.control.dataListLength != 0) {
+    if (!widget.control.needHeader && widget.control.dataListLength == 0) {
       return Container(
         child: Text('没有发现数据哦~~'),
       );
@@ -93,19 +91,52 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
     if (widget.control.needHeader &&
         index == _getListCount() - 1 &&
         widget.control.dataListLength != 0) {
-        if (widget.control.needLoadMore) {
-          return Container(
-            child: Text('正在加载...'),
-          );
-        } else {
-          return Container(
-            child: Text('小主没有更多了呢！'),
-          );
-        }
+      return _buildProgressIndicator();
     }
 
     // 回调外正常渲染Item
     return widget.itemBuilder(context, index);
+  }
+
+  //
+  Widget _buildProgressIndicator() {
+    TextStyle textStyle = TextStyle(
+      color: Colors.grey,
+      fontSize: 14.0,
+    );
+    // 根据是否需要加载更多控制底部的显示 widget
+    Widget bottomWidget = widget.control.needLoadMore
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 10.0),
+                width: 20.0,
+                height: 20.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                ),
+              ),
+              Text(
+                '正在加载...',
+                style: textStyle,
+              ),
+            ],
+          )
+        : Container(
+            height: 20.0,
+            child: Text(
+              '小主没有更多了呢！',
+              style: textStyle,
+            ),
+          );
+
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: Center(
+        child: bottomWidget,
+      ),
+    );
   }
 
   @override
@@ -138,6 +169,7 @@ class PullLoadWrapperControl {
   /// 上拉加载更多的列表数据
   // List dataList = [];
 
+  // 列表数据的长度
   int dataListLength = 0;
 
   /// 是否需要加载更多
