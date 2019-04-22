@@ -4,6 +4,7 @@ import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
 /// displayType == 1 的 BookItem需要呈现的布局
@@ -11,7 +12,11 @@ class BookItemDisplay1 extends StatelessWidget {
   final RecommendList.Book book;
   final double horizontalPadding; // 左右2侧水平的padding总和
 
-  BookItemDisplay1({Key key, @required this.book, this.horizontalPadding = 20.0}) : super(key: key);
+  BookItemDisplay1({
+    Key key,
+    @required this.book,
+    this.horizontalPadding = 20.0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,37 +25,48 @@ class BookItemDisplay1 extends StatelessWidget {
     int crossAxisCount = horizonratio >= 1 ? 2 : 3;
     double screenWidth = MediaQuery.of(context).size.width;
     double width =
-        (screenWidth - horizontalPadding - (crossAxisCount - 1) * spacing) / crossAxisCount;
-
+        (screenWidth - horizontalPadding - (crossAxisCount - 1) * spacing) /
+            crossAxisCount;
 
     return Wrap(
       runSpacing: 10.0,
       spacing: spacing,
       children: book.comicInfo.take(6).map((item) {
-        return Container(
-            width: width,
-            child: Stack(
-              alignment: Alignment.bottomLeft,
-              children: <Widget>[
-                ImageWrapper(
+        return GestureDetector(
+          onTap: () {
+            Application.router.navigateTo(
+              context,
+              '/comic/detail/${item.comicId}',
+            );
+          },
+          child: Container(
+              width: width,
+              child: Stack(
+                alignment: Alignment.bottomLeft,
+                children: <Widget>[
+                  ImageWrapper(
                     url: Utils.formatBookImgUrl(
-                        comicInfo: item, config: book.config),
+                      comicInfo: item,
+                      config: book.config,
+                    ),
                     width: width,
                     height: width / horizonratio,
-                    fit: BoxFit.fill),
-                Container(
-                  width: width,
-                  color: Color.fromRGBO(255, 255, 255, 0.8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item.comicName,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    fit: BoxFit.fill,
                   ),
-                )
-              ],
-            ));
+                  Container(
+                    width: width,
+                    color: Color.fromRGBO(255, 255, 255, 0.8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        item.comicName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                ],
+              )),
+        );
       }).toList(),
     );
   }

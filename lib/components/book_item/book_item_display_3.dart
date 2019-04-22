@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
 /// displayType == 3 的 BookItem需要呈现的布局
@@ -11,12 +12,12 @@ class BookItemDisplay3 extends StatelessWidget {
   final int count; // 布局需要显示的 comic 的数量
   final double horizontalPadding; // 左右2侧水平的padding总和
 
-  BookItemDisplay3(
-      {Key key,
-      @required this.book,
-      this.count = 4,
-      this.horizontalPadding = 20.0})
-      : super(key: key);
+  BookItemDisplay3({
+    Key key,
+    @required this.book,
+    this.count = 4,
+    this.horizontalPadding = 20.0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +33,39 @@ class BookItemDisplay3 extends StatelessWidget {
       runSpacing: 10.0,
       spacing: spacing,
       children: book.comicInfo.take(this.count).map((item) {
-        return Container(
-            width: width,
-            child: Column(
-              children: <Widget>[
-                ImageWrapper(
+        return GestureDetector(
+          onTap: () {
+            Application.router.navigateTo(
+              context,
+              '/comic/detail/${item.comicId}',
+            );
+          },
+          child: Container(
+              width: width,
+              child: Column(
+                children: <Widget>[
+                  ImageWrapper(
                     url: Utils.formatBookImgUrl(
-                        comicInfo: item, config: book.config),
+                      comicInfo: item,
+                      config: book.config,
+                    ),
                     width: width,
                     height: width / horizonratio,
-                    fit: BoxFit.fill),
-                Container(
-                  width: width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item.comicName,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    fit: BoxFit.fill,
                   ),
-                )
-              ],
-            ));
+                  Container(
+                    width: width,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        item.comicName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                ],
+              )),
+        );
       }).toList(),
     );
   }

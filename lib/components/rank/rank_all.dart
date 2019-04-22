@@ -44,7 +44,9 @@ class RankAll extends StatelessWidget {
 
       RankList.ListSub item = data.list[i];
       String imgUrl = Utils.generateImgUrlFromId(
-          id: item.comicId, aspectRatio: aspectRatio);
+        id: item.comicId,
+        aspectRatio: aspectRatio,
+      );
 
       Widget child = RankItemImg(
         url: imgUrl,
@@ -63,7 +65,6 @@ class RankAll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Column(

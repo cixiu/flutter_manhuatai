@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
@@ -18,34 +19,39 @@ class BannerSwipper extends StatelessWidget {
       child: Swiper(
         itemCount: bannerList.length,
         itemBuilder: (context, index) {
-          return Column(
-            children: <Widget>[
-              ImageWrapper(
-                url:
-                    '${AppConst.img_host}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
-                width: MediaQuery.of(context).size.width,
-                height: 200.0,
-                fit: BoxFit.fill,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(bannerList[index].comicName),
-                      Text(
-                        bannerList[index].lastComicChapterName,
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey[500],
-                        ),
-                      )
-                    ],
-                  ),
+          return GestureDetector(
+            onTap: () {
+              Application.router.navigateTo(context, '/comic/detail/${bannerList[index].comicId}');
+            },
+            child: Column(
+              children: <Widget>[
+                ImageWrapper(
+                  url:
+                      '${AppConst.img_host}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
+                  width: MediaQuery.of(context).size.width,
+                  height: 200.0,
+                  fit: BoxFit.fill,
                 ),
-              )
-            ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(bannerList[index].comicName),
+                        Text(
+                          bannerList[index].lastComicChapterName,
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey[500],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           );
         },
         // itemWidth: MediaQuery.of(context).size.width,

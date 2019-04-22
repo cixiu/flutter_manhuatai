@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:meta/meta.dart';
 
 import './http.dart';
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
@@ -124,6 +125,22 @@ class Api {
         contentType: ContentType.parse('application/x-www-form-urlencoded'),
       ),
     );
+
+    return response;
+  }
+
+  /// 获取指定漫画的主体信息
+  static Future<Map<String, dynamic>> getComicInfoBody({
+    @required String comicId,
+  }) async {
+    final String url =
+        'https://getcomicinfo-globalapi.yyhao.com/app_api/v5/getcomicinfo_body/';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'comic_id': comicId,
+      'platformname': 'android',
+      'productname': 'mht',
+    });
 
     return response;
   }

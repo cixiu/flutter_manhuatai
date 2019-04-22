@@ -69,41 +69,41 @@ class _HomeRankState extends State<HomeRank>
     });
   }
 
+  Widget itemBuilder(BuildContext context, int index) {
+    var data = rankList[index];
+    var type = data.type;
+
+    if (type == 'all') {
+      return RankAll(data: data);
+    } else if (type == 'self') {
+      return RankSelf(data: data);
+    } else if (type == 'new') {
+      return RankNew(data: data);
+    } else if (type == 'dark') {
+      return RankDark(data: data);
+    } else if (type == 'charge') {
+      return RankCharge(data: data);
+    } else if (type == 'boy') {
+      return RankBoy(data: data);
+    } else if (type == 'girl') {
+      return RankGirl(data: data);
+    } else if (type == 'serialize') {
+      return RankSerialize(data: data);
+    } else if (type == 'finish') {
+      return RankFinish(data: data);
+    } else if (type == 'free') {
+      return RankFree(data: data);
+    } else {
+      return RankAll(data: data);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     print('build Rank ..................');
     if (isFirstShow) {
       return Container();
-    }
-
-    Widget itemBuilder(BuildContext context, int index) {
-      var data = rankList[index];
-      var type = data.type;
-
-      if (type == 'all') {
-        return RankAll(data: data);
-      } else if (type == 'self') {
-        return RankSelf(data: data);
-      } else if (type == 'new') {
-        return RankNew(data: data);
-      } else if (type == 'dark') {
-        return RankDark(data: data);
-      } else if (type == 'charge') {
-        return RankCharge(data: data);
-      } else if (type == 'boy') {
-        return RankBoy(data: data);
-      } else if (type == 'girl') {
-        return RankGirl(data: data);
-      } else if (type == 'serialize') {
-        return RankSerialize(data: data);
-      } else if (type == 'finish') {
-        return RankFinish(data: data);
-      } else if (type == 'free') {
-        return RankFree(data: data);
-      } else {
-        return RankAll(data: data);
-      }
     }
 
     return PullLoadWrapper(
