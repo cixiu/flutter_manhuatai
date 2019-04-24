@@ -84,7 +84,7 @@ class Utils {
   ///
   /// 使用示例
   /// ```
-  /// generateImgUrlFromId(id: 123, size:'1:1', type: 'head') // https://image.mhxk.com/file/kanmanhua_images/head/000/123/456.jgp-100x100.jpg.webp
+  /// generateImgUrlFromId(id: 123, aspectRatio:'1:1', type: 'head') // https://image.mhxk.com/file/kanmanhua_images/head/000/123/456.jgp-100x100.jpg.webp
   /// ```
   static String generateImgUrlFromId(
       {@required int id, @required String aspectRatio, String type}) {
