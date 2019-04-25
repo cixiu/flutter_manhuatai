@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-mixin RefreshCommonState<T extends StatefulWidget> on State<T>, AutomaticKeepAliveClientMixin<T> {
+mixin RefreshCommonState<T extends StatefulWidget> on State<T>{
   final refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
-  @override
-  bool get wantKeepAlive => true;
+  // @override
+  // bool get wantKeepAlive => true;
 
   showRefreshLoading() {
     new Future.delayed(const Duration(seconds: 0), () {
