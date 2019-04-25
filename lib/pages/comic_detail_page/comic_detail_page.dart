@@ -52,51 +52,31 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   @override
   Widget build(BuildContext context) {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
-    print(MediaQuery.of(context).size.width);
-    print(MediaQuery.of(context).size.height);
-    print(ScreenUtil.screenWidth);
-    print(ScreenUtil.screenHeight);
-    print(ScreenUtil.pixelRatio);
-    print(ScreenUtil.statusBarHeight);
-    print(ScreenUtil.bottomBarHeight);
-    print(ScreenUtil.getInstance().setWidth(750));
-    print(ScreenUtil.getInstance().setHeight(488));
-    print('${ScreenUtil().setHeight(552) - ScreenUtil().setHeight(64)}');
-    var pinnedHeaderHeight =
-        //statusBar height
-        statusBarHeight +
-            //pinned SliverAppBar height in header
-            kToolbarHeight;
+    // 为了保持在各个设备上图片显示一致，根据宽度去适配
+    var expandedHeight = ScreenUtil().setWidth(488) +
+        ScreenUtil().setWidth(128) / 2 -
+        statusBarHeight;
     var isShowAll = true;
+
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(comicInfoBody?.comicName ?? ''),
-      //   centerTitle: true,
-      // ),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
             pinned: true,
-            expandedHeight: ScreenUtil().setHeight(552),
+            expandedHeight: expandedHeight,
             title: Text(comicInfoBody?.comicName ?? ''),
             elevation: 0.0,
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
               background: Stack(
                 children: <Widget>[
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    bottom: ScreenUtil().setHeight(64),
-                    left: 0,
-                    child: Image.network(
-                      Utils.generateImgUrlFromId(
-                        id: int.parse(widget.comicId),
-                        aspectRatio: '2:1',
-                      ),
-                      height: ScreenUtil().setHeight(488),
-                      fit: BoxFit.cover,
+                  Image.network(
+                    Utils.generateImgUrlFromId(
+                      id: int.parse(widget.comicId),
+                      aspectRatio: '2:1',
                     ),
+                    height: ScreenUtil().setWidth(488),
+                    fit: BoxFit.cover,
                   ),
                   Positioned(
                     top: 0,
@@ -111,10 +91,83 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                     right: 0,
                     bottom: 0,
                     left: 0,
-                    child: Image.asset(
-                      'lib/images/pic_detail_hx1.png',
-                      height: ScreenUtil().setHeight(128),
-                      fit: BoxFit.fill,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: <Widget>[
+                        Image.asset(
+                          'lib/images/pic_detail_hx1.png',
+                          height: ScreenUtil().setWidth(128),
+                          fit: BoxFit.fill,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: ScreenUtil().setWidth(200),
+                              height: ScreenUtil().setWidth(64),
+                              child: Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: <Widget>[
+                                  Image.asset(
+                                    'lib/images/icon_detail_collect.png',
+                                    width: ScreenUtil().setWidth(200),
+                                    height: ScreenUtil().setWidth(64),
+                                  ),
+                                  Text('收藏'),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: ScreenUtil().setWidth(248),
+                              height: ScreenUtil().setWidth(102),
+                              child: Stack(
+                                overflow: Overflow.visible,
+                                alignment: Alignment.bottomCenter,
+                                children: <Widget>[
+                                  Positioned(
+                                    top: ScreenUtil().setWidth(-10),
+                                    child: Image.asset(
+                                      'lib/images/icon_detail_reed.png',
+                                      width: ScreenUtil().setWidth(248),
+                                      height: ScreenUtil().setWidth(102),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: ScreenUtil().setWidth(20),
+                                    child: Text('开始阅读'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: ScreenUtil().setWidth(200),
+                              height: ScreenUtil().setWidth(64),
+                              child: Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: <Widget>[
+                                  Image.asset(
+                                    'lib/images/icon_detail_comt.png',
+                                    width: ScreenUtil().setWidth(200),
+                                    height: ScreenUtil().setWidth(64),
+                                  ),
+                                  Text('吐槽'),
+                                ],
+                              ),
+                            ),
+                            // Container(
+                            //   width: ScreenUtil().setWidth(200),
+                            //   height: ScreenUtil().setWidth(64),
+                            //   decoration: BoxDecoration(
+                            //     image: DecorationImage(
+                            //         image: AssetImage(
+                            //             'lib/images/icon_detail_comt.png')),
+                            //   ),
+                            //   child: Text('吐槽'),
+                            // ),
+                          ],
+                        )
+                      ],
                     ),
                   )
                 ],
@@ -197,73 +250,6 @@ class _ComicDetailPageState extends State<ComicDetailPage>
           )
         ],
       ),
-      // body: NestedScrollViewRefreshIndicator(
-      //   onRefresh: onRefresh,
-      //   child: NestedScrollView(
-      //     controller: _scrollController1,
-      //     headerSliverBuilder: (context, innerBoxIsScrolled) {
-      //       return <Widget>[
-      //         SliverAppBar(
-      //           pinned: true,
-      //           expandedHeight: ScreenUtil().setHeight(488),
-      //           title: Text(comicInfoBody?.comicName ?? ''),
-      //           flexibleSpace: FlexibleSpaceBar(
-      //             collapseMode: CollapseMode.pin,
-      //             background: Image.network(
-      //               Utils.generateImgUrlFromId(
-      //                 id: int.parse(widget.comicId),
-      //                 aspectRatio: '2:1',
-      //               ),
-      //               fit: BoxFit.cover,
-      //             ),
-      //           ),
-      //           // bottom: PreferredSize(
-      //           //   preferredSize: Size.fromHeight(30.0),
-      //           //   child: Container(
-      //           //     height: 30.0,
-      //           //     color: Colors.red,
-      //           //   ),
-      //           // ),
-      //         ),
-      //       ];
-      //     },
-      //     pinnedHeaderSliverHeightBuilder: () {
-      //       return pinnedHeaderHeight;
-      //     },
-      //     innerScrollPositionKeyBuilder: () {
-      //       return Key('position');
-      //     },
-      //     body: Column(
-      //       children: <Widget>[
-      //         Container(
-      //           height: 50.0,
-      //           color: Colors.green,
-      //         ),
-      //         Expanded(
-      //           child: NestedScrollViewInnerScrollPositionKeyWidget(
-      //             Key('position'),
-      //             ListView.builder(
-      //               // controller: _scrollController2,
-      //               itemCount: 100,
-      //               itemBuilder: (context, index) {
-      //                 return Text('$index');
-      //               },
-      //             ),
-      //           ),
-      //         )
-      //       ],
-      //     ),
-      //   ),
-      // ),
-      // body: Container(
-      //   child: Image.network(
-      //     Utils.generateImgUrlFromId(
-      //       id: int.parse(widget.comicId),
-      //       aspectRatio: '2:1',
-      //     ),
-      //     height: ScreenUtil().setHeight(488),
-      //   ),
-      // ),
     );
   }
 }

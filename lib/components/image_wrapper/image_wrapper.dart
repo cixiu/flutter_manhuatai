@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class ImageWrapper extends StatelessWidget {
   final double width;
@@ -22,7 +23,11 @@ class ImageWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       alignment: alignment,
-      // placeholder: (context, url) => Icon(Icons.toys),
+      placeholder: (context, url) => Image.memory(
+            kTransparentImage,
+            width: width,
+            height: height,
+          ),
       imageUrl: url,
       errorWidget: (context, url, error) => Image.asset(
             'lib/images/pic_cache.png',

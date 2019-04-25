@@ -32,6 +32,7 @@ dependencies:
   oktoast: ^2.1.5
   flutter_screenutil: ^0.5.1
   extended_nested_scroll_view: ^0.3.4
+  transparent_image: ^1.0.0
 
 
 dev_dependencies:
