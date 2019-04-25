@@ -86,8 +86,11 @@ class Utils {
   /// ```
   /// generateImgUrlFromId(id: 123, aspectRatio:'1:1', type: 'head') // https://image.mhxk.com/file/kanmanhua_images/head/000/123/456.jgp-100x100.jpg.webp
   /// ```
-  static String generateImgUrlFromId(
-      {@required int id, @required String aspectRatio, String type}) {
+  static String generateImgUrlFromId({
+    @required int id,
+    @required String aspectRatio,
+    String type,
+  }) {
     String imgHost = AppConst.img_host;
 
     List<String> ratioList = aspectRatio.split(':');

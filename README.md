@@ -22,3 +22,5 @@ flutter run
 1. [FloatingActionButton 的 heroTag 必须唯一， 或者为null](https://stackoverflow.com/questions/53265299/flutter-gridview-causes-navigator-push-error)
 2. [Widgets in the overflow of stack do not respond to gestures](https://github.com/flutter/flutter/issues/19445)
 3. [手机适配问题-Flutter screen adaptation, font adaptation, get screen information](https://github.com/OpenFlutter/flutter_screenutil)
+4. [嵌套的ScrollView问题(NestedScrollView, 吸顶TabBar),解决方法](https://github.com/fluttercandies/extended_nested_scroll_view)
+5. [嵌套的ScrollView+下拉上拉加载更多之解决方法](https://github.com/fluttercandies/loading_more_list)
