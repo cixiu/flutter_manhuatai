@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_manhuatai/components/score_star/score_star.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
@@ -25,6 +28,7 @@ class ComicDetailPage extends StatefulWidget {
 class _ComicDetailPageState extends State<ComicDetailPage>
     with RefreshCommonState, WidgetsBindingObserver {
   ComicInfoBody comicInfoBody = ComicInfoBody.fromJson({});
+  Call_data influenceData = Call_data.fromJson({});
   bool isFirstLoading = true;
 
   @override
@@ -43,8 +47,17 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
   }
 
+  Future<void> _getComicInfoInfluence() async {
+    var response = await Api.getComicInfoInfluence(comicId: widget.comicId);
+    var _comicInfoInfluence = ComicInfoInfluence.fromJson(response);
+    setState(() {
+      influenceData = _comicInfoInfluence.data.callData;
+    });
+  }
+
   Future<void> onRefresh() async {
     await _getComicInfoBody();
+    await _getComicInfoInfluence();
     setState(() {
       isFirstLoading = false;
     });
@@ -68,105 +81,14 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   SliverAppBar(
                     pinned: true,
                     expandedHeight: expandedHeight,
-                    title: Text(comicInfoBody?.comicName ?? ''),
+                    // title: Text(comicInfoBody?.comicName ?? ''),
                     elevation: 0.0,
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.pin,
-                      background: Stack(
-                        children: <Widget>[
-                          Image.network(
-                            Utils.generateImgUrlFromId(
-                              id: int.parse(widget.comicId),
-                              aspectRatio: '2:1',
-                            ),
-                            height: ScreenUtil().setWidth(488),
-                            fit: BoxFit.cover,
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            bottom: 0,
-                            left: 0,
-                            child: Container(
-                              color: Color.fromRGBO(0, 0, 0, 0.5),
-                            ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            left: 0,
-                            child: Stack(
-                              alignment: Alignment.bottomCenter,
-                              children: <Widget>[
-                                Image.asset(
-                                  'lib/images/pic_detail_hx1.png',
-                                  height: ScreenUtil().setWidth(128),
-                                  fit: BoxFit.fill,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      width: ScreenUtil().setWidth(200),
-                                      height: ScreenUtil().setWidth(64),
-                                      child: Stack(
-                                        alignment: Alignment.bottomCenter,
-                                        children: <Widget>[
-                                          Image.asset(
-                                            'lib/images/icon_detail_collect.png',
-                                            width: ScreenUtil().setWidth(200),
-                                            height: ScreenUtil().setWidth(64),
-                                          ),
-                                          Text('收藏'),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      width: ScreenUtil().setWidth(248),
-                                      height: ScreenUtil().setWidth(102),
-                                      child: Stack(
-                                        overflow: Overflow.visible,
-                                        alignment: Alignment.bottomCenter,
-                                        children: <Widget>[
-                                          Positioned(
-                                            top: ScreenUtil().setWidth(-10),
-                                            child: Image.asset(
-                                              'lib/images/icon_detail_reed.png',
-                                              width: ScreenUtil().setWidth(248),
-                                              height:
-                                                  ScreenUtil().setWidth(102),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            bottom: ScreenUtil().setWidth(20),
-                                            child: Text('开始阅读'),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      width: ScreenUtil().setWidth(200),
-                                      height: ScreenUtil().setWidth(64),
-                                      child: Stack(
-                                        alignment: Alignment.bottomCenter,
-                                        children: <Widget>[
-                                          Image.asset(
-                                            'lib/images/icon_detail_comt.png',
-                                            width: ScreenUtil().setWidth(200),
-                                            height: ScreenUtil().setWidth(64),
-                                          ),
-                                          Text('吐槽'),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          )
-                        ],
+                      background: ComicDetailHeader(
+                        comicId: widget.comicId,
+                        comicInfoBody: comicInfoBody,
+                        influenceData: influenceData,
                       ),
                     ),
                   ),

@@ -144,4 +144,21 @@ class Api {
 
     return response;
   }
+
+  /// 获取指定漫画的人气活跃数据
+  static Future<Map<String, dynamic>> getComicInfoInfluence({
+    @required String comicId,
+  }) async {
+    final String url =
+        'https://comic.321mh.com/app_api/v5/getcomicinfo_influence/';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'comic_id': comicId,
+      'rank_type': 'all',
+      'platformname': 'android',
+      'productname': 'mht',
+    });
+
+    return response;
+  }
 }

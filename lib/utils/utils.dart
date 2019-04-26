@@ -71,9 +71,9 @@ class Utils {
     if (number > YI) {
       double ratioYi = number / YI;
       if (ratioYi >= 100) {
-        resultNumber = '${ratioYi.floor()}万';
+        resultNumber = '${ratioYi.floor()}亿';
       } else {
-        resultNumber = '${ratioYi.toStringAsFixed(1)}万';
+        resultNumber = '${ratioYi.toStringAsFixed(1)}亿';
       }
     }
 
