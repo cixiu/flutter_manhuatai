@@ -27,16 +27,42 @@ class ComicDetailPage extends StatefulWidget {
 
 class _ComicDetailPageState extends State<ComicDetailPage>
     with RefreshCommonState, WidgetsBindingObserver {
+  ScrollController _scrollController = ScrollController();
   ComicInfoBody comicInfoBody = ComicInfoBody.fromJson({});
   Call_data influenceData = Call_data.fromJson({});
   bool isFirstLoading = true;
+  bool _showTitle = false;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
+    _scrollController.addListener(_listScroll);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_listScroll);
+    super.dispose();
+  }
+
+  // 监听滚动设置 appBar 的 title
+  void _listScroll() {
+    if (_scrollController.position.pixels > 200) {
+      if (!_showTitle) {
+        setState(() {
+          _showTitle = true;
+        });
+      }
+    } else {
+      if (_showTitle) {
+        setState(() {
+          _showTitle = false;
+        });
+      }
+    }
   }
 
   Future<void> _getComicInfoBody() async {
@@ -77,11 +103,13 @@ class _ComicDetailPageState extends State<ComicDetailPage>
         child: isFirstLoading
             ? Container()
             : CustomScrollView(
+                controller: _scrollController,
                 slivers: <Widget>[
                   SliverAppBar(
                     pinned: true,
                     expandedHeight: expandedHeight,
-                    // title: Text(comicInfoBody?.comicName ?? ''),
+                    title: Text(_showTitle ? comicInfoBody.comicName : ''),
+                    centerTitle: true,
                     elevation: 0.0,
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.pin,

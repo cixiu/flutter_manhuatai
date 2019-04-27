@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/models/comic_info_influence.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class ComicDetailHeader extends StatelessWidget {
   final String comicId;
@@ -23,8 +24,9 @@ class ComicDetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Image.network(
-          Utils.generateImgUrlFromId(
+        FadeInImage.memoryNetwork(
+          placeholder: kTransparentImage,
+          image: Utils.generateImgUrlFromId(
             id: int.parse(comicId),
             aspectRatio: '2:1',
           ),
@@ -161,13 +163,50 @@ class ComicDetailHeader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ImageWrapper(
-                    url: Utils.generateImgUrlFromId(
-                      id: int.parse(comicId),
-                      aspectRatio: '3:4',
-                    ),
-                    width: ScreenUtil().setWidth(158),
-                    height: ScreenUtil().setWidth(208),
+                  // 右侧的漫画封面图
+                  Stack(
+                    alignment: Alignment.topRight,
+                    children: <Widget>[
+                      Container(
+                        width: ScreenUtil().setWidth(158),
+                        height: ScreenUtil().setWidth(208),
+                        padding: EdgeInsets.all(ScreenUtil().setWidth(4)),
+                        color: Colors.white,
+                        child: ImageWrapper(
+                          url: Utils.generateImgUrlFromId(
+                            id: int.parse(comicId),
+                            aspectRatio: '3:4',
+                          ),
+                        ),
+                      ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            'lib/images/icon_detail_front_tag.png',
+                            width:  ScreenUtil().setWidth(24),
+                            height:  ScreenUtil().setWidth(54),
+                          ),
+                          Container(
+                            width: ScreenUtil().setWidth(24),
+                            child: Text(
+                              comicInfoBody.copyrightTypeCn,
+                              strutStyle: StrutStyle(
+                                fontSize: ScreenUtil().setWidth(16),
+                                forceStrutHeight: true,
+                              ),
+                              style: TextStyle(
+                                fontSize: ScreenUtil().setWidth(16),
+                                color: Colors.white,
+                                letterSpacing: 0.0,
+                              ),
+                              textAlign: TextAlign.center,
+                              // textDirection: TextDirection.ltr,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 ],
               ),
