@@ -128,27 +128,27 @@ class ComicDetailHeader extends StatelessWidget {
                                     return Container(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: ScreenUtil().setWidth(16),
-                                        // vertical: ScreenUtil().setWidth(6),
+                                        vertical: ScreenUtil().setWidth(6),
                                       ),
                                       margin: EdgeInsets.only(
                                         left: ScreenUtil().setWidth(10),
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(
-                                          ScreenUtil().setWidth(20)
+                                          ScreenUtil().setWidth(20),
                                         ),
                                         color:
                                             Color.fromRGBO(188, 188, 188, 0.5),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          item.name,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: ScreenUtil().setSp(20),
-                                            height: 1.0,
-                                            // fontSize: 10,
-                                          ),
+                                      child: Text(
+                                        item.name,
+                                        strutStyle: StrutStyle(
+                                          fontSize: ScreenUtil().setSp(20),
+                                          forceStrutHeight: true,
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: ScreenUtil().setSp(20),
                                         ),
                                       ),
                                     );
