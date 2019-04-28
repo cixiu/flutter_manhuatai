@@ -13,11 +13,13 @@ class ComicDetailHeader extends StatelessWidget {
   final String comicId;
   final ComicInfoBody comicInfoBody;
   final Call_data influenceData;
+  final int comicCommentCount;
 
   ComicDetailHeader({
     this.comicId,
     this.comicInfoBody,
     this.influenceData,
+    this.comicCommentCount,
   });
 
   @override
@@ -184,8 +186,8 @@ class ComicDetailHeader extends StatelessWidget {
                         children: <Widget>[
                           Image.asset(
                             'lib/images/icon_detail_front_tag.png',
-                            width:  ScreenUtil().setWidth(24),
-                            height:  ScreenUtil().setWidth(54),
+                            width: ScreenUtil().setWidth(24),
+                            height: ScreenUtil().setWidth(54),
                           ),
                           Container(
                             width: ScreenUtil().setWidth(24),
@@ -246,7 +248,13 @@ class ComicDetailHeader extends StatelessWidget {
                       width: ScreenUtil().setWidth(200),
                       height: ScreenUtil().setWidth(64),
                     ),
-                    Text('收藏'),
+                    Positioned(
+                      bottom: ScreenUtil().setWidth(6),
+                      child: _buildTabText(
+                        text: '收藏',
+                        subText: '${Utils.formatNumber(influenceData.collect)}',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -283,7 +291,14 @@ class ComicDetailHeader extends StatelessWidget {
                       width: ScreenUtil().setWidth(200),
                       height: ScreenUtil().setWidth(64),
                     ),
-                    Text('吐槽'),
+                    Positioned(
+                      bottom: ScreenUtil().setWidth(6),
+                      child: _buildTabText(
+                        text: '吐槽',
+                        subText:
+                            '${Utils.formatNumber(comicCommentCount.toString())}',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -291,6 +306,44 @@ class ComicDetailHeader extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  // 收藏，开始阅读，吐槽区域的文本Widget
+  Widget _buildTabText({
+    String text,
+    String subText,
+  }) {
+    return Row(
+      children: <Widget>[
+        Text(
+          text,
+          strutStyle: StrutStyle(
+            forceStrutHeight: true,
+            fontSize: ScreenUtil().setWidth(24),
+          ),
+          style: TextStyle(
+            fontSize: ScreenUtil().setWidth(24),
+            color: Color.fromRGBO(0, 0, 0, 0.7),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(
+            left: ScreenUtil().setWidth(10),
+          ),
+          child: Text(
+            subText,
+            strutStyle: StrutStyle(
+              forceStrutHeight: true,
+              fontSize: ScreenUtil().setWidth(20),
+            ),
+            style: TextStyle(
+              fontSize: ScreenUtil().setWidth(20),
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

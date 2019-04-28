@@ -161,4 +161,20 @@ class Api {
 
     return response;
   }
+
+  /// 获取指定漫画的人气活跃数据
+  static Future<Map<String, dynamic>> getComicCommentCount({
+    @required String comicId,
+  }) async {
+    final String url = 'https://community-hots.321mh.com/comment/count/';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'appId': 2,
+      'commentType': 2,
+      'ssid': comicId, // 漫画的id
+      'ssidType': 0,
+    });
+
+    return response;
+  }
 }

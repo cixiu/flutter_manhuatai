@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
-import 'package:flutter_manhuatai/components/score_star/score_star.dart';
+
+import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 /// 漫画详情
@@ -30,6 +27,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   ScrollController _scrollController = ScrollController();
   ComicInfoBody comicInfoBody = ComicInfoBody.fromJson({});
   Call_data influenceData = Call_data.fromJson({});
+  int comicCommentCount = 0;
   bool isFirstLoading = true;
   bool _showTitle = false;
 
@@ -65,6 +63,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     }
   }
 
+  // 获取指定漫画的主体信息
   Future<void> _getComicInfoBody() async {
     var response = await Api.getComicInfoBody(comicId: widget.comicId);
     var _comicInfoBody = ComicInfoBody.fromJson(response);
@@ -73,6 +72,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
   }
 
+  // 获取指定漫画的人气活跃数据
   Future<void> _getComicInfoInfluence() async {
     var response = await Api.getComicInfoInfluence(comicId: widget.comicId);
     var _comicInfoInfluence = ComicInfoInfluence.fromJson(response);
@@ -81,9 +81,18 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
   }
 
+  Future<void> _getComicCommentCount() async {
+    var response = await Api.getComicCommentCount(comicId: widget.comicId);
+    var _comicCommentCount = ComicCommentCount.fromJson(response);
+    setState(() {
+      comicCommentCount = _comicCommentCount.data;
+    });
+  }
+
   Future<void> onRefresh() async {
     await _getComicInfoBody();
     await _getComicInfoInfluence();
+    await _getComicCommentCount();
     setState(() {
       isFirstLoading = false;
     });
@@ -117,6 +126,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                         comicId: widget.comicId,
                         comicInfoBody: comicInfoBody,
                         influenceData: influenceData,
+                        comicCommentCount: comicCommentCount,
                       ),
                     ),
                   ),
