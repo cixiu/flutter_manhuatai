@@ -34,6 +34,10 @@ class MyApp extends StatelessWidget {
         store: store,
         child: MaterialApp(
           title: '漫意话',
+          theme: ThemeData(
+            backgroundColor: Colors.white,
+            canvasColor: Colors.white,
+          ),
           home: MyHomePage(),
           onGenerateRoute: Application.router.generator,
         ),

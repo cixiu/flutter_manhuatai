@@ -131,40 +131,37 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                     ),
                   ),
                   SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index == 0) {
-                          return Container(
-                            height: 40.0,
-                            color: Colors.cyan,
-                            child: Stack(
-                              overflow: Overflow.visible,
-                              // alignment: Alignment.center,
-                              children: <Widget>[
-                                Container(
-                                  color: Colors.blue,
-                                  height: 40.0,
-                                  child: Text('滴滴滴滴滴哒哒多多多多多多多多多多'),
-                                ),
-                                Positioned(
-                                  // top: -20.0,
-                                  child: Container(
-                                    color: Colors.red,
-                                    height: 40.0,
-                                    child: Text('jkddddddddddddddddddddddd'),
-                                  ),
-                                )
-                              ],
+                    delegate: SliverChildListDelegate(
+                      [
+                        Container(
+                          padding: EdgeInsets.fromLTRB(
+                            ScreenUtil().setWidth(20),
+                            ScreenUtil().setWidth(10),
+                            ScreenUtil().setWidth(20),
+                            ScreenUtil().setWidth(20),
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[200],
+                              ),
                             ),
-                          );
-                        }
-                        return Container(
-                          color: Colors.red,
-                          height: 30.0,
-                          child: Text('$index'),
-                        );
-                      },
-                      childCount: 20,
+                          ),
+                          child: Text(
+                            comicInfoBody.comicDesc,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            strutStyle: StrutStyle(
+                              forceStrutHeight: true,
+                              fontSize: ScreenUtil().setSp(24),
+                            ),
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: ScreenUtil().setSp(24),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   isShowAll
@@ -175,8 +172,11 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                       : SliverList(
                           delegate: SliverChildListDelegate([
                             Container(
-                              height: 50.0,
-                              color: Colors.grey,
+                              height: ScreenUtil().setWidth(96),
+                              padding: EdgeInsets.symmetric(
+                                vertical: ScreenUtil().setWidth(20),
+                              ),
+                              color: Colors.white,
                               child: Text('连载'),
                             )
                           ]),
@@ -213,19 +213,72 @@ class _ComicDetailPageState extends State<ComicDetailPage>
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
-  double get minExtent => 50;
+  double get minExtent => ScreenUtil().setWidth(96);
 
   @override
-  double get maxExtent => 50;
+  double get maxExtent => ScreenUtil().setWidth(96);
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
-      color: Colors.grey,
-      height: 50.0,
-      child: Text('连载'),
-    );
+        height: ScreenUtil().setWidth(96),
+        padding: EdgeInsets.symmetric(
+          horizontal: ScreenUtil().setWidth(20),
+        ),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey[200],
+            ),
+          ),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text(
+                  '连载',
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setWidth(32),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              height: ScreenUtil().setWidth(32),
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil().setWidth(14),
+              ),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(ScreenUtil().setWidth(32)),
+              ),
+              child: Center(
+                child: Text(
+                  '选集',
+                  strutStyle: StrutStyle(
+                    forceStrutHeight: true,
+                    fontSize: ScreenUtil().setSp(20),
+                  ),
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setSp(20),
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ));
   }
 
   @override
