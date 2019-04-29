@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_manhuatai/utils/utils.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_manhuatai/components/radius_container/radius_container.dart';
 
 import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
@@ -167,7 +170,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   isShowAll
                       ? SliverPersistentHeader(
                           pinned: true,
-                          delegate: _SliverAppBarDelegate(),
+                          delegate: _SliverAppBarDelegate(
+                            comicInfoBody: comicInfoBody,
+                          ),
                         )
                       : SliverList(
                           delegate: SliverChildListDelegate([
@@ -212,6 +217,12 @@ class _ComicDetailPageState extends State<ComicDetailPage>
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final ComicInfoBody comicInfoBody;
+
+  _SliverAppBarDelegate({
+    this.comicInfoBody,
+  });
+
   @override
   double get minExtent => ScreenUtil().setWidth(96);
 
@@ -240,43 +251,61 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text(
-                  '连载',
-                  style: TextStyle(
-                    fontSize: ScreenUtil().setWidth(32),
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    '连载',
+                    style: TextStyle(
+                      fontSize: ScreenUtil().setWidth(32),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                  Container(
+                    margin: EdgeInsets.only(left: ScreenUtil().setWidth(10)),
+                    child: Image.asset(
+                      'lib/images/icon_detail_list_a.png',
+                      width: ScreenUtil().setWidth(20),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil().setWidth(30),
+                    ),
+                    child: Text(
+                      '${Utils.formatDate(comicInfoBody.updateTime)}',
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setSp(20),
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        right: ScreenUtil().setWidth(30),
+                      ),
+                      child: Text(
+                        '${comicInfoBody.lastChapterName}',
+                        overflow: TextOverflow.ellipsis,
+                        strutStyle: StrutStyle(
+                          forceStrutHeight: true,
+                          fontSize: ScreenUtil().setSp(20),
+                        ),
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(20),
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
-            Container(
-              height: ScreenUtil().setWidth(32),
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(14),
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.grey,
-                ),
-                borderRadius: BorderRadius.circular(ScreenUtil().setWidth(32)),
-              ),
-              child: Center(
-                child: Text(
-                  '选集',
-                  strutStyle: StrutStyle(
-                    forceStrutHeight: true,
-                    fontSize: ScreenUtil().setSp(20),
-                  ),
-                  style: TextStyle(
-                    fontSize: ScreenUtil().setSp(20),
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            )
+            RadiusContainer(
+              text: '选集',
+            ),
           ],
         ));
   }

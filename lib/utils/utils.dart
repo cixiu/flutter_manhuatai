@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
@@ -123,5 +124,14 @@ class Utils {
     }
 
     return imgUrl;
+  }
+
+  // 格式化时间
+  static formatDate(int timestamp, [pattern = 'yyyy.MM.dd']) {
+    // 将小于 13 位的时间戳补 0 为 13 位数字的时间戳
+    var timestampString =  timestamp.toString().padRight(13, '0');
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString));
+
+    return DateFormat(pattern).format(dateTime);
   }
 }
