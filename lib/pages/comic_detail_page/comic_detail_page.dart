@@ -2,9 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_manhuatai/components/radius_container/radius_container.dart';
 
 import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
@@ -58,24 +55,17 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   }
 
   @override
-  void didUpdateWidget(ComicDetailPage oldWidget) {
-    // RenderBox renderBox = absKey.currentContext.findRenderObject();
-    // print(renderBox.localToGlobal(Offset.zero));
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void didChangeDependencies() {
-    print('didChangeDependencies');
-    // RenderBox renderBox = absKey.currentContext.findRenderObject();
-    // print(renderBox.localToGlobal(Offset.zero));
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     _scrollController.removeListener(_listScroll);
     super.dispose();
+  }
+
+  int get endChapterLength {
+    int end = 5;
+    if (comicInfoBody.comicChapter.length < 5) {
+      end = comicInfoBody.comicChapter.length;
+    }
+    return end;
   }
 
   // 监听滚动设置 appBar 的 title
@@ -101,8 +91,10 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     var _comicInfoBody = ComicInfoBody.fromJson(response);
     setState(() {
       comicInfoBody = _comicInfoBody;
-      comicChapterList =
-          _comicInfoBody.comicChapter.sublist(0, 5).reversed.toList();
+      comicChapterList = _comicInfoBody.comicChapter
+          .sublist(0, endChapterLength)
+          .reversed
+          .toList();
     });
   }
 
@@ -133,7 +125,12 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     // 观察主要内容渲染完成后，拿到漫画章节title距离屏幕的顶部距离
     WidgetsBinding.instance.addPostFrameCallback((_) {
       RenderBox renderBox = absKey.currentContext.findRenderObject();
-      _chapterTitleTop = renderBox.localToGlobal(Offset.zero).dy - 80.0;
+      // 手机状态栏的高度
+      double statusBarHeight = MediaQuery.of(context).padding.top;
+      // kToolbarHeight默认的AppBar高度
+      _chapterTitleTop = renderBox.localToGlobal(Offset.zero).dy -
+          statusBarHeight -
+          kToolbarHeight;
     });
   }
 
@@ -154,14 +151,17 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     setState(() {
       if (sortType == 'ASC') {
         if (isShowAll) {
-          comicChapterList =
-              comicInfoBody.comicChapter.sublist(0, 5).reversed.toList();
+          comicChapterList = comicInfoBody.comicChapter
+              .sublist(0, endChapterLength)
+              .reversed
+              .toList();
         } else {
           comicChapterList = comicInfoBody.comicChapter.reversed.toList();
         }
       } else {
         if (isShowAll) {
-          comicChapterList = comicInfoBody.comicChapter.sublist(0, 5).toList();
+          comicChapterList =
+              comicInfoBody.comicChapter.sublist(0, endChapterLength).toList();
         } else {
           comicChapterList = comicInfoBody.comicChapter.toList();
         }
@@ -239,9 +239,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                       ],
                     ),
                   ),
+                  // 漫画章节列表的title
                   isShowAll
                       ? SliverPersistentHeader(
-                          // key: absKey,
                           pinned: true,
                           delegate: _SliverAppBarDelegate(
                             absKey: absKey,
@@ -251,7 +251,6 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                           ),
                         )
                       : SliverList(
-                          // key: absKey,
                           delegate: SliverChildListDelegate(
                             [
                               ComicDetailChapterTitle(
@@ -263,22 +262,12 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                             ],
                           ),
                         ),
+                  // 漫画章节列表组件
                   ComicDetailChapter(
                     comicChapterList: comicChapterList,
                     isShowAll: isShowAll,
                     onTapShowAll: _onTapShowAll,
                   ),
-                  // SliverList(
-                  //   delegate: SliverChildBuilderDelegate(
-                  //     (context, index) {
-                  //       return Container(
-                  //         height: 30.0,
-                  //         child: Text('$index'),
-                  //       );
-                  //     },
-                  //     childCount: 100,
-                  //   ),
-                  // ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -297,10 +286,12 @@ class _ComicDetailPageState extends State<ComicDetailPage>
       bottomNavigationBar: isShowAll
           ? GestureDetector(
               onTap: _onTapShowAll,
-              child: Container(
-                height: 40,
-                color: Colors.red,
-                child: Text('小主，请收起'),
+              child: SafeArea(
+                child: Container(
+                  height: 40,
+                  color: Colors.red,
+                  child: Text('小主，请收起'),
+                ),
               ),
             )
           : null,
