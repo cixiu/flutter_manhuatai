@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
-
-import 'package:flutter_manhuatai/models/comic_comment_count.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_bottom.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
+import 'package:flutter_manhuatai/models/comic_info_influence.dart';
+import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 /// 漫画详情
@@ -188,6 +189,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
             ? Container()
             : CustomScrollView(
                 controller: _scrollController,
+                physics: ClampingScrollPhysics(),
                 slivers: <Widget>[
                   SliverAppBar(
                     pinned: true,
@@ -284,15 +286,10 @@ class _ComicDetailPageState extends State<ComicDetailPage>
               ),
       ),
       bottomNavigationBar: isShowAll
-          ? GestureDetector(
-              onTap: _onTapShowAll,
-              child: SafeArea(
-                child: Container(
-                  height: 40,
-                  color: Colors.red,
-                  child: Text('小主，请收起'),
-                ),
-              ),
+          ? ComicDetailChapterBottom(
+              collect: influenceData.collect,
+              comicCommentCount: comicCommentCount.toString(),
+              onTapCloseAll: _onTapShowAll,
             )
           : null,
     );
