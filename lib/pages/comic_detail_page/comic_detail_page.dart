@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_manhuatai/components/radius_container/radius_container.dart';
@@ -27,10 +29,22 @@ class ComicDetailPage extends StatefulWidget {
 
 class _ComicDetailPageState extends State<ComicDetailPage>
     with RefreshCommonState, WidgetsBindingObserver {
-  ScrollController _scrollController = ScrollController();
+  var absKey = GlobalKey();
+  // 漫画的主体信息
   ComicInfoBody comicInfoBody = ComicInfoBody.fromJson({});
+  // 展示的漫画章节
+  List<Comic_chapter> comicChapterList = [];
+  // 漫画章节的排序方式 'DES' => 降序 || 'ASC' => 升序
+  String sortType = 'ASC';
+  // 是否展开全部的漫画章节
+  bool isShowAll = false;
+  // 漫画的详细数据信息
   Call_data influenceData = Call_data.fromJson({});
+  // 漫画的总吐槽数量
   int comicCommentCount = 0;
+  // 漫画章节title距离顶部的距离
+  double _chapterTitleTop = 0.0;
+  ScrollController _scrollController = ScrollController();
   bool isFirstLoading = true;
   bool _showTitle = false;
 
@@ -41,6 +55,21 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
     _scrollController.addListener(_listScroll);
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(ComicDetailPage oldWidget) {
+    // RenderBox renderBox = absKey.currentContext.findRenderObject();
+    // print(renderBox.localToGlobal(Offset.zero));
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didChangeDependencies() {
+    print('didChangeDependencies');
+    // RenderBox renderBox = absKey.currentContext.findRenderObject();
+    // print(renderBox.localToGlobal(Offset.zero));
+    super.didChangeDependencies();
   }
 
   @override
@@ -72,6 +101,8 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     var _comicInfoBody = ComicInfoBody.fromJson(response);
     setState(() {
       comicInfoBody = _comicInfoBody;
+      comicChapterList =
+          _comicInfoBody.comicChapter.sublist(0, 5).reversed.toList();
     });
   }
 
@@ -99,6 +130,48 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     setState(() {
       isFirstLoading = false;
     });
+    // 观察主要内容渲染完成后，拿到漫画章节title距离屏幕的顶部距离
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      RenderBox renderBox = absKey.currentContext.findRenderObject();
+      _chapterTitleTop = renderBox.localToGlobal(Offset.zero).dy - 80.0;
+    });
+  }
+
+  // 改变漫画章节的排序方式
+  void _changeComicChapterSort() {
+    setState(() {
+      comicChapterList = comicChapterList.reversed.toList();
+      if (sortType == 'ASC') {
+        sortType = 'DES';
+      } else {
+        sortType = 'ASC';
+      }
+    });
+  }
+
+  // 全部章节的展示切换
+  void _onTapShowAll() {
+    setState(() {
+      if (sortType == 'ASC') {
+        if (isShowAll) {
+          comicChapterList =
+              comicInfoBody.comicChapter.sublist(0, 5).reversed.toList();
+        } else {
+          comicChapterList = comicInfoBody.comicChapter.reversed.toList();
+        }
+      } else {
+        if (isShowAll) {
+          comicChapterList = comicInfoBody.comicChapter.sublist(0, 5).toList();
+        } else {
+          comicChapterList = comicInfoBody.comicChapter.toList();
+        }
+      }
+      isShowAll = !isShowAll;
+    });
+
+    _scrollController.jumpTo(
+      _chapterTitleTop,
+    );
   }
 
   @override
@@ -106,7 +179,6 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     // 为了保持在各个设备上图片显示一致，根据宽度去适配
     var expandedHeight = ScreenUtil().setWidth(552) - statusBarHeight;
-    var isShowAll = true;
 
     return Scaffold(
       body: RefreshIndicator(
@@ -146,7 +218,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Colors.grey[200],
+                                color: Colors.grey[100],
                               ),
                             ),
                           ),
@@ -169,34 +241,44 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   ),
                   isShowAll
                       ? SliverPersistentHeader(
+                          // key: absKey,
                           pinned: true,
                           delegate: _SliverAppBarDelegate(
+                            absKey: absKey,
                             comicInfoBody: comicInfoBody,
+                            sortType: sortType,
+                            onTap: _changeComicChapterSort,
                           ),
                         )
                       : SliverList(
-                          delegate: SliverChildListDelegate([
-                            Container(
-                              height: ScreenUtil().setWidth(96),
-                              padding: EdgeInsets.symmetric(
-                                vertical: ScreenUtil().setWidth(20),
+                          // key: absKey,
+                          delegate: SliverChildListDelegate(
+                            [
+                              ComicDetailChapterTitle(
+                                absKey: absKey,
+                                comicInfoBody: comicInfoBody,
+                                sortType: sortType,
+                                onTap: _changeComicChapterSort,
                               ),
-                              color: Colors.white,
-                              child: Text('连载'),
-                            )
-                          ]),
+                            ],
+                          ),
                         ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return Container(
-                          height: 30.0,
-                          child: Text('$index'),
-                        );
-                      },
-                      childCount: 100,
-                    ),
+                  ComicDetailChapter(
+                    comicChapterList: comicChapterList,
+                    isShowAll: isShowAll,
+                    onTapShowAll: _onTapShowAll,
                   ),
+                  // SliverList(
+                  //   delegate: SliverChildBuilderDelegate(
+                  //     (context, index) {
+                  //       return Container(
+                  //         height: 30.0,
+                  //         child: Text('$index'),
+                  //       );
+                  //     },
+                  //     childCount: 100,
+                  //   ),
+                  // ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -212,15 +294,31 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                 ],
               ),
       ),
+      bottomNavigationBar: isShowAll
+          ? GestureDetector(
+              onTap: _onTapShowAll,
+              child: Container(
+                height: 40,
+                color: Colors.red,
+                child: Text('小主，请收起'),
+              ),
+            )
+          : null,
     );
   }
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final GlobalKey absKey;
   final ComicInfoBody comicInfoBody;
+  final String sortType;
+  final VoidCallback onTap;
 
   _SliverAppBarDelegate({
+    this.absKey,
     this.comicInfoBody,
+    this.sortType,
+    this.onTap,
   });
 
   @override
@@ -235,83 +333,16 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(
-        height: ScreenUtil().setWidth(96),
-        padding: EdgeInsets.symmetric(
-          horizontal: ScreenUtil().setWidth(20),
-        ),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey[200],
-            ),
-          ),
-          color: Colors.white,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    '连载',
-                    style: TextStyle(
-                      fontSize: ScreenUtil().setWidth(32),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: ScreenUtil().setWidth(10)),
-                    child: Image.asset(
-                      'lib/images/icon_detail_list_a.png',
-                      width: ScreenUtil().setWidth(20),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil().setWidth(30),
-                    ),
-                    child: Text(
-                      '${Utils.formatDate(comicInfoBody.updateTime)}',
-                      style: TextStyle(
-                        fontSize: ScreenUtil().setSp(20),
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(
-                        right: ScreenUtil().setWidth(30),
-                      ),
-                      child: Text(
-                        '${comicInfoBody.lastChapterName}',
-                        overflow: TextOverflow.ellipsis,
-                        strutStyle: StrutStyle(
-                          forceStrutHeight: true,
-                          fontSize: ScreenUtil().setSp(20),
-                        ),
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(20),
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            RadiusContainer(
-              text: '选集',
-            ),
-          ],
-        ));
+    return ComicDetailChapterTitle(
+      absKey: absKey,
+      comicInfoBody: comicInfoBody,
+      sortType: sortType,
+      onTap: onTap,
+    );
   }
 
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
+    return true;
   }
 }
