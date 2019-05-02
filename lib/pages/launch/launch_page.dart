@@ -53,7 +53,7 @@ class _LaunchPageState extends State<LaunchPage> {
       token = iosInfo.identifierForVendor;
     }
     print('------------------------------------');
-    print('设备的id $token ${guestInfo.uid}');
+    print('设备的id $token');
     print('游客的id ${guestInfo.uid}');
     print('用户的id ${userInfo.uid}');
     print('------------------------------------');
@@ -104,8 +104,25 @@ class _LaunchPageState extends State<LaunchPage> {
           ..init(context);
 
     return Scaffold(
-      body: Center(
-        child: Text('启动页'),
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: <Widget>[
+          Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.0,
+              ),
+              child: Image.asset(
+                'lib/images/ic_logo_girl.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Image.asset(
+            'lib/images/ic_logo.png',
+            fit: BoxFit.cover,
+          ),
+        ],
       ),
     );
   }

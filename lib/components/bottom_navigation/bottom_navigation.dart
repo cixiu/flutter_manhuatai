@@ -59,10 +59,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
       child: Container(
         height: 50.0,
         decoration: BoxDecoration(
-            border:
-                Border(top: BorderSide(width: 0.5, color: Colors.grey[200]))),
+          border: Border(
+            top: BorderSide(
+              width: 0.5,
+              color: Colors.grey[200],
+            ),
+          ),
+        ),
         child: Card(
           margin: const EdgeInsets.all(0.0),
+          elevation: 0.0,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

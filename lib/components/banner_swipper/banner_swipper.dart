@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
@@ -15,13 +16,14 @@ class BannerSwipper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 236.0,
+      height: ScreenUtil().setWidth(472),
       child: Swiper(
         itemCount: bannerList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Application.router.navigateTo(context, '/comic/detail/${bannerList[index].comicId}');
+              Application.router.navigateTo(
+                  context, '/comic/detail/${bannerList[index].comicId}');
             },
             child: Column(
               children: <Widget>[
@@ -29,12 +31,14 @@ class BannerSwipper extends StatelessWidget {
                   url:
                       '${AppConst.img_host}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
                   width: MediaQuery.of(context).size.width,
-                  height: 200.0,
+                  height: ScreenUtil().setWidth(400),
                   fit: BoxFit.fill,
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ScreenUtil().setWidth(20),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
@@ -42,7 +46,7 @@ class BannerSwipper extends StatelessWidget {
                         Text(
                           bannerList[index].lastComicChapterName,
                           style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: ScreenUtil().setSp(24),
                             color: Colors.grey[500],
                           ),
                         )
@@ -55,9 +59,12 @@ class BannerSwipper extends StatelessWidget {
           );
         },
         // itemWidth: MediaQuery.of(context).size.width,
-        itemHeight: 236.0,
-        pagination:
-            SwiperPagination(margin: const EdgeInsets.only(bottom: 46.0)),
+        itemHeight: ScreenUtil().setWidth(472),
+        pagination: SwiperPagination(
+          margin: EdgeInsets.only(
+            bottom: ScreenUtil().setWidth(92),
+          ),
+        ),
         // controller: SwiperController(),
         autoplay: true,
       ),
