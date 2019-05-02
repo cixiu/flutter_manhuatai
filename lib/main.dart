@@ -7,7 +7,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/pages/home/home.dart';
+import 'package:flutter_manhuatai/pages/launch/launch_page.dart';
 
 main() async {
   var initialState = await initState();
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.white,
             canvasColor: Colors.white,
           ),
-          home: MyHomePage(),
+          home: LaunchPage(),
           onGenerateRoute: Application.router.generator,
         ),
       ),

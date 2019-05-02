@@ -94,8 +94,10 @@ class Api {
   /// 获取用户的信息
   static Future<Map<String, dynamic>> getUserInfo({
     String token,
+    String type,
+    String deviceid,
     String openid,
-    String myuid,
+    int myuid,
     String autologo,
   }) async {
     final String url =
@@ -110,6 +112,15 @@ class Api {
 
     if (token != null) {
       data['token'] = token;
+    }
+
+    if (type != null) {
+      // 如果是游客模式登录，type="device", token="$androidId"
+      data['type'] = type;
+    }
+
+    if (deviceid != null) {
+      data['deviceid'] = deviceid;
     }
 
     if (openid != null && myuid != null && autologo != null) {
