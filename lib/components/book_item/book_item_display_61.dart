@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
@@ -16,16 +17,22 @@ class BookItemDisplay61 extends StatelessWidget {
     Key key,
     @required this.book,
     this.count = 4,
-    this.horizontalPadding = 20.0,
+    this.horizontalPadding = 40,
   }) : super(key: key);
 
-  List<Widget> buildListWidget(BuildContext context, RecommendList.Book book,
-      {double width, double horizonratio, double spacing}) {
+  List<Widget> buildListWidget(
+    BuildContext context,
+    RecommendList.Book book, {
+    double width,
+    double horizonratio,
+    double spacing,
+  }) {
     List<Widget> _listChildren = [];
     String customHorizonratio;
     double height;
     // 盒子的 width, 去除了左右 padding
-    double boxWidth = MediaQuery.of(context).size.width - horizontalPadding;
+    double boxWidth = MediaQuery.of(context).size.width -
+        ScreenUtil().setWidth(horizontalPadding);
     int len = this.count != null ? count : this.book.comicInfo.length;
 
     for (int i = 0; i < len; i++) {
@@ -70,7 +77,9 @@ class BookItemDisplay61 extends StatelessWidget {
               Container(
                 width: width,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: EdgeInsets.symmetric(
+                    vertical: ScreenUtil().setWidth(16),
+                  ),
                   child: Column(
                     crossAxisAlignment: i.isEven
                         ? CrossAxisAlignment.start
@@ -86,7 +95,7 @@ class BookItemDisplay61 extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Colors.grey,
-                                fontSize: 10.0,
+                                fontSize: ScreenUtil().setSp(20),
                               ),
                             )
                           : Text(''),
@@ -107,19 +116,27 @@ class BookItemDisplay61 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double horizonratio = Utils.computedRatio(book.config.horizonratio);
-    double spacing = book.config.interwidth == 1 ? 10.0 : 2.0;
+    double spacing = book.config.interwidth == 1
+        ? ScreenUtil().setWidth(20)
+        : ScreenUtil().setWidth(4);
     int crossAxisCount = horizonratio >= 1 ? 2 : 3;
     double screenWidth = MediaQuery.of(context).size.width;
-    double width =
-        (screenWidth - horizontalPadding - (crossAxisCount - 1) * spacing) /
-            crossAxisCount;
+    double width = (screenWidth -
+            ScreenUtil().setWidth(horizontalPadding) -
+            (crossAxisCount - 1) * spacing) /
+        crossAxisCount;
 
     // width = (screenWidth - horizontalPadding) * 0.7;
     return Wrap(
-      runSpacing: 10.0,
+      runSpacing: ScreenUtil().setWidth(20),
       spacing: spacing,
-      children: buildListWidget(context, book,
-          width: width, horizonratio: horizonratio, spacing: spacing),
+      children: buildListWidget(
+        context,
+        book,
+        width: width,
+        horizonratio: horizonratio,
+        spacing: spacing,
+      ),
     );
   }
 }

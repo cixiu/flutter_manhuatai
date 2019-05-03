@@ -1,9 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'recommend_list.g.dart';
+part 'book_list.g.dart';
 
 @JsonSerializable()
-class RecommendList extends Object {
+class BookList extends Object {
   @JsonKey(name: 'data')
   Data data;
 
@@ -13,16 +13,16 @@ class RecommendList extends Object {
   @JsonKey(name: 'message')
   String message;
 
-  RecommendList(
+  BookList(
     this.data,
     this.status,
     this.message,
   );
 
-  factory RecommendList.fromJson(Map<String, dynamic> srcJson) =>
-      _$RecommendListFromJson(srcJson);
+  factory BookList.fromJson(Map<String, dynamic> srcJson) =>
+      _$BookListFromJson(srcJson);
 
-  Map<String, dynamic> toJson() => _$RecommendListToJson(this);
+  Map<String, dynamic> toJson() => _$BookListToJson(this);
 }
 
 @JsonSerializable()

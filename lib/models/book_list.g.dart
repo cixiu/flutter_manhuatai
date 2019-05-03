@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'recommend_list.dart';
+part of 'book_list.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-RecommendList _$RecommendListFromJson(Map<String, dynamic> json) {
-  return RecommendList(
+BookList _$BookListFromJson(Map<String, dynamic> json) {
+  return BookList(
       json['data'] == null
           ? null
           : Data.fromJson(json['data'] as Map<String, dynamic>),
@@ -15,8 +15,7 @@ RecommendList _$RecommendListFromJson(Map<String, dynamic> json) {
       json['message'] as String);
 }
 
-Map<String, dynamic> _$RecommendListToJson(RecommendList instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$BookListToJson(BookList instance) => <String, dynamic>{
       'data': instance.data,
       'status': instance.status,
       'message': instance.message

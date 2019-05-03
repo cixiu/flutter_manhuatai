@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
+import 'package:dio/dio.dart';
 
 import './http.dart';
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
-import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
 
 class Api {
   /// 获取首页的推荐推荐列表数据
@@ -186,6 +184,26 @@ class Api {
       'ssidType': 0,
     });
 
+    return response;
+  }
+
+  /// 获取指定漫画的推荐相关的列表
+  static Future<Map<String, dynamic>> getBookByComicId({
+    @required String userauth,
+    @required String comicId,
+  }) async {
+    final String url =
+        'https://cms-booklist.321mh.com/api/v1/bookList/getBookByComicidNew';
+
+    Map<String, dynamic> response = await HttpRequest.post(url, data: {
+      'userauth': userauth,
+      'comic_id': comicId,
+      'booktype': 'detail',
+      'platform': 8,
+      'localtime': DateTime.now().millisecondsSinceEpoch,
+      'platformname': 'android',
+      'productname': 'mht',
+    });
     return response;
   }
 }

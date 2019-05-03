@@ -7,7 +7,7 @@ import 'package:flutter_manhuatai/components/book_item/book_item.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 
 class HomeRecommend extends StatefulWidget {
   @override
@@ -51,8 +51,8 @@ class _HomeRecommendState extends State<HomeRecommend>
 
   Future<void> handleRefrsh() async {
     Map<String, dynamic> data = await Api.getRecommentList();
-    RecommendList.RecommendList recommendList =
-        RecommendList.RecommendList.fromJson(data);
+    RecommendList.BookList recommendList =
+        RecommendList.BookList.fromJson(data);
     // bookId == 7414 代表bannerList
     List<RecommendList.Comic_info> bannerList =
         recommendList.data.book[0].title.contains('安卓')
@@ -72,7 +72,8 @@ class _HomeRecommendState extends State<HomeRecommend>
 
     int start = bannerList.length != 0 ? 1 : 0;
     int length = recommendList.data.book.length;
-    var bookList = recommendList.data.book.getRange(start, length).where((book) {
+    var bookList =
+        recommendList.data.book.getRange(start, length).where((book) {
       return book.config.displayType != 20;
     }).toList();
 

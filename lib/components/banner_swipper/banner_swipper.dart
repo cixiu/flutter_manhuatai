@@ -5,7 +5,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 
 class BannerSwipper extends StatelessWidget {

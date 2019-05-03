@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// 通用的下拉刷新和上拉加载更多组件
 class PullLoadWrapper extends StatefulWidget {
@@ -102,7 +103,7 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
   Widget _buildProgressIndicator() {
     TextStyle textStyle = TextStyle(
       color: Colors.grey,
-      fontSize: 14.0,
+      fontSize: ScreenUtil().setSp(28),
     );
     // 根据是否需要加载更多控制底部的显示 widget
     Widget bottomWidget = widget.control.needLoadMore
@@ -110,11 +111,13 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(right: 10.0),
-                width: 20.0,
-                height: 20.0,
+                margin: EdgeInsets.only(
+                  right: ScreenUtil().setWidth(20),
+                ),
+                width: ScreenUtil().setWidth(40),
+                height: ScreenUtil().setWidth(40),
                 child: CircularProgressIndicator(
-                  strokeWidth: 2.0,
+                  strokeWidth: ScreenUtil().setWidth(4),
                 ),
               ),
               Text(
@@ -124,7 +127,7 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
             ],
           )
         : Container(
-            height: 20.0,
+            height: ScreenUtil().setWidth(40),
             child: Text(
               '小主没有更多了呢！',
               style: textStyle,
@@ -132,7 +135,7 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
           );
 
     return Padding(
-      padding: EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(ScreenUtil().setWidth(40)),
       child: Center(
         child: bottomWidget,
       ),

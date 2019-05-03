@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_book.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
@@ -270,18 +271,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                     isShowAll: isShowAll,
                     onTapShowAll: _onTapShowAll,
                   ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return Container(
-                          color: Colors.green,
-                          height: 30.0,
-                          child: Text('$index'),
-                        );
-                      },
-                      childCount: 20,
-                    ),
-                  )
+                  ComicDetailBook(
+                    comicId: widget.comicId,
+                  ),
                 ],
               ),
       ),

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 
 class Utils {

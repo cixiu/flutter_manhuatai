@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
-import 'package:flutter_manhuatai/common/const/app_const.dart';
-import 'package:flutter_manhuatai/models/recommend_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
@@ -15,21 +15,24 @@ class BookItemDisplay1 extends StatelessWidget {
   BookItemDisplay1({
     Key key,
     @required this.book,
-    this.horizontalPadding = 20.0,
+    this.horizontalPadding = 40,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double horizonratio = Utils.computedRatio(book.config.horizonratio);
-    double spacing = book.config.interwidth == 1 ? 10.0 : 2.0;
+    double spacing = book.config.interwidth == 1
+        ? ScreenUtil().setWidth(20)
+        : ScreenUtil().setWidth(4);
     int crossAxisCount = horizonratio >= 1 ? 2 : 3;
     double screenWidth = MediaQuery.of(context).size.width;
-    double width =
-        (screenWidth - horizontalPadding - (crossAxisCount - 1) * spacing) /
-            crossAxisCount;
+    double width = (screenWidth -
+            ScreenUtil().setWidth(horizontalPadding) -
+            (crossAxisCount - 1) * spacing) /
+        crossAxisCount;
 
     return Wrap(
-      runSpacing: 10.0,
+      runSpacing: ScreenUtil().setWidth(20),
       spacing: spacing,
       children: book.comicInfo.take(6).map((item) {
         return GestureDetector(
@@ -57,7 +60,9 @@ class BookItemDisplay1 extends StatelessWidget {
                     width: width,
                     color: Color.fromRGBO(255, 255, 255, 0.8),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(
+                        ScreenUtil().setWidth(16),
+                      ),
                       child: Text(
                         item.comicName,
                         overflow: TextOverflow.ellipsis,
