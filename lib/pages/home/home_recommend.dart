@@ -72,7 +72,9 @@ class _HomeRecommendState extends State<HomeRecommend>
 
     int start = bannerList.length != 0 ? 1 : 0;
     int length = recommendList.data.book.length;
-    var bookList = recommendList.data.book.getRange(start, length).toList();
+    var bookList = recommendList.data.book.getRange(start, length).where((book) {
+      return book.config.displayType != 20;
+    }).toList();
 
     setState(() {
       _bannerList = bannerList;
