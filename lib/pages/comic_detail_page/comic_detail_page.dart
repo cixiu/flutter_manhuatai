@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide NestedScrollView;
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_book.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_bottom.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_role.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_book.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_bottom.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_comment_count.dart';
+import 'package:flutter_manhuatai/models/comic_info_role.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 /// 漫画详情
@@ -41,6 +43,8 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   Call_data influenceData = Call_data.fromJson({});
   // 漫画的总吐槽数量
   int comicCommentCount = 0;
+  // 漫画的作者和角色
+  ComicInfoRole comicInfoRole = ComicInfoRole.fromJson({});
   // 漫画章节title距离顶部的距离
   double _chapterTitleTop = 0.0;
   ScrollController _scrollController = ScrollController();
@@ -109,6 +113,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
   }
 
+  // 获取漫画的吐槽总数
   Future<void> _getComicCommentCount() async {
     var response = await Api.getComicCommentCount(comicId: widget.comicId);
     var _comicCommentCount = ComicCommentCount.fromJson(response);
@@ -117,10 +122,20 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     });
   }
 
+  // 获取漫画的作者和角色信息
+  Future<void> _getComicInfoRole() async {
+    var response = await Api.getComicInfoRole(comicId: widget.comicId);
+    var _comicInfoRole = ComicInfoRole.fromJson(response);
+    setState(() {
+      comicInfoRole = _comicInfoRole;
+    });
+  }
+
   Future<void> onRefresh() async {
     await _getComicInfoBody();
     await _getComicInfoInfluence();
     await _getComicCommentCount();
+    await _getComicInfoRole();
     setState(() {
       isFirstLoading = false;
     });
@@ -238,6 +253,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                               fontSize: ScreenUtil().setSp(24),
                             ),
                           ),
+                        ),
+                        ComicDetailRole(
+                          comicInfoRole: comicInfoRole.data,
                         ),
                       ],
                     ),

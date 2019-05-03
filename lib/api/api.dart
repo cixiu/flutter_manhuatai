@@ -171,7 +171,7 @@ class Api {
     return response;
   }
 
-  /// 获取指定漫画的人气活跃数据
+  /// 获取指定漫画的吐槽总数
   static Future<Map<String, dynamic>> getComicCommentCount({
     @required String comicId,
   }) async {
@@ -204,6 +204,22 @@ class Api {
       'platformname': 'android',
       'productname': 'mht',
     });
+    return response;
+  }
+
+  // 获取漫画的作者和角色信息
+  static Future<Map<String, dynamic>> getComicInfoRole({
+    @required String comicId,
+  }) async {
+    final String url =
+        'https://kanmanapi-main.321mh.com/app_api/v5/getcomicinfo_role/';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'comic_id': comicId, // 漫画的id
+      'platformname': 'android',
+      'productname': 'mht',
+    });
+
     return response;
   }
 }
