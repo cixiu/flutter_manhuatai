@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/score_star/score_star.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/models/comic_info_influence.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class ComicDetailHeader extends StatelessWidget {
   final String comicId;
@@ -68,24 +68,41 @@ class ComicDetailHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Padding(
+                          Container(
                             padding: EdgeInsets.only(
                               right: ScreenUtil().setWidth(16),
                             ),
+                            constraints: BoxConstraints(
+                              maxWidth: ScreenUtil().setWidth(360),
+                            ),
                             child: Text(
                               comicInfoBody.comicName,
+                              strutStyle: StrutStyle(
+                                forceStrutHeight: true,
+                                fontSize: ScreenUtil().setSp(40),
+                              ),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: ScreenUtil().setSp(40),
                               ),
                             ),
                           ),
-                          Text(
-                            comicInfoBody.comicAuthor,
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: ScreenUtil().setSp(24),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: ScreenUtil().setWidth(8),
+                            ),
+                            child: Text(
+                              comicInfoBody.comicAuthor,
+                              strutStyle: StrutStyle(
+                                forceStrutHeight: true,
+                                fontSize: ScreenUtil().setSp(24),
+                              ),
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: ScreenUtil().setSp(24),
+                              ),
                             ),
                           ),
                         ],
