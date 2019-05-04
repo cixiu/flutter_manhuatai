@@ -41,3 +41,4 @@ child: Text(
 ),
 ```
 7. [borderRadius必须有统一的border才能设置](https://github.com/flutter/flutter/issues/12583)
+8. [border属性不支持dashed(虚线)设置，需要自己绘制](https://github.com/flutter/flutter/issues/4858)
