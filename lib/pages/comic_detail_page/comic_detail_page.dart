@@ -3,10 +3,11 @@ import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
-import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_heat.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_role.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_fans.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_book.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_bottom.dart';
 
@@ -42,6 +43,8 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   bool isShowAll = false;
   // 漫画的详细数据信息
   Call_data influenceData = Call_data.fromJson({});
+  // 漫画的前100粉丝
+  List<Insider_list> insiderFansList = [];
   // 漫画的总吐槽数量
   int comicCommentCount = 0;
   // 漫画的作者和角色
@@ -111,6 +114,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     var _comicInfoInfluence = ComicInfoInfluence.fromJson(response);
     setState(() {
       influenceData = _comicInfoInfluence.data.callData;
+      insiderFansList = _comicInfoInfluence.data.insiderList;
     });
   }
 
@@ -256,11 +260,18 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                             ),
                           ),
                         ),
+                        // 总人气和周人气
                         ComicDetailHeat(
                           influenceData: influenceData,
                         ),
+                        // 作者&角色
                         ComicDetailRole(
                           comicInfoRole: comicInfoRole.data,
+                        ),
+                        // 粉丝打call
+                        ComicDetailFans(
+                          influenceData: influenceData,
+                          insiderFansList: insiderFansList,
                         ),
                       ],
                     ),
