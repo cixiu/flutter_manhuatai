@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_title.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter.dart';
+import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_heat.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_role.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_book.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_chapter_bottom.dart';
@@ -236,7 +237,8 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Colors.grey[100],
+                                color: Colors.grey[200],
+                                width: ScreenUtil().setWidth(1),
                               ),
                             ),
                           ),
@@ -253,6 +255,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                               fontSize: ScreenUtil().setSp(24),
                             ),
                           ),
+                        ),
+                        ComicDetailHeat(
+                          influenceData: influenceData,
                         ),
                         ComicDetailRole(
                           comicInfoRole: comicInfoRole.data,

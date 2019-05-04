@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/radius_container/radius_container.dart';
@@ -22,18 +22,20 @@ class ComicDetailRole extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               children: <Widget>[
                 ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(ScreenUtil().setWidth(33)),
-                  child: FadeInImage.memoryNetwork(
-                    placeholder: kTransparentImage,
-                    image: role.sculpture,
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(33),
+                  ),
+                  child: ImageWrapper(
+                    url: role.sculpture,
                     width: ScreenUtil().setWidth(66),
                     height: ScreenUtil().setWidth(66),
+                    fit: BoxFit.cover,
                   ),
                 ),
                 ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(ScreenUtil().setWidth(34)),
+                  borderRadius: BorderRadius.circular(
+                    ScreenUtil().setWidth(34),
+                  ),
                   child: Image.asset(
                     'lib/images/pic_tx.png',
                     width: ScreenUtil().setWidth(68),
@@ -87,11 +89,13 @@ class ComicDetailRole extends StatelessWidget {
         horizontal: ScreenUtil().setWidth(20),
       ),
       decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-        width: ScreenUtil().setWidth(1),
-        color: Colors.grey[200],
-      ))),
+        border: Border(
+          bottom: BorderSide(
+            width: ScreenUtil().setWidth(1),
+            color: Colors.grey[200],
+          ),
+        ),
+      ),
       child: Column(
         children: <Widget>[
           Container(
