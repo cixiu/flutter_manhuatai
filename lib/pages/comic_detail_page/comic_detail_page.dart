@@ -301,6 +301,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                         ),
                   // 漫画章节列表组件
                   ComicDetailChapter(
+                    comicId: widget.comicId,
                     comicChapterList: comicChapterList,
                     isShowAll: isShowAll,
                     onTapShowAll: _onTapShowAll,

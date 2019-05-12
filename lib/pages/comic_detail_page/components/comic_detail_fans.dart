@@ -133,11 +133,13 @@ class ComicDetailFans extends StatelessWidget {
   List<Widget> _buildFansListAvatar() {
     List<Widget> children = [];
     for (int i = 0; i < 3; i++) {
-      var fan = insiderFansList[i];
+      Insider_list fan;
+      if (insiderFansList.length != 0) {
+        fan = insiderFansList[i];
+      }
       children.add(
         Transform.translate(
           offset: Offset(ScreenUtil().setWidth(-36.0 * (3 - i - 1)), 0.0),
-          // : Offset(0.0, 0.0),
           child: Stack(
             alignment: Alignment.bottomRight,
             overflow: Overflow.visible,
@@ -146,16 +148,21 @@ class ComicDetailFans extends StatelessWidget {
                 borderRadius: BorderRadius.circular(
                   ScreenUtil().setWidth(46),
                 ),
-                child: ImageWrapper(
-                  url: Utils.generateImgUrlFromId(
-                    id: fan.uid,
-                    aspectRatio: '1:1',
-                    type: 'head',
-                  ),
-                  width: ScreenUtil().setWidth(46),
-                  height: ScreenUtil().setWidth(46),
-                  fit: BoxFit.cover,
-                ),
+                child: fan != null
+                    ? ImageWrapper(
+                        url: Utils.generateImgUrlFromId(
+                          id: fan.uid,
+                          aspectRatio: '1:1',
+                          type: 'head',
+                        ),
+                        width: ScreenUtil().setWidth(46),
+                        height: ScreenUtil().setWidth(46),
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        width: ScreenUtil().setWidth(46),
+                        height: ScreenUtil().setWidth(46),
+                      ),
               ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(
