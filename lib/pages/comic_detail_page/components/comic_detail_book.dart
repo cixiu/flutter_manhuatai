@@ -51,12 +51,14 @@ class _ComicDetailBookState extends State<ComicDetailBook>
     );
 
     var _bookListData = BookListByComicId.fromJson(bookListMap);
-    setState(() {
-      bookList = _bookListData.data
-          .where((book) => book.config.displayType != 20)
-          .toList();
-      isLoading = false;
-    });
+    if (this.mounted) {
+      setState(() {
+        bookList = _bookListData.data
+            .where((book) => book.config.displayType != 20)
+            .toList();
+        isLoading = false;
+      });
+    }
   }
 
   @override

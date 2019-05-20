@@ -99,41 +99,49 @@ class _ComicDetailPageState extends State<ComicDetailPage>
   Future<void> _getComicInfoBody() async {
     var response = await Api.getComicInfoBody(comicId: widget.comicId);
     var _comicInfoBody = ComicInfoBody.fromJson(response);
-    setState(() {
-      comicInfoBody = _comicInfoBody;
-      comicChapterList = _comicInfoBody.comicChapter
-          .sublist(0, endChapterLength)
-          .reversed
-          .toList();
-    });
+    if (this.mounted) {
+      setState(() {
+        comicInfoBody = _comicInfoBody;
+        comicChapterList = _comicInfoBody.comicChapter
+            .sublist(0, endChapterLength)
+            .reversed
+            .toList();
+      });
+    }
   }
 
   // 获取指定漫画的人气活跃数据
   Future<void> _getComicInfoInfluence() async {
     var response = await Api.getComicInfoInfluence(comicId: widget.comicId);
     var _comicInfoInfluence = ComicInfoInfluence.fromJson(response);
-    setState(() {
-      influenceData = _comicInfoInfluence.data.callData;
-      insiderFansList = _comicInfoInfluence.data.insiderList;
-    });
+    if (this.mounted) {
+      setState(() {
+        influenceData = _comicInfoInfluence.data.callData;
+        insiderFansList = _comicInfoInfluence.data.insiderList;
+      });
+    }
   }
 
   // 获取漫画的吐槽总数
   Future<void> _getComicCommentCount() async {
     var response = await Api.getComicCommentCount(comicId: widget.comicId);
     var _comicCommentCount = ComicCommentCount.fromJson(response);
-    setState(() {
-      comicCommentCount = _comicCommentCount.data;
-    });
+    if (this.mounted) {
+      setState(() {
+        comicCommentCount = _comicCommentCount.data;
+      });
+    }
   }
 
   // 获取漫画的作者和角色信息
   Future<void> _getComicInfoRole() async {
     var response = await Api.getComicInfoRole(comicId: widget.comicId);
     var _comicInfoRole = ComicInfoRole.fromJson(response);
-    setState(() {
-      comicInfoRole = _comicInfoRole;
-    });
+    if (this.mounted) {
+      setState(() {
+        comicInfoRole = _comicInfoRole;
+      });
+    }
   }
 
   Future<void> onRefresh() async {
@@ -141,19 +149,21 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     await _getComicInfoInfluence();
     await _getComicCommentCount();
     await _getComicInfoRole();
-    setState(() {
-      isFirstLoading = false;
-    });
-    // 观察主要内容渲染完成后，拿到漫画章节title距离屏幕的顶部距离
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      RenderBox renderBox = absKey.currentContext.findRenderObject();
-      // 手机状态栏的高度
-      double statusBarHeight = MediaQuery.of(context).padding.top;
-      // kToolbarHeight默认的AppBar高度
-      _chapterTitleTop = renderBox.localToGlobal(Offset.zero).dy -
-          statusBarHeight -
-          kToolbarHeight;
-    });
+    if (this.mounted) {
+      setState(() {
+        isFirstLoading = false;
+      });
+      // 观察主要内容渲染完成后，拿到漫画章节title距离屏幕的顶部距离
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        RenderBox renderBox = absKey.currentContext.findRenderObject();
+        // 手机状态栏的高度
+        double statusBarHeight = MediaQuery.of(context).padding.top;
+        // kToolbarHeight默认的AppBar高度
+        _chapterTitleTop = renderBox.localToGlobal(Offset.zero).dy -
+            statusBarHeight -
+            kToolbarHeight;
+      });
+    }
   }
 
   // 改变漫画章节的排序方式
