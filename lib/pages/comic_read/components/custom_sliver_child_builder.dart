@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
+typedef void ItemShow(int index);
+
 class CustomSliverChildBuilderDelegate extends SliverChildBuilderDelegate {
   final visibilityMonitor = VisibilityMonitor();
+  final ItemShow itemShow;
 
   CustomSliverChildBuilderDelegate(
     IndexedWidgetBuilder builder, {
     int childCount,
     bool addAutomaticKeepAlives = true,
     bool addRepaintBoundaries = true,
+    this.itemShow,
   }) : super(
           builder,
           childCount: childCount,
@@ -17,16 +21,22 @@ class CustomSliverChildBuilderDelegate extends SliverChildBuilderDelegate {
 
   @override
   void didFinishLayout(int firstIndex, int lastIndex) {
-    visibilityMonitor.update(VisibilityState(
-      firstIndex: firstIndex,
-      lastIndex: lastIndex,
-    ));
+    visibilityMonitor.update(
+      VisibilityState(
+        firstIndex: firstIndex,
+        lastIndex: lastIndex,
+      ),
+      itemShow,
+    );
     super.didFinishLayout(firstIndex, lastIndex);
   }
 }
 
 class VisibilityState {
-  const VisibilityState({this.firstIndex, this.lastIndex});
+  const VisibilityState({
+    this.firstIndex,
+    this.lastIndex,
+  });
 
   final int firstIndex;
   final int lastIndex;
@@ -54,7 +64,7 @@ class VisibilityMonitor {
     }
   }
 
-  update(VisibilityState newState) {
+  update(VisibilityState newState, ItemShow itemShow) {
     if (lastState != null &&
         newState.firstIndex == lastState.firstIndex &&
         newState.lastIndex == lastState.lastIndex) {
@@ -102,7 +112,8 @@ class VisibilityMonitor {
 
     if (!changeSet.empty) {
       changeSet.exposure.forEach((i) {
-        // print('第 ${i+1} 张图片曝光了');
+        // print('第 ${i} 张图片曝光了');
+        itemShow(i);
       });
 
       // changeSet.hidden.forEach((i) {
