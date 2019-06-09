@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/pages/comic_read/components/custom_sliver_child_builder.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ComicReadPage extends StatefulWidget {
   final String comicId;
@@ -31,11 +30,13 @@ class _ComicReadPageState extends State<ComicReadPage>
   List<int> _listHeight = [0];
   // List<int> _listLength = [0];
   int _chapterIndex = 0;
+  // 视图滚动时作为一个标记位
+  int _lastIndex = 0;
   // 正在阅读的漫画在漫画列表中的索引
   int _readerChapterIndex;
   // 正在阅读的漫画
   Comic_chapter _readerChapter;
-  int _readerNum = 1;
+  // int _readerNum = 1;
   bool _isLoading = true;
   ScrollController _scrollController = ScrollController();
 
@@ -84,6 +85,9 @@ class _ComicReadPageState extends State<ComicReadPage>
 
         _imageStream.addListener(
           (info, _) {
+            if (!this.mounted) {
+              return;
+            }
             if (imageHashMap[info.hashCode] != null) {
               return;
             }
@@ -98,26 +102,11 @@ class _ComicReadPageState extends State<ComicReadPage>
             queueLen++;
             setState(() {
               _customImageListState
-                ..imageViews[i] = ImageWrapper(
-                  url: imgUrl,
+                ..imageViews[i] = _buildImageWidget(
+                  imgUrl: imgUrl,
                   width: screenWidth,
                   height: height.toDouble(),
-                  placeholder: (context, url) {
-                    return Container(
-                      width: screenWidth,
-                      height: height.toDouble(),
-                      color: Colors.black87,
-                      child: Center(
-                        child: Text(
-                          '$i',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32.0,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                  index: i,
                 )
                 ..imageNum.add(i);
               _customImageListState.imageNum.sort();
@@ -145,8 +134,9 @@ class _ComicReadPageState extends State<ComicReadPage>
     }
     // 判断当前滑动位置是不是到达底部，触发加载更多回调
     var position = _scrollController.position;
+    var statusHeight = MediaQuery.of(context).padding.top;
     double scrollTop = position.pixels;
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width - statusHeight;
     int halfScreenHeight = (screenWidth / 2).floor();
 
     if (position.pixels > position.maxScrollExtent - halfScreenHeight) {
@@ -175,6 +165,9 @@ class _ComicReadPageState extends State<ComicReadPage>
             Image.network(imgUrl).image.resolve(ImageConfiguration());
         _imageStream.addListener(
           (info, _) {
+            if (!this.mounted) {
+              return;
+            }
             if (imageHashMap[info.hashCode] != null) {
               return;
             }
@@ -190,35 +183,19 @@ class _ComicReadPageState extends State<ComicReadPage>
             _imageNum.add(i);
             setState(() {
               _customImageListState
-                ..imageViews[i + lastImageNumLength] = ImageWrapper(
-                  url: imgUrl,
+                ..imageViews[i + lastImageNumLength] = _buildImageWidget(
+                  imgUrl: imgUrl,
                   width: screenWidth,
                   height: height.toDouble(),
-                  placeholder: (context, url) {
-                    return Container(
-                      width: screenWidth,
-                      height: height.toDouble(),
-                      color: Colors.black87,
-                      child: Center(
-                        child: Text(
-                          '$i',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32.0,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                  index: i,
                 );
-                // ..imageNum.add(i);
+              // ..imageNum.add(i);
             });
 
             // 等所有图片都加载完后在显示漫画图片
             if (queueLen == len - 1) {
+              chapterTotalHeight += _listHeight[_listHeight.length - 1];
               _listHeight.add(chapterTotalHeight);
-              _listHeight[_listHeight.length - 1] =
-                  _listHeight.reduce((val, ele) => val + ele);
               _isLoadingMore = false;
               // 需要先排序
               _imageNum.sort();
@@ -227,52 +204,10 @@ class _ComicReadPageState extends State<ComicReadPage>
               });
               print(_listHeight);
               print(_customImageListState.imageNum);
-              // setState(() {
-              //   _isLoading = false;
-              //   _readerChapter = readerChapter;
-              // });
             }
           },
         );
       }
-      // _listHeight.add(0);
-      // _listHeight[_listHeight.length - 1] =
-      //     _listHeight.reduce((val, ele) => val + ele);
-
-      // int queueLen = _imageViews.length;
-
-      // for (int i = 0; i < len - 1; i++) {
-      //   _imageViews[i].image.resolve(ImageConfiguration()).addListener(
-      //     (info, __) {
-      //       if (queueLen < 0) {
-      //         return;
-      //       }
-      //       // 图片在屏幕中的高度
-      //       int height = screenWidth * info.image.height ~/ info.image.width;
-      //       // 这个章节的高度累加以前的高度
-      //       _listHeight[_listHeight.length - 1] += height;
-      //       // setState(() {
-      //       //   imageViews.add(
-      //       //     Container(
-      //       //       height: height.toDouble(),
-      //       //       child: _customImageListState.imageViews[i],
-      //       //     ),
-      //       //   );
-      //       // });
-      //       queueLen--;
-      //       // 等所有图片都加载完后在显示漫画图片
-      //       if (queueLen == 0) {
-      //         print(_listHeight);
-      //         _isLoadingMore = false;
-      //         setState(() {
-      //           _customImageListState
-      //             ..imageViews.addAll(_imageViews)
-      //             ..imageNum.addAll(_imageNum);
-      //         });
-      //       }
-      //     },
-      //   );
-      // }
     }
 
     for (int i = 0; i < _listHeight.length - 1; i++) {
@@ -282,13 +217,15 @@ class _ComicReadPageState extends State<ComicReadPage>
       // 如果滚动距离落在某一个章节的高度区间，则将导航的标题设置成章节的名字
       if (scrollTop >= height1 - halfScreenHeight &&
           scrollTop < height2 - halfScreenHeight) {
-        int readingChapterIndex = _chapterIndex - i;
-        if (_readerChapterIndex != readingChapterIndex) {
-          // print(readingChapterIndex);
+        if (_lastIndex != i) {
+          // print('$_lastIndex $i');
+          int readingChapterIndex = _chapterIndex - i;
+          setState(() {
+            // _readerNum = 1;
+            _readerChapter = comicInfoBody.comicChapter[readingChapterIndex];
+          });
+          _lastIndex = i;
         }
-        setState(() {
-          _readerChapter = comicInfoBody.comicChapter[readingChapterIndex];
-        });
       }
     }
   }
@@ -333,13 +270,18 @@ class _ComicReadPageState extends State<ComicReadPage>
                         return _customImageListState.imageViews[index + 1];
                       },
                       childCount: _customImageListState.imageNum.length,
-                      itemShow: (int index) {
-                        Future.delayed(Duration(seconds: 0), () {
-                          setState(() {
-                            _readerNum = _customImageListState.imageNum[index];
-                          });
-                        });
-                      },
+                      // itemShow: (int index) {
+                      //   Future.delayed(Duration(seconds: 0), () {
+                      //     setState(() {
+                      //       if (index == 0) {
+                      //         _readerNum = 1;
+                      //         return;
+                      //       }
+                      //       _readerNum =
+                      //           _customImageListState.imageNum[index - 1];
+                      //     });
+                      //   });
+                      // },
                     ),
                     cacheExtent: MediaQuery.of(context).size.height / 2,
                     // itemExtent: 50.0,
@@ -372,8 +314,8 @@ class _ComicReadPageState extends State<ComicReadPage>
                               ),
                             ),
                             Text(
-                              '${_readerNum}/${_readerChapter.endNum}',
-                              // '共${_readerChapter.endNum}张',
+                              // '$_readerNum/${_readerChapter.endNum}',
+                              '共${_readerChapter.endNum}张',
                               strutStyle: strutStyle,
                               style: textStyle,
                             ),
@@ -387,6 +329,47 @@ class _ComicReadPageState extends State<ComicReadPage>
           : Center(
               child: Text('加载中...'),
             ),
+    );
+  }
+
+  Widget _buildImageWidget({
+    String imgUrl,
+    double width,
+    double height,
+    int index,
+  }) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: <Widget>[
+        ImageWrapper(
+          url: imgUrl,
+          width: width,
+          height: height.toDouble(),
+          placeholder: (context, url) {
+            return Container(
+              width: width,
+              height: height.toDouble(),
+              color: Colors.black87,
+              child: Center(
+                child: Text(
+                  '$index',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32.0,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        Text(
+          '$index',
+          style: TextStyle(
+            color: Colors.grey[200],
+            fontSize: 42.0,
+          ),
+        ),
+      ],
     );
   }
 }

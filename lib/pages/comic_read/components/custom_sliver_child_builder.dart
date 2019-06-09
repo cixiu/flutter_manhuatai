@@ -21,13 +21,13 @@ class CustomSliverChildBuilderDelegate extends SliverChildBuilderDelegate {
 
   @override
   void didFinishLayout(int firstIndex, int lastIndex) {
-    visibilityMonitor.update(
-      VisibilityState(
-        firstIndex: firstIndex,
-        lastIndex: lastIndex,
-      ),
-      itemShow,
-    );
+    // visibilityMonitor.update(
+    //   VisibilityState(
+    //     firstIndex: firstIndex,
+    //     lastIndex: lastIndex,
+    //   ),
+    //   itemShow,
+    // );
     super.didFinishLayout(firstIndex, lastIndex);
   }
 }
