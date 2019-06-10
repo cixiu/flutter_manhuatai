@@ -25,7 +25,6 @@ class ComicDetailChapterTitle extends StatefulWidget {
 }
 
 class _ComicDetailChapterTitleState extends State<ComicDetailChapterTitle> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,7 +53,7 @@ class _ComicDetailChapterTitleState extends State<ComicDetailChapterTitle> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      '连载',
+                      widget.comicInfoBody.comicStatus == 2 ? '完结' : '连载',
                       style: TextStyle(
                         fontSize: ScreenUtil().setWidth(32),
                         fontWeight: FontWeight.bold,

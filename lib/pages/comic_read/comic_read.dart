@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/pages/comic_read/components/custom_sliver_child_builder.dart';
+
+import 'components/comic_read_bottom_bar.dart';
+import 'components/comic_read_drawer.dart';
+import 'components/comic_read_status_bar.dart';
 
 class ComicReadPage extends StatefulWidget {
   final String comicId;
@@ -22,7 +27,7 @@ class ComicReadPage extends StatefulWidget {
 }
 
 class _ComicReadPageState extends State<ComicReadPage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   ComicInfoBody comicInfoBody;
   List<Widget> imageViews = [];
   CustomImageListState _customImageListState = CustomImageListState();
@@ -40,13 +45,22 @@ class _ComicReadPageState extends State<ComicReadPage>
   bool _isLoading = true;
   ScrollController _scrollController = ScrollController();
 
+  AnimationController controller;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   // 是否正在加载更多
   bool _isLoadingMore = false;
+  // 是否显示菜单栏
+  bool _isShowStatusBar = false;
 
   @override
   void initState() {
     super.initState();
-    // SystemChrome.setEnabledSystemUIOverlays ([]);
+    controller = new AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     _scrollController.addListener(_scrollListener);
     _getComicInfoBody();
   }
@@ -239,6 +253,13 @@ class _ComicReadPageState extends State<ComicReadPage>
     double tapPosition = details.globalPosition.dy;
 
     if (tapPosition > top && tapPosition < bottom) {
+      if (_isShowStatusBar) {
+        controller.reverse();
+        _isShowStatusBar = false;
+      } else {
+        controller.forward();
+        _isShowStatusBar = true;
+      }
       print('点击了中间区域 $tapPosition');
     }
   }
@@ -255,6 +276,10 @@ class _ComicReadPageState extends State<ComicReadPage>
     );
 
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: ComicReadDrawer(
+        comicInfoBody: comicInfoBody,
+      ),
       body: comicInfoBody != null && !_isLoading
           ? GestureDetector(
               // 点击中间区域，呼起菜单
@@ -323,6 +348,48 @@ class _ComicReadPageState extends State<ComicReadPage>
                         ),
                       ),
                     ],
+                  ),
+                  Positioned(
+                    top: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    child: SlideTransition(
+                      position: Tween(
+                        begin: Offset(0.0, -1.0),
+                        end: Offset(0.0, 0.0),
+                      ).animate(
+                        CurvedAnimation(
+                          parent: controller,
+                          curve: Curves.easeIn,
+                        ),
+                      ),
+                      child: ComicReadStatusBar(
+                        chapterName: _readerChapter.chapterName,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    child: SlideTransition(
+                      position: Tween(
+                        begin: Offset(0.0, 1.0),
+                        end: Offset(0.0, 0.0),
+                      ).animate(
+                        CurvedAnimation(
+                          parent: controller,
+                          curve: Curves.easeIn,
+                        ),
+                      ),
+                      child: ComicReadBottomBar(
+                        scaffoldKey: _scaffoldKey,
+                        closeMenu: () {
+                          controller.reverse();
+                          _isShowStatusBar = false;
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ))
