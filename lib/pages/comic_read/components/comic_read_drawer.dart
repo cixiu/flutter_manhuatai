@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+typedef void SelectChapter(Comic_chapter selectedComicChapter);
+
 class ComicReadDrawer extends StatefulWidget {
   final ComicInfoBody comicInfoBody;
+  final Comic_chapter readingComicChapter;
+  final SelectChapter selectChapter;
 
   ComicReadDrawer({
     Key key,
     this.comicInfoBody,
+    this.readingComicChapter,
+    this.selectChapter,
   }) : super(key: key);
 
   @override
@@ -15,8 +21,26 @@ class ComicReadDrawer extends StatefulWidget {
 }
 
 class _ComicReadDrawerState extends State<ComicReadDrawer> {
-  ScrollController _scrollController = ScrollController();
+  List<Comic_chapter> _comicChapterList;
+  ScrollController _scrollController;
   bool _isTop = true;
+  // 漫画章节的排序方式 'DES' => 降序 || 'ASC' => 升序
+  String sortType = 'DES';
+
+  @override
+  void initState() {
+    setState(() {
+      _comicChapterList = widget.comicInfoBody.comicChapter;
+    });
+
+    int index = _comicChapterList.indexWhere((item) =>
+        item.chapterTopicId == widget.readingComicChapter.chapterTopicId);
+    double initialScrollOffset = index * 50.0;
+    _scrollController =
+        ScrollController(initialScrollOffset: initialScrollOffset);
+
+    super.initState();
+  }
 
   /// 回到顶部或者回到底部
   void _backToTopOrBottom() {
@@ -27,6 +51,18 @@ class _ComicReadDrawerState extends State<ComicReadDrawer> {
     }
     setState(() {
       _isTop = !_isTop;
+    });
+  }
+
+  // 改变漫画章节的排序方式
+  void _changeComicChapterSort() {
+    setState(() {
+      _comicChapterList = _comicChapterList.reversed.toList();
+      if (sortType == 'ASC') {
+        sortType = 'DES';
+      } else {
+        sortType = 'ASC';
+      }
     });
   }
 
@@ -73,9 +109,7 @@ class _ComicReadDrawerState extends State<ComicReadDrawer> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        print('切换排序规则');
-                      },
+                      onTap: _changeComicChapterSort,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           vertical: ScreenUtil().setWidth(8),
@@ -83,12 +117,14 @@ class _ComicReadDrawerState extends State<ComicReadDrawer> {
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              Icons.arrow_upward,
+                              sortType == 'ASC'
+                                  ? Icons.arrow_upward
+                                  : Icons.arrow_downward,
                               color: Colors.grey,
                               size: ScreenUtil().setSp(30),
                             ),
                             Text(
-                              '倒序',
+                              sortType == 'ASC' ? '倒序' : '正序',
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontSize: ScreenUtil().setSp(24),
@@ -105,30 +141,40 @@ class _ComicReadDrawerState extends State<ComicReadDrawer> {
                 child: ListView.builder(
                   controller: _scrollController,
                   padding: EdgeInsets.all(0.0),
-                  itemCount: widget.comicInfoBody.comicChapter.length,
+                  itemCount: _comicChapterList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    var item = widget.comicInfoBody.comicChapter[index];
+                    var item = _comicChapterList[index];
 
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setWidth(30),
-                      ),
-                      margin: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil().setWidth(20),
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey[850],
-                            width: ScreenUtil().setWidth(1),
+                    return GestureDetector(
+                      onTap: () {
+                        if (widget.selectChapter != null) {
+                          widget.selectChapter(item);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setWidth(30),
+                        ),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: ScreenUtil().setWidth(20),
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey[850],
+                              width: ScreenUtil().setWidth(1),
+                            ),
                           ),
                         ),
-                      ),
-                      child: Text(
-                        item.chapterName,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: ScreenUtil().setSp(28),
+                        child: Text(
+                          item.chapterName,
+                          style: TextStyle(
+                            color: widget.readingComicChapter.chapterTopicId ==
+                                    item.chapterTopicId
+                                ? Colors.orangeAccent
+                                : Colors.white70,
+                            fontSize: ScreenUtil().setSp(28),
+                          ),
                         ),
                       ),
                     );

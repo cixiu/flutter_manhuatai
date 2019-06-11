@@ -150,7 +150,7 @@ class _ComicReadPageState extends State<ComicReadPage>
     var position = _scrollController.position;
     var statusHeight = MediaQuery.of(context).padding.top;
     double scrollTop = position.pixels;
-    double screenWidth = MediaQuery.of(context).size.width - statusHeight;
+    double screenWidth = MediaQuery.of(context).size.width;
     int halfScreenHeight = (screenWidth / 2).floor();
 
     if (position.pixels > position.maxScrollExtent - halfScreenHeight) {
@@ -264,6 +264,82 @@ class _ComicReadPageState extends State<ComicReadPage>
     }
   }
 
+  // 在侧边栏中选择漫画章节
+  void _selectChapter(Comic_chapter selectedComicChapter) {
+    Navigator.pop(context);
+    // 重置一些数据
+    _listHeight = [0];
+    _lastIndex = 0;
+    setState(() {
+      _isLoading = true;
+      _customImageListState = CustomImageListState();
+    });
+    // 获取阅读的章节
+    _readerChapterIndex = comicInfoBody.comicChapter.indexWhere((chapter) {
+      return chapter.chapterTopicId == selectedComicChapter.chapterTopicId;
+    });
+    _chapterIndex = _readerChapterIndex;
+    var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
+    // 将章节对应的漫画图片插入数组
+    int len = readerChapter.startNum + readerChapter.endNum;
+    String imgHost = 'https://mhpic.manhualang.com';
+
+    if (this.mounted) {
+      int queueLen = 0;
+      int chapterTotalHeight = 0;
+      double screenWidth = MediaQuery.of(context).size.width;
+      Map<int, int> imageHashMap = Map();
+
+      for (var i = 1; i < len; i++) {
+        String imgUrl = '$imgHost' +
+            readerChapter.chapterImage.middle.replaceAll(RegExp(r'\$\$'), '$i');
+        var _imageStream =
+            Image.network(imgUrl).image.resolve(ImageConfiguration());
+
+        _imageStream.addListener(
+          (info, _) {
+            if (!this.mounted) {
+              return;
+            }
+            if (imageHashMap[info.hashCode] != null) {
+              return;
+            }
+            if (queueLen < 0) {
+              return;
+            }
+            imageHashMap[info.hashCode] = i;
+            // 图片在屏幕中的高度
+            int height = screenWidth * info.image.height ~/ info.image.width;
+            // 将整个章节的所有图片相加得出这个章节的高度
+            chapterTotalHeight += height;
+            queueLen++;
+            setState(() {
+              _customImageListState
+                ..imageViews[i] = _buildImageWidget(
+                  imgUrl: imgUrl,
+                  width: screenWidth,
+                  height: height.toDouble(),
+                  index: i,
+                )
+                ..imageNum.add(i);
+              _customImageListState.imageNum.sort();
+            });
+
+            // 等所有图片都加载完后在显示漫画图片
+            if (queueLen == len - 1) {
+              _listHeight.add(chapterTotalHeight);
+              print(_listHeight);
+              setState(() {
+                _isLoading = false;
+                _readerChapter = readerChapter;
+              });
+            }
+          },
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     StrutStyle strutStyle = StrutStyle(
@@ -279,6 +355,8 @@ class _ComicReadPageState extends State<ComicReadPage>
       key: _scaffoldKey,
       endDrawer: ComicReadDrawer(
         comicInfoBody: comicInfoBody,
+        readingComicChapter: _readerChapter,
+        selectChapter: _selectChapter,
       ),
       body: comicInfoBody != null && !_isLoading
           ? GestureDetector(
