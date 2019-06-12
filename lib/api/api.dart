@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter_manhuatai/models/rank_types.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
@@ -221,5 +222,21 @@ class Api {
     });
 
     return response;
+  }
+
+  // 获取排行榜类型
+  static Future<RankTypes> getRankTypes() async {
+    final String url =
+        'https://rankdata-globalapi.321mh.com/app_api/v1/comic/getRankTypes/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'platformname': 'android',
+        'productname': 'mht',
+      },
+    );
+
+    return RankTypes.fromJson(response);
   }
 }

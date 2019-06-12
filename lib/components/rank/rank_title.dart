@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RankTitle extends StatelessWidget {
   final String type;
@@ -43,17 +46,33 @@ class RankTitle extends StatelessWidget {
               )
             ],
           ),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(20.0),
+          GestureDetector(
+            onTap: () {
+              Application.router.navigateTo(
+                context,
+                '${Routes.comicRank}?type=$type',
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: ScreenUtil().setWidth(8.0),
+              ),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Text(
+                  'TOP 100',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 8.0,
+                  ),
+                ),
+                // onPressed: () {},
+              ),
             ),
-            child: Text('TOP 100', style: TextStyle(
-              color: Colors.grey,
-              fontSize: 8.0,
-            ),),
-            // onPressed: () {},
           )
         ],
       ),

@@ -8,7 +8,7 @@ mixin RefreshCommonState<T extends StatefulWidget> on State<T>{
   // bool get wantKeepAlive => true;
 
   showRefreshLoading() {
-    new Future.delayed(const Duration(seconds: 0), () {
+    new Future.delayed(Duration(milliseconds: 250), () {
       print('--------------------- showRefreshLoading ---------------------');
       refreshIndicatorKey.currentState.show().then((e) {});
       return true;
