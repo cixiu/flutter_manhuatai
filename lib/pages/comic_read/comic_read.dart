@@ -75,71 +75,10 @@ class _ComicReadPageState extends State<ComicReadPage>
   Future<void> _getComicInfoBody() async {
     var response = await Api.getComicInfoBody(comicId: widget.comicId);
     var _comicInfoBody = ComicInfoBody.fromJson(response);
-    // 获取阅读的章节
-    _readerChapterIndex = _comicInfoBody.comicChapter.indexWhere((chapter) {
-      return chapter.chapterTopicId == widget.chapterTopicId;
+    setState(() {
+      comicInfoBody = _comicInfoBody;
     });
-    _chapterIndex = _readerChapterIndex;
-    var readerChapter = _comicInfoBody.comicChapter[_readerChapterIndex];
-    // 将章节对应的漫画图片插入数组
-    int len = readerChapter.startNum + readerChapter.endNum;
-    String imgHost = 'https://mhpic.manhualang.com';
-
-    if (this.mounted) {
-      int queueLen = 0;
-      int chapterTotalHeight = 0;
-      double screenWidth = MediaQuery.of(context).size.width;
-      Map<int, int> imageHashMap = Map();
-
-      for (var i = 1; i < len; i++) {
-        String imgUrl = '$imgHost' +
-            readerChapter.chapterImage.middle.replaceAll(RegExp(r'\$\$'), '$i');
-        var _imageStream =
-            Image.network(imgUrl).image.resolve(ImageConfiguration());
-
-        _imageStream.addListener(
-          (info, _) {
-            if (!this.mounted) {
-              return;
-            }
-            if (imageHashMap[info.hashCode] != null) {
-              return;
-            }
-            if (queueLen < 0) {
-              return;
-            }
-            imageHashMap[info.hashCode] = i;
-            // 图片在屏幕中的高度
-            int height = screenWidth * info.image.height ~/ info.image.width;
-            // 将整个章节的所有图片相加得出这个章节的高度
-            chapterTotalHeight += height;
-            queueLen++;
-            setState(() {
-              _customImageListState
-                ..imageViews[i] = _buildImageWidget(
-                  imgUrl: imgUrl,
-                  width: screenWidth,
-                  height: height.toDouble(),
-                  index: i,
-                )
-                ..imageNum.add(i);
-              _customImageListState.imageNum.sort();
-            });
-
-            // 等所有图片都加载完后在显示漫画图片
-            if (queueLen == len - 1) {
-              _listHeight.add(chapterTotalHeight);
-              print(_listHeight);
-              setState(() {
-                _isLoading = false;
-                _readerChapter = readerChapter;
-                comicInfoBody = _comicInfoBody;
-              });
-            }
-          },
-        );
-      }
-    }
+    _setComicChapter(widget.chapterTopicId);
   }
 
   void _scrollListener() {
@@ -165,7 +104,7 @@ class _ComicReadPageState extends State<ComicReadPage>
       print(readerChapter.chapterName);
       // 将章节对应的漫画图片插入数组
       int len = readerChapter.startNum + readerChapter.endNum;
-      String imgHost = 'https://mhpic.manhualang.com';
+      String imgHost = 'https://mhpic.isamanhua.com';
       List<int> _imageNum = [];
       Map<int, int> imageHashMap = Map();
       int queueLen = 0;
@@ -203,7 +142,6 @@ class _ComicReadPageState extends State<ComicReadPage>
                   height: height.toDouble(),
                   index: i,
                 );
-              // ..imageNum.add(i);
             });
 
             // 等所有图片都加载完后在显示漫画图片
@@ -274,15 +212,19 @@ class _ComicReadPageState extends State<ComicReadPage>
       _isLoading = true;
       _customImageListState = CustomImageListState();
     });
+    _setComicChapter(selectedComicChapter.chapterTopicId);
+  }
+
+  void _setComicChapter(int chapterTopicId) {
     // 获取阅读的章节
     _readerChapterIndex = comicInfoBody.comicChapter.indexWhere((chapter) {
-      return chapter.chapterTopicId == selectedComicChapter.chapterTopicId;
+      return chapter.chapterTopicId == chapterTopicId;
     });
     _chapterIndex = _readerChapterIndex;
     var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
     // 将章节对应的漫画图片插入数组
     int len = readerChapter.startNum + readerChapter.endNum;
-    String imgHost = 'https://mhpic.manhualang.com';
+    String imgHost = 'https://mhpic.isamanhua.com';
 
     if (this.mounted) {
       int queueLen = 0;
