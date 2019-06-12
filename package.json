@@ -1,0 +1,27 @@
+{
+  "name": "flutter_manhuatai",
+  "version": "1.0.0",
+  "description": "一个使用 Flutter 开发的一款漫画阅读 App, 相应的微信小程序地址 [漫画台小程序](https://github.com/cixiu/manhuatai-miniapp).",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "start": "flutter run",
+    "dev": "flutter run",
+    "build": "flutter build apk",
+    "build_runner": "flutter pub run build_runner build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cixiu/flutter_manhuatai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cixiu/flutter_manhuatai/issues"
+  },
+  "homepage": "https://github.com/cixiu/flutter_manhuatai#readme"
+}
