@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter_manhuatai/models/rank_types.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
+
+import 'package:flutter_manhuatai/utils/utils.dart';
+import 'package:flutter_manhuatai/models/rank_data_detials.dart';
+import 'package:flutter_manhuatai/models/rank_types.dart';
 
 import './http.dart';
 
@@ -208,7 +212,7 @@ class Api {
     return response;
   }
 
-  // 获取漫画的作者和角色信息
+  /// 获取漫画的作者和角色信息
   static Future<Map<String, dynamic>> getComicInfoRole({
     @required String comicId,
   }) async {
@@ -224,7 +228,7 @@ class Api {
     return response;
   }
 
-  // 获取排行榜类型
+  /// 获取排行榜类型
   static Future<RankTypes> getRankTypes() async {
     final String url =
         'https://rankdata-globalapi.321mh.com/app_api/v1/comic/getRankTypes/';
@@ -238,5 +242,33 @@ class Api {
     );
 
     return RankTypes.fromJson(response);
+  }
+
+  /// 获取排行榜类型的详细信息
+  static Future<RankDataDetials> getRankDataDetials({
+    @required String sortType,
+    String rankType = 'heat',
+    String timeType = 'week',
+  }) async {
+    final String url =
+        'https://rankdata-globalapi.321mh.com/app_api/v1/comic/getRankDataDetials/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'sort_type': sortType,
+        'rank_type': rankType,
+        'time_type': timeType,
+        'query_time': Utils.formatDate(
+          DateTime.now().millisecondsSinceEpoch,
+          'yyyy-MM-dd',
+        ),
+        'product_id': 2,
+        'platformname': 'android',
+        'productname': 'mht',
+      },
+    );
+
+    return RankDataDetials.fromJson(response);
   }
 }

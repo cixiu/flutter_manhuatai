@@ -127,11 +127,52 @@ class Utils {
   }
 
   // 格式化时间
-  static formatDate(int timestamp, [pattern = 'yyyy.MM.dd']) {
+  static String formatDate(int timestamp, [pattern = 'yyyy.MM.dd']) {
     // 将小于 13 位的时间戳补 0 为 13 位数字的时间戳
-    var timestampString =  timestamp.toString().padRight(13, '0');
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString));
+    var timestampString = timestamp.toString().padRight(13, '0');
+    var dateTime =
+        DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString));
 
     return DateFormat(pattern).format(dateTime);
+  }
+
+  /// 获取当前时间在这一年是第几周 -- ISO 8601 标准
+  ///
+  /// 第一个日历星期有以下四种等效说法：
+  ///
+  ///  1，本年度第一个星期四所在的星期；
+  ///
+  ///  2，1月4日所在的星期；
+  ///
+  ///  3，本年度第一个至少有4天在同一星期内的星期；
+  ///
+  ///  4，星期一在去年12月29日至今年1月4日以内的星期；
+  static String getWeek([DateTime date]) {
+    // 获取当前date的时间
+    date = date ?? DateTime.now();
+
+    // 设置当前时间本周星期四的日期
+    var targetThursday =
+        DateTime(date.year, date.month, date.day - (date.weekday + 6) % 7 + 3);
+
+    // 获取本年度的1月4日的时间
+    var firstThursday = DateTime(targetThursday.year, 1, 4);
+
+    // 设置本年度的1月4日所在周的星期四的日期 作为本年度的第一周开始日期
+    firstThursday = DateTime(firstThursday.year, firstThursday.month,
+        firstThursday.day - (firstThursday.weekday + 6) % 7 + 3);
+
+    // 检查当前时间星期四所在周的时区 与 本年度1月4日所在周的星期四的时区差
+    var ds = targetThursday.timeZoneOffset.inHours -
+        firstThursday.timeZoneOffset.inHours;
+
+    targetThursday = DateTime(targetThursday.year, targetThursday.month,
+        targetThursday.day, targetThursday.hour - ds);
+
+    // 当前时间星期四所在周的时间与本年度1月4日所在周的星期四的时间差
+    var weekDiff = (targetThursday.difference(firstThursday).inDays) / 7;
+    var week = 1 + weekDiff.floor();
+
+    return '${date.year}年第${week}周';
   }
 }
