@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
@@ -53,15 +54,13 @@ class _ComicRankPageState extends State<ComicRankPage> with RefreshCommonState {
   Future<void> _selectSortType(Sort_type_list item) async {
     setState(() {
       _sortType = item.name;
+      _isSelecting = true;
     });
     await _getRankDataDetials();
   }
 
   // 获取排行榜类型的详细信息
   Future<void> _getRankDataDetials() async {
-    setState(() {
-      _isSelecting = true;
-    });
     var _getRankDataDetialsRes = await Api.getRankDataDetials(
       sortType: _sortType,
     );
@@ -94,47 +93,52 @@ class _ComicRankPageState extends State<ComicRankPage> with RefreshCommonState {
         onRefresh: onRefresh,
         child: _isLoading
             ? Container()
-            : CustomScrollView(
-                physics: ClampingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                slivers: <Widget>[
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      GridView.count(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil().setWidth(20),
+            : Stack(
+                children: <Widget>[
+                  CustomScrollView(
+                    physics: ClampingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    slivers: <Widget>[
+                      SliverList(
+                        delegate: SliverChildListDelegate([
+                          GridView.count(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil().setWidth(20),
+                            ),
+                            shrinkWrap: true,
+                            crossAxisCount: _sortTypeList.length ~/ 2,
+                            childAspectRatio: 2,
+                            children: _buildSortTypeListWidget(),
+                          ),
+                        ]),
+                      ),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: CommonSliverPersistentHeaderDelegate(
+                          height: ScreenUtil().setWidth(74),
+                          child: _buildSortTypeDescription(),
                         ),
-                        shrinkWrap: true,
-                        crossAxisCount: _sortTypeList.length ~/ 2,
-                        childAspectRatio: 2,
-                        children: _buildSortTypeListWidget(),
                       ),
-                    ]),
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          top: ScreenUtil().setWidth(30),
+                        ),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              var item = _sortDataList[index];
+                              return ComicRankItem(
+                                comicItem: item,
+                                index: index,
+                              );
+                            },
+                            childCount: _sortDataList.length,
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: CommonSliverPersistentHeaderDelegate(
-                      height: ScreenUtil().setWidth(74),
-                      child: _buildSortTypeDescription(),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                      top: ScreenUtil().setWidth(30),
-                    ),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          var item = _sortDataList[index];
-                          return ComicRankItem(
-                            comicItem: item,
-                            index: index,
-                          );
-                        },
-                        childCount: _sortDataList.length,
-                      ),
-                    ),
-                  )
+                  _isSelecting ? RequestLoading() : Container(),
                 ],
               ),
       ),
@@ -155,6 +159,7 @@ class _ComicRankPageState extends State<ComicRankPage> with RefreshCommonState {
 
     return _sortTypeList.map((item) {
       return GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           _selectSortType(item);
         },

@@ -6,7 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
 
-import 'package:flutter_manhuatai/components/requset_loading.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_info.dart';
