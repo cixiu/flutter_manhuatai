@@ -34,6 +34,16 @@ class AppConst {
   static RegExp phoneReg = RegExp(
       r'^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[01356789]\d{2}|4(?:0\d|1[0-2]|9\d))|9[189]\d{2}|6[567]\d{2}|4[579]\d{2})\d{6}$');
 
+  static Map<int, String> weekdayString = {
+    0: '周日',
+    1: '周一',
+    2: '周二',
+    3: '周三',
+    4: '周四',
+    5: '周五',
+    6: '周六',
+  };
+
   // android使用webp格式图片
   // static ImageSizeSuffix imageSizeWebp = ImageSizeSuffix.fromJson({
   //   "h1x1": "-500x500.jpg.webp",

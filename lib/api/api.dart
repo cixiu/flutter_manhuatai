@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/update_list.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
@@ -270,5 +271,21 @@ class Api {
     );
 
     return RankDataDetials.fromJson(response);
+  }
+
+  /// 获取更新列表
+  static Future<UpdateList> getUpdateList() async {
+    final String url =
+        'https://getconfig-globalapi.yyhao.com/app_api/v5/updatelist/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'platformname': 'android',
+        'productname': 'mht',
+      },
+    );
+
+    return UpdateList.fromJson(response);
   }
 }

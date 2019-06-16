@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fluro/fluro.dart';
 
 import './home_rank.dart';
 import './home_recommend.dart';
-
-import 'package:flutter_manhuatai/routes/application.dart';
-
-// import 'package:flutter_manhuatai/api/api.dart';
 
 class HomeIndex extends StatefulWidget {
   @override
@@ -42,7 +37,7 @@ class _HomeIndexState extends State<HomeIndex>
   @override
   void dispose() {
     super.dispose();
-    this.tabController.dispose();
+    tabController.dispose();
   }
 
   @override
