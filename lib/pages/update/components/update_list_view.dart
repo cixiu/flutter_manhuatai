@@ -164,6 +164,7 @@ class _UpdateListViewState extends State<UpdateListView>
                     ),
                     child: Text(
                       '${item.chapterFeature.isNotEmpty ? item.chapterFeature : item.comicFeature}',
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: ScreenUtil().setSp(36),

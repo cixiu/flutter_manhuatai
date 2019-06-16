@@ -1,6 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
+import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
 import 'package:flutter_manhuatai/pages/user_center/user_center.dart';
@@ -33,5 +34,12 @@ var comicRankHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     String type = params['type']?.first;
     return ComicRankPage(type: type);
+  },
+);
+
+// 漫画排行榜
+var comicSearchHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return ComicSearchPage();
   },
 );

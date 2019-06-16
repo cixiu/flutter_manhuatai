@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
@@ -15,6 +16,10 @@ main() async {
 
   runApp(MyApp(
     store: store,
+  ));
+
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
   ));
 }
 

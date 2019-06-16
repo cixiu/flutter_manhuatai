@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/common/const/app_const.dart';
-import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/pages/update/components/update_list_view.dart';
 
 class HomeUpdate extends StatefulWidget {
@@ -63,35 +63,66 @@ class _HomeUpdateState extends State<HomeUpdate>
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(toolBarHeight),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: statusBarHeight,
-            ),
-            Expanded(
-              child: TabBar(
-                controller: tabController,
-                indicatorColor: Colors.blue,
-                indicatorSize: TabBarIndicatorSize.label,
-                labelColor: Colors.blue,
-                labelPadding: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setWidth(20),
-                  horizontal: 0.0,
-                ),
-                unselectedLabelColor: Colors.grey[800],
-                labelStyle: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: ScreenUtil().setWidth(24),
-                ),
-                tabs: _buildTabs(dateList),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          brightness: Brightness.light,
+          elevation: 0.0,
+          title: Container(
+            height: toolBarHeight,
+            color: Colors.white,
+            child: TabBar(
+              controller: tabController,
+              indicatorColor: Colors.blue,
+              indicatorSize: TabBarIndicatorSize.label,
+              labelColor: Colors.blue,
+              labelPadding: EdgeInsets.symmetric(
+                vertical: ScreenUtil().setWidth(20),
+                horizontal: 0.0,
               ),
-            )
-          ],
+              unselectedLabelColor: Colors.grey[800],
+              labelStyle: TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: ScreenUtil().setWidth(24),
+              ),
+              tabs: _buildTabs(dateList),
+            ),
+          ),
         ),
       ),
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(toolBarHeight),
+      //   child: Column(
+      //     children: <Widget>[
+      //       Container(
+      //         height: statusBarHeight,
+      //       ),
+      //       Expanded(
+      //         child: TabBar(
+      //           controller: tabController,
+      //           indicatorColor: Colors.blue,
+      //           indicatorSize: TabBarIndicatorSize.label,
+      //           labelColor: Colors.blue,
+      //           labelPadding: EdgeInsets.symmetric(
+      //             vertical: ScreenUtil().setWidth(20),
+      //             horizontal: 0.0,
+      //           ),
+      //           unselectedLabelColor: Colors.grey[800],
+      //           labelStyle: TextStyle(
+      //             color: Colors.blue,
+      //             fontWeight: FontWeight.bold,
+      //           ),
+      //           unselectedLabelStyle: TextStyle(
+      //             fontSize: ScreenUtil().setWidth(24),
+      //           ),
+      //           tabs: _buildTabs(dateList),
+      //         ),
+      //       )
+      //     ],
+      //   ),
+      // ),
       body: TabBarView(
         controller: tabController,
         children: _buildTabBarViews(dateList),

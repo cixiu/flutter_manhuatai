@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import './home_rank.dart';
 import './home_recommend.dart';
@@ -46,19 +49,57 @@ class _HomeIndexState extends State<HomeIndex>
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0),
+        preferredSize: Size.fromHeight(
+          ScreenUtil().setWidth(140),
+        ),
         child: AppBar(
-          title: Container(
-            width: MediaQuery.of(context).size.width,
-            height: 30.0,
-            color: Colors.grey,
-            child: Text('搜索框，进入搜索页'),
+          centerTitle: true,
+          elevation: 0.0,
+          title: GestureDetector(
+            onTap: () {
+              Application.router.navigateTo(context, '${Routes.comicSearch}');
+            },
+            child: Container(
+              width: ScreenUtil().setWidth(600),
+              height: ScreenUtil().setWidth(60),
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenUtil().setWidth(30),
+              ),
+              margin: EdgeInsets.symmetric(
+                horizontal: ScreenUtil().setWidth(20),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(
+                  ScreenUtil().setWidth(30),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    '请输入漫画名或其他关键词',
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontSize: ScreenUtil().setSp(24),
+                    ),
+                  ),
+                  Icon(
+                    Icons.search,
+                    size: ScreenUtil().setWidth(36),
+                    color: Colors.white54,
+                  ),
+                ],
+              ),
+            ),
           ),
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(30.0),
+            preferredSize: Size.fromHeight(
+              ScreenUtil().setWidth(60),
+            ),
             child: Container(
               color: Colors.blue,
-              height: 30.0,
+              height: ScreenUtil().setWidth(60),
               child: TabBar(
                 controller: tabController,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 12.5),
