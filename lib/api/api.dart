@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/hot_search.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
@@ -287,5 +288,24 @@ class Api {
     );
 
     return UpdateList.fromJson(response);
+  }
+
+  /// 获取热门搜索列表
+  static Future<HotSearch> getHotSearch() async {
+    final String url = 'https://community.321mh.com/star/hotsearchs/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'page': 1,
+        'pagesize': 10,
+        'userloglevel': 1,
+        'AppId': 2,
+        'level': 1,
+        'siteId': 8,
+      },
+    );
+
+    return HotSearch.fromJson(response);
   }
 }

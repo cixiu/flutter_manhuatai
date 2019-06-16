@@ -18,9 +18,10 @@ main() async {
     store: store,
   ));
 
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-  ));
+  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //   statusBarColor: Colors.transparent,
+  //   statusBarBrightness: Brightness.dark,
+  // ));
 }
 
 class MyApp extends StatelessWidget {
