@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+typedef void OnChange(String val);
+
 class SearchAppBar extends StatelessWidget {
+  final TextEditingController controller;
+  final String searchKey;
+  final OnChange onChange;
+  final VoidCallback close;
+
+  SearchAppBar({
+    this.controller,
+    this.searchKey,
+    this.onChange,
+    this.close,
+  });
+
   @override
   Widget build(BuildContext context) {
     var statusBarHeight = MediaQuery.of(context).padding.top;
@@ -30,25 +44,48 @@ class SearchAppBar extends StatelessWidget {
                         ScreenUtil().setWidth(30),
                       ),
                     ),
-                    child: TextField(
-                      // controller: widget.controller,
-                      style: TextStyle(
-                        fontSize: ScreenUtil().setSp(28),
-                      ),
-                      decoration: InputDecoration(
-                        hintText: '请输入漫画名或其他关键词',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextField(
+                            controller: controller,
+                            style: TextStyle(
+                              fontSize: ScreenUtil().setSp(28),
+                            ),
+                            decoration: InputDecoration(
+                              hintText: '请输入漫画名或其他关键词',
+                              hintStyle: TextStyle(
+                                color: Colors.grey,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil().setWidth(20),
+                                vertical: ScreenUtil().setWidth(6),
+                              ),
+                              border: UnderlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            onChanged: onChange,
+                          ),
                         ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil().setWidth(10),
-                          vertical: ScreenUtil().setWidth(6),
-                        ),
-                        border: UnderlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      // onChanged: widget.onChange,
+                        searchKey.isEmpty
+                            ? Container(
+                                height: 0.0,
+                              )
+                            : GestureDetector(
+                                onTap: close,
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    right: ScreenUtil().setWidth(20),
+                                  ),
+                                  child: Icon(
+                                    Icons.close,
+                                    size: ScreenUtil().setSp(40),
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                      ],
                     ),
                   ),
                 ),

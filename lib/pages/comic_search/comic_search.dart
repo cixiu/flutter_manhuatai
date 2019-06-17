@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/models/hot_search.dart' as HotSearch;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/models/hot_search.dart' as HotSearch;
+import 'package:flutter_manhuatai/models/search_comic.dart' as SearchComic;
 import 'components/search_app_bar.dart';
 
 class ComicSearchPage extends StatefulWidget {
@@ -16,14 +17,25 @@ class ComicSearchPage extends StatefulWidget {
 class _ComicSearchPageState extends State<ComicSearchPage>
     with RefreshCommonState, WidgetsBindingObserver {
   bool _isLoading = true;
+  TextEditingController _searchController;
   List<HotSearch.Data> _hotSearchList;
+  String _searchKey = '';
+  Timer _timer;
+  List<SearchComic.Data> _suggestList = [];
 
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchController?.dispose();
   }
 
   Future<void> handleRefresh() async {
@@ -32,10 +44,26 @@ class _ComicSearchPageState extends State<ComicSearchPage>
 
   Future<void> _getHotSearch() async {
     var _getHotSearch = await Api.getHotSearch();
-    print(_getHotSearch);
+    if (!this.mounted) {
+      return;
+    }
+
     setState(() {
       _hotSearchList = _getHotSearch.data;
       _isLoading = false;
+    });
+  }
+
+  // 输入时触发搜索
+  Future<void> _inputChange(String val) async {
+    _timer?.cancel();
+    _timer = Timer(Duration(milliseconds: 300), () async {
+      // setState(() {});
+      var _searchComic = await Api.searchComic(val);
+      setState(() {
+        _searchKey = val;
+        _suggestList = _searchComic.data;
+      });
     });
   }
 
@@ -44,61 +72,152 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     var statusBarHeight = MediaQuery.of(context).padding.top;
     var appBarHeight = ScreenUtil().setWidth(40);
 
+    TextStyle commonStyle = TextStyle(
+      color: Colors.black,
+      fontSize: ScreenUtil().setSp(28),
+      fontWeight: FontWeight.normal,
+    );
+    TextStyle selectedStyle = TextStyle(
+      color: Colors.blue,
+      fontSize: ScreenUtil().setSp(28),
+      fontWeight: FontWeight.bold,
+    );
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(
           statusBarHeight + appBarHeight,
         ),
-        child: SearchAppBar(),
+        child: SearchAppBar(
+          controller: _searchController,
+          searchKey: _searchKey,
+          onChange: (val) {
+            _inputChange(val);
+          },
+          close: () {
+            setState(() {
+              _searchController.value = TextEditingValue(text: '');
+              _searchKey = '';
+            });
+          },
+        ),
       ),
-      body: RefreshIndicator(
-        key: refreshIndicatorKey,
-        onRefresh: handleRefresh,
-        child: _isLoading
-            ? Container()
-            : ListView(
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        height: ScreenUtil().setWidth(86),
-                        padding: EdgeInsets.only(
-                          left: ScreenUtil().setWidth(20),
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.grey[300],
-                              width: ScreenUtil().setWidth(1),
+      body: GestureDetector(
+        onTap: () {
+          // 使键盘失焦
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: RefreshIndicator(
+          key: refreshIndicatorKey,
+          onRefresh: handleRefresh,
+          child: _isLoading
+              ? Container()
+              : _searchKey.isNotEmpty
+                  ? _suggestList.length == 0
+                      ? Center(
+                          child: Text(
+                            '没有搜索到任何内容哦~~',
+                            style: commonStyle,
+                          ),
+                        )
+                      : ListView.builder(
+                          physics: ClampingScrollPhysics(),
+                          itemCount: _suggestList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            var item = _suggestList[index];
+                            // 是否包含搜索的关键词
+                            bool _hasContainSearchKey =
+                                item.comicName.contains(_searchKey);
+                            List<String> comicNameList = [];
+
+                            // 将漫画中的关键词提取出来
+                            if (_hasContainSearchKey) {
+                              comicNameList = item.comicName.split(_searchKey);
+                            }
+
+                            return Container(
+                              height: ScreenUtil().setWidth(96),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil().setWidth(96),
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey[200],
+                                    width: ScreenUtil().setWidth(1),
+                                  ),
+                                ),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: !_hasContainSearchKey
+                                  ? Text(
+                                      '${item.comicName}',
+                                      overflow: TextOverflow.clip,
+                                      style: commonStyle,
+                                    )
+                                  : Text.rich(
+                                      TextSpan(
+                                        text: comicNameList[0],
+                                        style: commonStyle,
+                                        children: <TextSpan>[
+                                          TextSpan(
+                                            text: '$_searchKey',
+                                            style: selectedStyle,
+                                          ),
+                                          TextSpan(
+                                            text: comicNameList[1],
+                                            style: commonStyle,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                            );
+                          },
+                        )
+                  : ListView(
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              height: ScreenUtil().setWidth(86),
+                              padding: EdgeInsets.only(
+                                left: ScreenUtil().setWidth(20),
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey[300],
+                                    width: ScreenUtil().setWidth(1),
+                                  ),
+                                ),
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '大家都在搜',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: ScreenUtil().setSp(32),
+                                ),
+                              ),
                             ),
-                          ),
+                            Container(
+                              padding: EdgeInsets.only(
+                                top: ScreenUtil().setWidth(36),
+                                left: ScreenUtil().setWidth(36),
+                                right: ScreenUtil().setWidth(36),
+                              ),
+                              child: Wrap(
+                                spacing: ScreenUtil().setWidth(50),
+                                runSpacing: ScreenUtil().setWidth(25),
+                                children: _buildHotSearchList(),
+                              ),
+                            ),
+                          ],
                         ),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '大家都在搜',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: ScreenUtil().setSp(32),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                          top: ScreenUtil().setWidth(36),
-                          left: ScreenUtil().setWidth(36),
-                          right: ScreenUtil().setWidth(36),
-                        ),
-                        child: Wrap(
-                          spacing: ScreenUtil().setWidth(50),
-                          runSpacing: ScreenUtil().setWidth(25),
-                          children: _buildHotSearchList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
+        ),
       ),
     );
   }
