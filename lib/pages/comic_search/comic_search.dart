@@ -5,9 +5,11 @@ import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/models/hot_search.dart' as HotSearch;
+import 'package:flutter_manhuatai/models/hot_search.dart';
 import 'package:flutter_manhuatai/models/search_comic.dart' as SearchComic;
 import 'components/search_app_bar.dart';
+import 'components/search_history.dart';
+import 'components/search_suggest_list.dart';
 
 class ComicSearchPage extends StatefulWidget {
   @override
@@ -18,7 +20,7 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     with RefreshCommonState, WidgetsBindingObserver {
   bool _isLoading = true;
   TextEditingController _searchController;
-  List<HotSearch.Data> _hotSearchList;
+  List<HotSearch> _hotSearchList;
   String _searchKey = '';
   Timer _timer;
   List<SearchComic.Data> _suggestList = [];
@@ -49,7 +51,7 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     }
 
     setState(() {
-      _hotSearchList = _getHotSearch.data;
+      _hotSearchList = _getHotSearch;
       _isLoading = false;
     });
   }
@@ -76,11 +78,6 @@ class _ComicSearchPageState extends State<ComicSearchPage>
       color: Colors.black,
       fontSize: ScreenUtil().setSp(28),
       fontWeight: FontWeight.normal,
-    );
-    TextStyle selectedStyle = TextStyle(
-      color: Colors.blue,
-      fontSize: ScreenUtil().setSp(28),
-      fontWeight: FontWeight.bold,
     );
 
     return Scaffold(
@@ -120,59 +117,9 @@ class _ComicSearchPageState extends State<ComicSearchPage>
                             style: commonStyle,
                           ),
                         )
-                      : ListView.builder(
-                          physics: ClampingScrollPhysics(),
-                          itemCount: _suggestList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            var item = _suggestList[index];
-                            // 是否包含搜索的关键词
-                            bool _hasContainSearchKey =
-                                item.comicName.contains(_searchKey);
-                            List<String> comicNameList = [];
-
-                            // 将漫画中的关键词提取出来
-                            if (_hasContainSearchKey) {
-                              comicNameList = item.comicName.split(_searchKey);
-                            }
-
-                            return Container(
-                              height: ScreenUtil().setWidth(96),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: ScreenUtil().setWidth(96),
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey[200],
-                                    width: ScreenUtil().setWidth(1),
-                                  ),
-                                ),
-                              ),
-                              alignment: Alignment.centerLeft,
-                              child: !_hasContainSearchKey
-                                  ? Text(
-                                      '${item.comicName}',
-                                      overflow: TextOverflow.clip,
-                                      style: commonStyle,
-                                    )
-                                  : Text.rich(
-                                      TextSpan(
-                                        text: comicNameList[0],
-                                        style: commonStyle,
-                                        children: <TextSpan>[
-                                          TextSpan(
-                                            text: '$_searchKey',
-                                            style: selectedStyle,
-                                          ),
-                                          TextSpan(
-                                            text: comicNameList[1],
-                                            style: commonStyle,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                            );
-                          },
+                      : SearchSuggestList(
+                          searchKey: _searchKey,
+                          suggestList: _suggestList,
                         )
                   : ListView(
                       children: <Widget>[
@@ -208,12 +155,18 @@ class _ComicSearchPageState extends State<ComicSearchPage>
                                 right: ScreenUtil().setWidth(36),
                               ),
                               child: Wrap(
-                                spacing: ScreenUtil().setWidth(50),
+                                spacing: ScreenUtil().setWidth(36),
                                 runSpacing: ScreenUtil().setWidth(25),
                                 children: _buildHotSearchList(),
                               ),
                             ),
                           ],
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: ScreenUtil().setWidth(20),
+                          ),
+                          child: SearchHistory(),
                         ),
                       ],
                     ),
@@ -287,7 +240,7 @@ class _ComicSearchPageState extends State<ComicSearchPage>
             ),
           ),
           child: Text(
-            item.name,
+            item.comicName,
             strutStyle: StrutStyle(
               forceStrutHeight: true,
               fontSize: ScreenUtil().setWidth(26),

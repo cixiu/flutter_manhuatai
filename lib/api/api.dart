@@ -292,22 +292,19 @@ class Api {
   }
 
   /// 获取热门搜索列表
-  static Future<HotSearch> getHotSearch() async {
-    final String url = 'https://community.321mh.com/star/hotsearchs/';
+  static Future<List<HotSearch>> getHotSearch() async {
+    final String url =
+        'https://getconfig-globalapi.yyhao.com/app_api/v5/gettopsearch/';
 
-    Map<String, dynamic> response = await HttpRequest.get(
+    List<dynamic> response = await HttpRequest.get(
       url,
       params: {
-        'page': 1,
-        'pagesize': 10,
-        'userloglevel': 1,
-        'AppId': 2,
-        'level': 1,
-        'siteId': 8,
+        'platformname': 'android',
+        'productname': 'mht',
       },
     );
 
-    return HotSearch.fromJson(response);
+    return getHotSearchList(response);
   }
 
   /// 搜索漫画

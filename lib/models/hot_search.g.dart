@@ -7,26 +7,13 @@ part of 'hot_search.dart';
 // **************************************************************************
 
 HotSearch _$HotSearchFromJson(Map<String, dynamic> json) {
-  return HotSearch(
-      json['status'] as int,
-      json['msg'] as String,
-      (json['data'] as List)
-          ?.map((e) =>
-              e == null ? null : Data.fromJson(e as Map<String, dynamic>))
-          ?.toList(),
-      json['servicetime'] as int);
+  return HotSearch(json['comic_id'] as int, json['comic_name'] as String,
+      json['last_chapter_name'] as String, json['comic_newid'] as String);
 }
 
 Map<String, dynamic> _$HotSearchToJson(HotSearch instance) => <String, dynamic>{
-      'status': instance.status,
-      'msg': instance.msg,
-      'data': instance.data,
-      'servicetime': instance.servicetime
+      'comic_id': instance.comicId,
+      'comic_name': instance.comicName,
+      'last_chapter_name': instance.lastChapterName,
+      'comic_newid': instance.comicNewid
     };
-
-Data _$DataFromJson(Map<String, dynamic> json) {
-  return Data((json['Id'] as num)?.toDouble(), json['Name'] as String);
-}
-
-Map<String, dynamic> _$DataToJson(Data instance) =>
-    <String, dynamic>{'Id': instance.id, 'Name': instance.name};

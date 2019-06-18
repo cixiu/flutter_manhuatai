@@ -2,48 +2,37 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'hot_search.g.dart';
 
+List<HotSearch> getHotSearchList(List<dynamic> list) {
+  List<HotSearch> result = [];
+  list.forEach((item) {
+    result.add(HotSearch.fromJson(item));
+  });
+  return result;
+}
+
 @JsonSerializable()
 class HotSearch extends Object {
-  @JsonKey(name: 'status')
-  int status;
+  @JsonKey(name: 'comic_id')
+  int comicId;
 
-  @JsonKey(name: 'msg')
-  String msg;
+  @JsonKey(name: 'comic_name')
+  String comicName;
 
-  @JsonKey(name: 'data')
-  List<Data> data;
+  @JsonKey(name: 'last_chapter_name')
+  String lastChapterName;
 
-  @JsonKey(name: 'servicetime')
-  int servicetime;
+  @JsonKey(name: 'comic_newid')
+  String comicNewid;
 
   HotSearch(
-    this.status,
-    this.msg,
-    this.data,
-    this.servicetime,
+    this.comicId,
+    this.comicName,
+    this.lastChapterName,
+    this.comicNewid,
   );
 
   factory HotSearch.fromJson(Map<String, dynamic> srcJson) =>
       _$HotSearchFromJson(srcJson);
 
   Map<String, dynamic> toJson() => _$HotSearchToJson(this);
-}
-
-@JsonSerializable()
-class Data extends Object {
-  @JsonKey(name: 'Id')
-  double id;
-
-  @JsonKey(name: 'Name')
-  String name;
-
-  Data(
-    this.id,
-    this.name,
-  );
-
-  factory Data.fromJson(Map<String, dynamic> srcJson) =>
-      _$DataFromJson(srcJson);
-
-  Map<String, dynamic> toJson() => _$DataToJson(this);
 }
