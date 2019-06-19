@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/get_channels_res.dart';
+import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
+import 'package:flutter_manhuatai/models/search_author.dart';
 import 'package:flutter_manhuatai/models/search_comic.dart';
+import 'package:flutter_manhuatai/models/sort_list.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
@@ -308,19 +312,141 @@ class Api {
   }
 
   /// 搜索漫画
-  static Future<SearchComic> searchComic(String serachKey) async {
+  static Future<SearchComic> searchComic(String serachKey,
+      [int topNumber]) async {
     final String url =
         'https://getconfig-globalapi.yyhao.com/app_api/v5/serachcomic/';
 
+    Map<String, dynamic> params = {
+      'serachKey': serachKey,
+      'platformname': 'android',
+      'productname': 'mht',
+    };
+
+    if (topNumber != null) {
+      params.addAll({'topNumber': topNumber});
+    }
+
     Map<String, dynamic> response = await HttpRequest.get(
       url,
-      params: {
-        'serachKey': serachKey,
-        'platformname': 'android',
-        'productname': 'mht',
-      },
+      params: params,
     );
 
     return SearchComic.fromJson(response);
+  }
+
+  /// 获取关键词中的漫画列表
+  static Future<SortList> getSortList({
+    int page = 1,
+    int size = 7,
+    String orderby = 'click',
+    String searchKey,
+  }) async {
+    final String url =
+        'https://getconfig-globalapi.yyhao.com/app_api/v5/getsortlist/';
+
+    Map<String, dynamic> params = {
+      'page': page,
+      'size': size,
+      'orderby': orderby,
+      'search_key': searchKey,
+      'platformname': 'android',
+      'productname': 'mht',
+    };
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+    );
+
+    return SortList.fromJson(response);
+  }
+
+  /// 获取关键词相关的漫画作者
+  static Future<SearchAuthor> searchAuthor({
+    int page = 1,
+    int size = 3,
+    String searchKey,
+  }) async {
+    final String url = 'https://kanmanapi-main.321mh.com/v1/comic/searchauthor';
+
+    Map<String, dynamic> params = {
+      'page': page,
+      'size': size,
+      'search_key': searchKey,
+      'platformname': 'android',
+      'productname': 'mht',
+    };
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+    );
+
+    return SearchAuthor.fromJson(response);
+  }
+
+  /// 获取关键词相关的频道
+  static Future<GetChannelsRes> getChannels({
+    int userIdentifier,
+    int level,
+    String keyword,
+  }) async {
+    final String url = 'https://community.321mh.com/star/gets/';
+
+    Map<String, dynamic> params = {
+      'userIdentifier': userIdentifier, // 登录用户的id
+      'userloglevel': 1,
+      'appId': 2,
+      'level': level, // 用户的等级
+      'siteId': 8,
+      'isHot': 0,
+      'universeId': 0,
+      'isSelf': 0,
+      'starId': 0,
+      'userId': 0,
+      'keyword': keyword,
+    };
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+    );
+
+    return GetChannelsRes.fromJson(response);
+  }
+
+  /// 获取关键词相关的帖子
+  static Future<GetSatelliteRes> getSatellite({
+    int userIdentifier,
+    int level,
+    String keyword,
+    int satelliteId = 0,
+    int satelliteType = 0,
+    int starId = 0,
+    int isJoin = 0,
+  }) async {
+    final String url = 'http://community.321mh.com/satellite/gets/';
+
+    Map<String, dynamic> params = {
+      'userIdentifier': userIdentifier,
+      'userloglevel': 1,
+      'appId': 2,
+      'level': level,
+      'isWater': -1,
+      'siteId': 8,
+      'satelliteId': satelliteId,
+      'satelliteType': satelliteType,
+      'starId': starId,
+      'isJoin': isJoin,
+      'keyWord': keyword,
+    };
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+    );
+
+    return GetSatelliteRes.fromJson(response);
   }
 }
