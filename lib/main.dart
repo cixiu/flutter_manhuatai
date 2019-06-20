@@ -43,6 +43,19 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             backgroundColor: Colors.white,
             canvasColor: Colors.white,
+            appBarTheme: AppBarTheme(
+              elevation: 0.0,
+              color: Colors.white,
+              iconTheme: IconThemeData(
+                color: Colors.blue,
+              ),
+              textTheme: TextTheme(
+                title: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
           ),
           home: LaunchPage(),
           onGenerateRoute: Application.router.generator,

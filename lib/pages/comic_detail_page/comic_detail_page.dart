@@ -225,6 +225,9 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                   SliverAppBar(
                     pinned: true,
                     expandedHeight: expandedHeight,
+                    iconTheme: IconThemeData(
+                      color: _showTitle ? Colors.blue : Colors.white,
+                    ),
                     title: Text(_showTitle ? comicInfoBody.comicName : ''),
                     centerTitle: true,
                     elevation: 0.0,

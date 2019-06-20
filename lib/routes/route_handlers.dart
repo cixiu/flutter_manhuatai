@@ -4,6 +4,7 @@ import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
+import 'package:flutter_manhuatai/pages/search_result/search_result.dart';
 import 'package:flutter_manhuatai/pages/user_center/user_center.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/comic_detail_page.dart';
 
@@ -37,9 +38,20 @@ var comicRankHandler = Handler(
   },
 );
 
-// 漫画排行榜
+// 搜索
 var comicSearchHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return ComicSearchPage();
+  },
+);
+
+// 搜索结果
+var searchResultHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String keyword = params['keyword']?.first;
+
+    return SearchResultPage(
+      keyword: keyword,
+    );
   },
 );

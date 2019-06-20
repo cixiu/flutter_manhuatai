@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
@@ -21,6 +24,7 @@ class _ComicSearchPageState extends State<ComicSearchPage>
   bool _isLoading = true;
   TextEditingController _searchController;
   List<HotSearch> _hotSearchList;
+  List<String> _searchHistoryList = [];
   String _searchKey = '';
   Timer _timer;
   List<SearchComic.Data> _suggestList = [];
@@ -40,18 +44,26 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     _searchController?.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateSearchHistoryList();
+  }
+
   Future<void> handleRefresh() async {
     await _getHotSearch();
   }
 
   Future<void> _getHotSearch() async {
     var _getHotSearch = await Api.getHotSearch();
+    var searchHistoryList = await SpUtils.loadSearchHistory();
     if (!this.mounted) {
       return;
     }
 
     setState(() {
       _hotSearchList = _getHotSearch;
+      _searchHistoryList = searchHistoryList;
       _isLoading = false;
     });
   }
@@ -66,6 +78,21 @@ class _ComicSearchPageState extends State<ComicSearchPage>
         _searchKey = val;
         _suggestList = _searchComic.data;
       });
+    });
+  }
+
+  void _navigateToSearchResultPage(BuildContext context, String query) {
+    String keyword = Uri.encodeComponent(query);
+    Application.router
+        .navigateTo(context, '${Routes.searchResult}?keyword=$keyword');
+    SpUtils.saveSearchHistory(query);
+  }
+
+  // 更新搜索历史
+  void _updateSearchHistoryList() async {
+    var searchHistoryList = await SpUtils.loadSearchHistory();
+    setState(() {
+      _searchHistoryList = searchHistoryList;
     });
   }
 
@@ -162,12 +189,17 @@ class _ComicSearchPageState extends State<ComicSearchPage>
                             ),
                           ],
                         ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: ScreenUtil().setWidth(20),
-                          ),
-                          child: SearchHistory(),
-                        ),
+                        _searchHistoryList.length == 0
+                            ? Container()
+                            : Container(
+                                margin: EdgeInsets.only(
+                                  top: ScreenUtil().setWidth(20),
+                                ),
+                                child: SearchHistory(
+                                  historyList: _searchHistoryList,
+                                  update: _updateSearchHistoryList,
+                                ),
+                              ),
                       ],
                     ),
         ),
@@ -228,26 +260,31 @@ class _ComicSearchPageState extends State<ComicSearchPage>
       }
 
       _children.add(
-        Container(
-          padding: EdgeInsets.symmetric(
-            vertical: ScreenUtil().setWidth(15),
-            horizontal: ScreenUtil().setWidth(20),
-          ),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(
-              ScreenUtil().setWidth(30),
+        GestureDetector(
+          onTap: () {
+            _navigateToSearchResultPage(context, item.comicName);
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: ScreenUtil().setWidth(15),
+              horizontal: ScreenUtil().setWidth(20),
             ),
-          ),
-          child: Text(
-            item.comicName,
-            strutStyle: StrutStyle(
-              forceStrutHeight: true,
-              fontSize: ScreenUtil().setWidth(26),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(
+                ScreenUtil().setWidth(30),
+              ),
             ),
-            style: TextStyle(
-              color: color,
-              fontSize: ScreenUtil().setWidth(26),
+            child: Text(
+              item.comicName,
+              strutStyle: StrutStyle(
+                forceStrutHeight: true,
+                fontSize: ScreenUtil().setWidth(26),
+              ),
+              style: TextStyle(
+                color: color,
+                fontSize: ScreenUtil().setWidth(26),
+              ),
             ),
           ),
         ),

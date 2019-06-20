@@ -1,7 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/cancel_dialog/cancel_dialog.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SearchHistory extends StatelessWidget {
+  final List<String> historyList;
+  final VoidCallback update;
+
+  SearchHistory({
+    this.historyList,
+    this.update,
+  });
+
+  void _navigateToSearchResultPage(BuildContext context, String query) {
+    String keyword = Uri.encodeComponent(query);
+    Application.router
+        .navigateTo(context, '${Routes.searchResult}?keyword=$keyword');
+    SpUtils.saveSearchHistory(query);
+  }
+
+  void _deleteOneSearchHistory(String query) async {
+    await SpUtils.deleteOneSearchHistory(query);
+    update();
+  }
+
+  void _clearSearchHistory(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CancelDialog(
+          title: '是否清空搜索记录',
+          confirm: () async {
+            await SpUtils.clearSearchHistory();
+            update();
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -34,7 +73,7 @@ class SearchHistory extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  print('是否清空搜索记录');
+                  _clearSearchHistory(context);
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(
@@ -52,8 +91,8 @@ class SearchHistory extends StatelessWidget {
           ),
         ),
         Column(
-          children: <Widget>[
-            Container(
+          children: historyList.map((item) {
+            return Container(
               height: ScreenUtil().setWidth(96),
               margin: EdgeInsets.symmetric(
                 horizontal: ScreenUtil().setWidth(20),
@@ -67,7 +106,9 @@ class SearchHistory extends StatelessWidget {
                 ),
               ),
               child: InkResponse(
-                onTap: () {},
+                onTap: () {
+                  _navigateToSearchResultPage(context, item);
+                },
                 highlightShape: BoxShape.rectangle,
                 containedInkWell: true,
                 child: Row(
@@ -85,7 +126,7 @@ class SearchHistory extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        '斗破苍穹',
+                        '$item',
                         overflow: TextOverflow.clip,
                         style: TextStyle(
                           color: Colors.grey[700],
@@ -94,21 +135,26 @@ class SearchHistory extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.all(
-                        ScreenUtil().setWidth(20),
-                      ),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.grey,
-                        size: ScreenUtil().setWidth(42),
+                    GestureDetector(
+                      onTap: () {
+                        _deleteOneSearchHistory(item);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(
+                          ScreenUtil().setWidth(20),
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.grey,
+                          size: ScreenUtil().setWidth(42),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ],
     );

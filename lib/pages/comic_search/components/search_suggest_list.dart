@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/models/search_comic.dart' as SearchComic;
@@ -11,6 +14,13 @@ class SearchSuggestList extends StatelessWidget {
     this.searchKey,
     this.suggestList,
   });
+
+  void _navigateToSearchResultPage(BuildContext context, String query) {
+    String keyword = Uri.encodeComponent(query);
+    Application.router
+        .navigateTo(context, '${Routes.searchResult}?keyword=$keyword');
+    SpUtils.saveSearchHistory(query);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,42 +49,49 @@ class SearchSuggestList extends StatelessWidget {
           comicNameList = item.comicName.split(searchKey);
         }
 
-        return Container(
-          height: ScreenUtil().setWidth(96),
-          padding: EdgeInsets.symmetric(
-            horizontal: ScreenUtil().setWidth(96),
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.grey[200],
-                width: ScreenUtil().setWidth(1),
+        return InkResponse(
+          onTap: () {
+            _navigateToSearchResultPage(context, item.comicName);
+          },
+          containedInkWell: true,
+          highlightShape: BoxShape.rectangle,
+          child: Container(
+            height: ScreenUtil().setWidth(96),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil().setWidth(96),
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey[200],
+                  width: ScreenUtil().setWidth(1),
+                ),
               ),
             ),
-          ),
-          alignment: Alignment.centerLeft,
-          child: !_hasContainSearchKey
-              ? Text(
-                  '${item.comicName}',
-                  overflow: TextOverflow.clip,
-                  style: commonStyle,
-                )
-              : Text.rich(
-                  TextSpan(
-                    text: comicNameList[0],
+            alignment: Alignment.centerLeft,
+            child: !_hasContainSearchKey
+                ? Text(
+                    '${item.comicName}',
+                    overflow: TextOverflow.clip,
                     style: commonStyle,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: '$searchKey',
-                        style: selectedStyle,
-                      ),
-                      TextSpan(
-                        text: comicNameList[1],
-                        style: commonStyle,
-                      ),
-                    ],
+                  )
+                : Text.rich(
+                    TextSpan(
+                      text: comicNameList[0],
+                      style: commonStyle,
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: '$searchKey',
+                          style: selectedStyle,
+                        ),
+                        TextSpan(
+                          text: comicNameList[1],
+                          style: commonStyle,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+          ),
         );
       },
     );

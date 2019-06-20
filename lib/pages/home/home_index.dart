@@ -55,6 +55,7 @@ class _HomeIndexState extends State<HomeIndex>
         child: AppBar(
           centerTitle: true,
           elevation: 0.0,
+          backgroundColor: Colors.blue,
           title: GestureDetector(
             onTap: () {
               Application.router.navigateTo(context, '${Routes.comicSearch}');
@@ -104,6 +105,7 @@ class _HomeIndexState extends State<HomeIndex>
                 controller: tabController,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 12.5),
                 labelStyle: TextStyle(fontSize: 16.0),
+                indicatorColor: Colors.white,
                 // indicatorSize: TabBarIndicatorSize.label,
                 // isScrollable: true,
                 tabs: <Widget>[

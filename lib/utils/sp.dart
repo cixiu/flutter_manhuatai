@@ -90,7 +90,7 @@ class SpUtils {
   }
 
   /// 删除一条搜索历史
-  static Future<void> deleteOneSearchHistory(String searchVal) async {
+  static Future<List<String>> deleteOneSearchHistory(String searchVal) async {
     var spf = await SharedPreferences.getInstance();
     var searchHistoryList = spf.getStringList(SpKey.SEARCH_HISTORY) ?? [];
 
