@@ -19,6 +19,13 @@ class SearchAppBar extends StatelessWidget {
     this.close,
   });
 
+  void _navigateToSearchResultPage(BuildContext context, String query) {
+    String keyword = Uri.encodeComponent(query);
+    Application.router
+        .navigateTo(context, '${Routes.searchResult}?keyword=$keyword');
+    SpUtils.saveSearchHistory(query);
+  }
+
   @override
   Widget build(BuildContext context) {
     var statusBarHeight = MediaQuery.of(context).padding.top;
@@ -69,6 +76,12 @@ class SearchAppBar extends StatelessWidget {
                               ),
                             ),
                             onChanged: onChange,
+                            onSubmitted: (val) {
+                              if (val.isEmpty) {
+                                return;
+                              }
+                              _navigateToSearchResultPage(context, val);
+                            },
                           ),
                         ),
                         searchKey.isEmpty

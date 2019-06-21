@@ -102,7 +102,10 @@ class _SearchResultPageState extends State<SearchResultPage>
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 slivers: <Widget>[
-                  RelatedComics(),
+                  RelatedComics(
+                    keyword: widget.keyword,
+                    relatedListData: _sortListData,
+                  ),
                 ],
               ),
       ),

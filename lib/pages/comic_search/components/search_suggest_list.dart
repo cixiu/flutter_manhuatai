@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/match_text/match_text.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/sp.dart';
@@ -24,30 +25,11 @@ class SearchSuggestList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle commonStyle = TextStyle(
-      color: Colors.black,
-      fontSize: ScreenUtil().setSp(28),
-      fontWeight: FontWeight.normal,
-    );
-    TextStyle selectedStyle = TextStyle(
-      color: Colors.blue,
-      fontSize: ScreenUtil().setSp(28),
-      fontWeight: FontWeight.bold,
-    );
-
     return ListView.builder(
       physics: ClampingScrollPhysics(),
       itemCount: suggestList.length,
       itemBuilder: (BuildContext context, int index) {
         var item = suggestList[index];
-        // 是否包含搜索的关键词
-        bool _hasContainSearchKey = item.comicName.contains(searchKey);
-        List<String> comicNameList = [];
-
-        // 将漫画中的关键词提取出来
-        if (_hasContainSearchKey) {
-          comicNameList = item.comicName.split(searchKey);
-        }
 
         return InkResponse(
           onTap: () {
@@ -69,28 +51,10 @@ class SearchSuggestList extends StatelessWidget {
               ),
             ),
             alignment: Alignment.centerLeft,
-            child: !_hasContainSearchKey
-                ? Text(
-                    '${item.comicName}',
-                    overflow: TextOverflow.clip,
-                    style: commonStyle,
-                  )
-                : Text.rich(
-                    TextSpan(
-                      text: comicNameList[0],
-                      style: commonStyle,
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: '$searchKey',
-                          style: selectedStyle,
-                        ),
-                        TextSpan(
-                          text: comicNameList[1],
-                          style: commonStyle,
-                        ),
-                      ],
-                    ),
-                  ),
+            child: MatchText(
+              '${item.comicName}',
+              matchText: '$searchKey',
+            ),
           ),
         );
       },
