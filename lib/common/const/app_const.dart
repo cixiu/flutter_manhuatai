@@ -2,6 +2,7 @@ import 'dart:io';
 
 class AppConst {
   static const img_host = 'https://image.mhxk.com';
+  static const commentImgHost = 'https://comment.yyhao.com';
 
   // ios使用jpg格式图片 android使用webp格式图片
   static ImageSizeSuffix imageSizeSuffix =

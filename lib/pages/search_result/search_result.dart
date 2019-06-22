@@ -14,6 +14,8 @@ import 'package:flutter_manhuatai/models/get_channels_res.dart'
 import 'package:flutter_manhuatai/models/get_satellite_res.dart'
     as GetSatelliteRes;
 
+import 'components/related_authors.dart';
+import 'components/related_channels.dart';
 import 'components/related_comics.dart';
 
 class SearchResultPage extends StatefulWidget {
@@ -102,10 +104,30 @@ class _SearchResultPageState extends State<SearchResultPage>
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 slivers: <Widget>[
-                  RelatedComics(
-                    keyword: widget.keyword,
-                    relatedListData: _sortListData,
-                  ),
+                  _sortListData.length == 0
+                      ? SliverList(
+                          delegate: SliverChildListDelegate([]),
+                        )
+                      : RelatedComics(
+                          keyword: widget.keyword,
+                          relatedListData: _sortListData,
+                        ),
+                  _searchAuthorData.total == 0
+                      ? SliverList(
+                          delegate: SliverChildListDelegate([]),
+                        )
+                      : RelatedAuthors(
+                          keyword: widget.keyword,
+                          relatedAuthorList: _searchAuthorData.data,
+                        ),
+                  _channelList.length == 0
+                      ? SliverList(
+                          delegate: SliverChildListDelegate([]),
+                        )
+                      : RelatedChannels(
+                          keyword: widget.keyword,
+                          relatedChannelList: _channelList,
+                        ),
                 ],
               ),
       ),
