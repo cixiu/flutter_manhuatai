@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
-import 'package:flutter_manhuatai/components/match_text/match_text.dart';
-import 'package:flutter_manhuatai/models/search_author.dart' as SearchAuthor;
-import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+
+import 'package:flutter_manhuatai/models/search_author.dart' as SearchAuthor;
+import 'package:flutter_manhuatai/utils/utils.dart';
+
+import 'package:flutter_manhuatai/components/match_text/match_text.dart';
+import 'related_header.dart';
 
 class RelatedAuthors extends StatelessWidget {
   final String keyword;
@@ -27,17 +28,8 @@ class RelatedAuthors extends StatelessWidget {
       sliver: SliverList(
         delegate: SliverChildListDelegate(
           [
-            Container(
-              padding: EdgeInsets.only(
-                bottom: ScreenUtil().setWidth(20),
-              ),
-              child: Text(
-                '相关用户(${relatedAuthorList.length})',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: ScreenUtil().setSp(32),
-                ),
-              ),
+            RelatedHeader(
+              title: '相关用户(${relatedAuthorList.length})',
             ),
             Row(
               children: <Widget>[

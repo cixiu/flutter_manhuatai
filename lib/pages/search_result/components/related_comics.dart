@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
-import 'package:flutter_manhuatai/components/match_text/match_text.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_manhuatai/models/sort_list.dart' as SortList;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
+import 'package:flutter_manhuatai/components/match_text/match_text.dart';
+import 'related_header.dart';
 
 class RelatedComics extends StatelessWidget {
   final String keyword;
@@ -25,51 +28,12 @@ class RelatedComics extends StatelessWidget {
       sliver: SliverList(
         delegate: SliverChildListDelegate(
           [
-            Container(
-              padding: EdgeInsets.only(
-                bottom: ScreenUtil().setWidth(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    '相关漫画',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(32),
-                    ),
-                  ),
-                  relatedListData.length > 6
-                      ? Container(
-                          height: ScreenUtil().setWidth(32),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil().setWidth(10),
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: ScreenUtil().setWidth(1),
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              ScreenUtil().setWidth(14),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '全部',
-                            strutStyle: StrutStyle(
-                              forceStrutHeight: true,
-                              fontSize: ScreenUtil().setSp(20),
-                            ),
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: ScreenUtil().setSp(20),
-                            ),
-                          ),
-                        )
-                      : Container(),
-                ],
-              ),
+            RelatedHeader(
+              title: '相关漫画',
+              showAll: relatedListData.length > 6,
+              onTap: () {
+                print('TODO: 跳转查看全部的相关漫画');
+              },
             ),
             Wrap(
               runSpacing: ScreenUtil().setWidth(20),

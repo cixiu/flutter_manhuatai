@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_manhuatai/components/match_text/match_text.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
+
+import 'package:flutter_manhuatai/components/match_text/match_text.dart';
+import 'related_header.dart';
 
 class RelatedChannels extends StatelessWidget {
   final String keyword;
@@ -27,51 +29,12 @@ class RelatedChannels extends StatelessWidget {
       sliver: SliverList(
         delegate: SliverChildListDelegate(
           [
-            Container(
-              padding: EdgeInsets.only(
-                bottom: ScreenUtil().setWidth(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    '相关频道(${relatedChannelList.length})',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(32),
-                    ),
-                  ),
-                  relatedChannelList.length > 2
-                      ? Container(
-                          height: ScreenUtil().setWidth(32),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil().setWidth(10),
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: ScreenUtil().setWidth(1),
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              ScreenUtil().setWidth(14),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '全部',
-                            strutStyle: StrutStyle(
-                              forceStrutHeight: true,
-                              fontSize: ScreenUtil().setSp(20),
-                            ),
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: ScreenUtil().setSp(20),
-                            ),
-                          ),
-                        )
-                      : Container(),
-                ],
-              ),
+            RelatedHeader(
+              title: '相关频道(${relatedChannelList.length})',
+              showAll: relatedChannelList.length > 2,
+              onTap: () {
+                print('TODO: 跳转查看全部的相关频道');
+              },
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
