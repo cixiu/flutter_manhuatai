@@ -26,16 +26,20 @@ dependencies:
   redux: ^3.0.0
   flutter_redux: ^0.5.3
   flutter_spinkit: "^3.1.0"
-  cached_network_image: ^0.6.0+1
+  cached_network_image: ^0.8.0
   flutter_swiper : ^1.1.4
   shared_preferences: ^0.5.1+1
   oktoast: ^2.1.5
   flutter_screenutil: ^0.5.2
   extended_nested_scroll_view: ^0.3.4
-  transparent_image: ^1.0.0
+  transparent_image: ^0.1.0
   intl: ^0.15.8
   device_info: ^0.4.0+1
+  html_unescape: ^1.0.1+2
+  extended_text: ^0.5.8
 
+dependency_overrides:
+  path_provider: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +62,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+  - lib/images/emojis/
   - lib/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see

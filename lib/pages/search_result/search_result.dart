@@ -13,10 +13,12 @@ import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
 import 'package:flutter_manhuatai/models/get_satellite_res.dart'
     as GetSatelliteRes;
+import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
 import 'components/related_authors.dart';
 import 'components/related_channels.dart';
 import 'components/related_comics.dart';
+import 'components/related_posts.dart';
 
 class SearchResultPage extends StatefulWidget {
   final String keyword;
@@ -37,6 +39,7 @@ class _SearchResultPageState extends State<SearchResultPage>
   SearchAuthor.Data _searchAuthorData;
   List<GetChannelsRes.Data> _channelList;
   List<GetSatelliteRes.Data> _postList;
+  Map<int, CommentUser.Data> _postListUserMap;
 
   @override
   void initState() {
@@ -77,12 +80,22 @@ class _SearchResultPageState extends State<SearchResultPage>
     var searchAuthorRes = result[1] as SearchAuthor.SearchAuthor;
     var getChannelsRes = result[2] as GetChannelsRes.GetChannelsRes;
     var getSatelliteRes = result[3] as GetSatelliteRes.GetSatelliteRes;
+    List<int> userids = getSatelliteRes.data.map((item) {
+      return item.userIdentifier.toInt();
+    }).toList();
+    // 获取用户列表信息
+    var getCommentUserRes = await Api.getCommentUser(userids: userids);
+    Map<int, CommentUser.Data> postListUserMap = Map();
+    getCommentUserRes.data.forEach((item) {
+      postListUserMap[item.uid] = item;
+    });
 
     setState(() {
       _sortListData = getSortListRes.data;
       _searchAuthorData = searchAuthorRes.data;
       _channelList = getChannelsRes.data;
       _postList = getSatelliteRes.data;
+      _postListUserMap = postListUserMap;
       _isLoading = false;
     });
   }
@@ -127,6 +140,15 @@ class _SearchResultPageState extends State<SearchResultPage>
                       : RelatedChannels(
                           keyword: widget.keyword,
                           relatedChannelList: _channelList,
+                        ),
+                  _postList.length == 0
+                      ? SliverList(
+                          delegate: SliverChildListDelegate([]),
+                        )
+                      : RelatedPosts(
+                          keyword: widget.keyword,
+                          postList: _postList,
+                          postListUserMap: _postListUserMap,
                         ),
                 ],
               ),

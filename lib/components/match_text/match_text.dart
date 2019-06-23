@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class MatchText extends StatelessWidget {
   final String text;
   final String matchText;
+  final TextOverflow overflow;
   final TextStyle commonStyle;
   final TextStyle matchedStyle;
 
   MatchText(
     this.text, {
     @required this.matchText,
+    this.overflow,
     this.commonStyle,
     this.matchedStyle,
   })  : assert(text != null),
@@ -28,36 +30,57 @@ class MatchText extends StatelessWidget {
       fontWeight: FontWeight.bold,
     );
 
-    bool _hasContainMatchText = text.contains(matchText);
-    List<String> comicNameList = [];
+    bool _hasContainMatchText =
+        matchText.isNotEmpty && text.contains(matchText);
+    List<String> nameList = [];
 
     // 将漫画中的关键词提取出来
     if (_hasContainMatchText) {
-      comicNameList = text.split(matchText);
+      nameList = text.split(matchText);
     }
 
     return !_hasContainMatchText
         ? Text(
             '$text',
-            overflow: TextOverflow.ellipsis,
+            overflow: overflow ?? TextOverflow.ellipsis,
             style: commonStyle ?? defaultCommonStyle,
           )
         : Text.rich(
             TextSpan(
-              text: comicNameList[0],
+              text: '',
               style: commonStyle,
-              children: <TextSpan>[
-                TextSpan(
-                  text: '$matchText',
-                  style: matchedStyle ?? defaultMatchedStyle,
-                ),
-                TextSpan(
-                  text: comicNameList[1],
-                  style: commonStyle ?? defaultCommonStyle,
-                ),
-              ],
+              children: _buildTextSpan(
+                nameList: nameList,
+                matchText: matchText,
+                defaultCommonStyle: defaultCommonStyle,
+                defaultMatchedStyle: defaultMatchedStyle,
+              ),
             ),
-            overflow: TextOverflow.ellipsis,
+            overflow: overflow ?? TextOverflow.ellipsis,
           );
+  }
+
+  List<TextSpan> _buildTextSpan({
+    List<String> nameList,
+    String matchText,
+    TextStyle defaultCommonStyle,
+    TextStyle defaultMatchedStyle,
+  }) {
+    List<String> newNameList = List()..addAll(nameList);
+    for (var i = 0; i < nameList.length - 1; i++) {
+      newNameList.insert(i + i + 1, matchText);
+    }
+
+    return newNameList.map((item) {
+      return item == matchText
+          ? TextSpan(
+              text: '$matchText',
+              style: matchedStyle ?? defaultMatchedStyle,
+            )
+          : TextSpan(
+              text: item,
+              style: commonStyle ?? defaultCommonStyle,
+            );
+    }).toList();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
@@ -426,7 +427,7 @@ class Api {
     int starId = 0,
     int isJoin = 0,
   }) async {
-    final String url = 'http://community.321mh.com/satellite/gets/';
+    final String url = 'https://community.321mh.com/satellite/gets/';
 
     Map<String, dynamic> params = {
       'userIdentifier': userIdentifier,
@@ -448,5 +449,23 @@ class Api {
     );
 
     return GetSatelliteRes.fromJson(response);
+  }
+
+  /// 获取用户列表信息
+  static Future<CommentUser> getCommentUser({
+    List<int> userids,
+  }) async {
+    String url = 'https://community-hots.321mh.com/user/commentuser/?appId=2';
+    // 规范中如果请求中的 params 是一个 List, 则会被解析成 'key[]: value' 格式，
+    // 但是由于这里的后端的api参数并没有按照规范来做，所以这里需要自己拼接成 'key: value'形式加入到 url 中,
+    userids.forEach((item) {
+      url += '&userids=$item';
+    });
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+    );
+
+    return CommentUser.fromJson(response);
   }
 }

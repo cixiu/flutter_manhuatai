@@ -68,6 +68,32 @@ class AppConst {
   //   "head_webp": "-100x100.webp",
   //   "default_webp": "-noresize.webp"
   // });
+
+  static const emojiMap = {
+    '[/奋斗]': 'lib/images/emojis/face01.png',
+    '[/鼓掌]': 'lib/images/emojis/face02.png',
+    '[/发怒]': 'lib/images/emojis/face03.png',
+    '[/色]': 'lib/images/emojis/face04.png',
+    '[/给力]': 'lib/images/emojis/face05.png',
+    '[/憨笑]': 'lib/images/emojis/face06.png',
+    '[/可爱]': 'lib/images/emojis/face07.png',
+    '[/抓狂]': 'lib/images/emojis/face08.png',
+    '[/流汗]': 'lib/images/emojis/face09.png',
+    '[/强]': 'lib/images/emojis/face10.png',
+    '[/弱]': 'lib/images/emojis/face11.png',
+    '[/玫瑰]': 'lib/images/emojis/face12.png',
+    '[/大哭]': 'lib/images/emojis/face13.png',
+    '[/疑问]': 'lib/images/emojis/face14.png',
+    '[/鄙视]': 'lib/images/emojis/face15.png',
+    '[/钱]': 'lib/images/emojis/face16.png',
+    '[/闭嘴]': 'lib/images/emojis/face17.png',
+    '[/可怜]': 'lib/images/emojis/face18.png',
+    '[/惊讶]': 'lib/images/emojis/face19.png',
+    '[/浮云]': 'lib/images/emojis/face20.png',
+    '[/打酱油]': 'lib/images/emojis/face21.png',
+    '[/握手]': 'lib/images/emojis/face22.png',
+    '[/拳头]': 'lib/images/emojis/face23.png',
+  };
 }
 
 class ImageSizeSuffix {
