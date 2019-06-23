@@ -2,17 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:extended_text/extended_text.dart';
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:html_unescape/html_unescape.dart';
 
-import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart'
     as GetSatelliteRes;
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 import 'package:flutter_manhuatai/utils/utils.dart';
 
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/match_text/match_text.dart';
 
 import 'post_special_text_span_builder.dart';
@@ -45,9 +44,11 @@ class PostItem extends StatelessWidget {
               _buildPostTitle(),
               _buildPostContent(),
               _buildPostImages(),
+              _buildPostStarName(),
             ],
           ),
         ),
+        _buildPostBottomAction(),
         Container(
           height: ScreenUtil().setWidth(14),
           color: Colors.grey[200],
@@ -201,7 +202,7 @@ class PostItem extends StatelessWidget {
     return Container(
       width: ScreenUtil().setWidth(710),
       margin: EdgeInsets.only(
-        bottom: ScreenUtil().setWidth(15),
+        bottom: ScreenUtil().setWidth(20),
       ),
       child: Stack(
         children: <Widget>[
@@ -248,6 +249,89 @@ class PostItem extends StatelessWidget {
                   ),
                 )
               : Container(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostStarName() {
+    return Container(
+      margin: EdgeInsets.only(
+        bottom: ScreenUtil().setWidth(20),
+      ),
+      child: Row(
+        children: <Widget>[
+          Container(
+            height: ScreenUtil().setWidth(40),
+            padding: EdgeInsets.symmetric(
+              horizontal: ScreenUtil().setWidth(10),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(
+                ScreenUtil().setWidth(8),
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              postItem.starName,
+              strutStyle: StrutStyle(
+                forceStrutHeight: true,
+                fontSize: ScreenUtil().setWidth(22),
+              ),
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: ScreenUtil().setWidth(22),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostBottomAction() {
+    TextStyle style = TextStyle(
+      color: Colors.grey[400],
+      fontSize: ScreenUtil().setSp(24),
+    );
+
+    return Container(
+      height: ScreenUtil().setWidth(86),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[350],
+            width: ScreenUtil().setWidth(1),
+          ),
+        ),
+      ),
+      child: Row(
+        children: <Widget>[
+          _buildPostBottomActionItem(
+            text: '更多',
+            icon: Icon(
+              Icons.more_horiz,
+              color: Colors.grey[400],
+              size: ScreenUtil().setWidth(28),
+            ),
+          ),
+          _buildPostBottomActionItem(
+            text: '${postItem.replyNum}',
+            icon: Image.asset(
+              'lib/images/icon_newsc_comment.png',
+              width: ScreenUtil().setWidth(28),
+              height: ScreenUtil().setWidth(28),
+            ),
+          ),
+          _buildPostBottomActionItem(
+            text: '${postItem.supportNum.toInt()}',
+            icon: Icon(
+              Icons.thumb_up,
+              color: Colors.grey[400],
+              size: ScreenUtil().setWidth(28),
+            ),
+          ),
         ],
       ),
     );
@@ -319,6 +403,43 @@ class PostItem extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildPostBottomActionItem({
+    String text,
+    Widget icon,
+  }) {
+    return Expanded(
+      child: InkResponse(
+        onTap: () {},
+        containedInkWell: true,
+        highlightShape: BoxShape.rectangle,
+        child: Container(
+          height: ScreenUtil().setWidth(86),
+          constraints: BoxConstraints(
+            maxWidth: ScreenUtil().setWidth(120),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(
+                  right: ScreenUtil().setWidth(10),
+                ),
+                child: icon,
+              ),
+              Text(
+                '$text',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: ScreenUtil().setSp(24),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
