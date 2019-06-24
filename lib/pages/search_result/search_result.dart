@@ -80,15 +80,18 @@ class _SearchResultPageState extends State<SearchResultPage>
     var searchAuthorRes = result[1] as SearchAuthor.SearchAuthor;
     var getChannelsRes = result[2] as GetChannelsRes.GetChannelsRes;
     var getSatelliteRes = result[3] as GetSatelliteRes.GetSatelliteRes;
-    List<int> userids = getSatelliteRes.data.map((item) {
-      return item.userIdentifier.toInt();
-    }).toList();
-    // 获取用户列表信息
-    var getCommentUserRes = await Api.getCommentUser(userids: userids);
+
     Map<int, CommentUser.Data> postListUserMap = Map();
-    getCommentUserRes.data.forEach((item) {
-      postListUserMap[item.uid] = item;
-    });
+    if (getSatelliteRes.data.length != 0) {
+      List<int> userids = getSatelliteRes.data.map((item) {
+        return item.userIdentifier.toInt();
+      }).toList();
+      // 获取用户列表信息
+      var getCommentUserRes = await Api.getCommentUser(userids: userids);
+      getCommentUserRes.data.forEach((item) {
+        postListUserMap[item.uid] = item;
+      });
+    }
 
     setState(() {
       _sortListData = getSortListRes.data;

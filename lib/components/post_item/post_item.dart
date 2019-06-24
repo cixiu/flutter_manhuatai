@@ -310,27 +310,15 @@ class PostItem extends StatelessWidget {
         children: <Widget>[
           _buildPostBottomActionItem(
             text: '更多',
-            icon: Icon(
-              Icons.more_horiz,
-              color: Colors.grey[400],
-              size: ScreenUtil().setWidth(28),
-            ),
+            icon: 'lib/images/icon_newsc_more.png',
           ),
           _buildPostBottomActionItem(
             text: '${postItem.replyNum}',
-            icon: Image.asset(
-              'lib/images/icon_newsc_comment.png',
-              width: ScreenUtil().setWidth(28),
-              height: ScreenUtil().setWidth(28),
-            ),
+            icon: 'lib/images/icon_newsc_comment.png',
           ),
           _buildPostBottomActionItem(
             text: '${postItem.supportNum.toInt()}',
-            icon: Icon(
-              Icons.thumb_up,
-              color: Colors.grey[400],
-              size: ScreenUtil().setWidth(28),
-            ),
+            icon: 'lib/images/icon_weidianzan_cat.png',
           ),
         ],
       ),
@@ -408,7 +396,7 @@ class PostItem extends StatelessWidget {
 
   Widget _buildPostBottomActionItem({
     String text,
-    Widget icon,
+    String icon,
   }) {
     return Expanded(
       child: InkResponse(
@@ -427,7 +415,12 @@ class PostItem extends StatelessWidget {
                 margin: EdgeInsets.only(
                   right: ScreenUtil().setWidth(10),
                 ),
-                child: icon,
+                child: Image.asset(
+                  '$icon',
+                  width: ScreenUtil().setWidth(28),
+                  height: ScreenUtil().setWidth(28),
+                  fit: BoxFit.fill,
+                ),
               ),
               Text(
                 '$text',
