@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:flutter_manhuatai/components/crop_image/crop_image.dart';
+import 'package:flutter_manhuatai/components/pic_swiper/pic_swiper.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -16,6 +20,8 @@ import 'package:flutter_manhuatai/components/match_text/match_text.dart';
 
 import 'post_special_text_span_builder.dart';
 
+typedef void CurrentTap(int index);
+
 class PostItem extends StatelessWidget {
   final String keyword;
   final GetSatelliteRes.Data postItem;
@@ -26,6 +32,36 @@ class PostItem extends StatelessWidget {
     this.postItem,
     this.postAuthor,
   });
+
+  void previewImage({
+    BuildContext context,
+    int index,
+    List<ImageItem> imageList,
+  }) {
+    var page = PicSwiper(
+      index,
+      imageList.map<PicSwiperItem>((item) {
+        return PicSwiperItem(
+          item.url,
+        );
+      }).toList(),
+    );
+
+    Navigator.push(
+      context,
+      Platform.isAndroid
+          ? TransparentMaterialPageRoute(
+              builder: (_) {
+                return page;
+              },
+            )
+          : TransparentCupertinoPageRoute(
+              builder: (_) {
+                return page;
+              },
+            ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +79,7 @@ class PostItem extends StatelessWidget {
               _buildPostAuthor(),
               _buildPostTitle(),
               _buildPostContent(),
-              _buildPostImages(),
+              _buildPostImages(context),
               _buildPostStarName(),
             ],
           ),
@@ -166,13 +202,13 @@ class PostItem extends StatelessWidget {
           );
   }
 
-  Widget _buildPostImages() {
+  Widget _buildPostImages(BuildContext context) {
     List<dynamic> images = json.decode(postItem.images);
     if (images.length == 0) {
       return Container();
     }
 
-    List<ImageInfo> imageViewList = [];
+    List<ImageItem> imageViewList = [];
     var reg = RegExp(r'@#de<!--IMG#\d+-->@#de(\d+:\d+)');
 
     images.forEach((item) {
@@ -190,7 +226,7 @@ class PostItem extends StatelessWidget {
       );
 
       url = 'https://comment.yyhao.com/${imgUrl}';
-      imageViewList.add(ImageInfo(
+      imageViewList.add(ImageItem(
         url: url,
         width: width,
         height: height,
@@ -207,8 +243,14 @@ class PostItem extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           _buildPostViewImages(
-            imageViewList: imageViewList,
-          ),
+              imageViewList: imageViewList,
+              onTap: (int index) {
+                previewImage(
+                  context: context,
+                  index: index,
+                  imageList: imageViewList,
+                );
+              }),
           imageViewList.length > 3
               ? Positioned(
                   bottom: ScreenUtil().setWidth(20),
@@ -291,11 +333,6 @@ class PostItem extends StatelessWidget {
   }
 
   Widget _buildPostBottomAction() {
-    TextStyle style = TextStyle(
-      color: Colors.grey[400],
-      fontSize: ScreenUtil().setSp(24),
-    );
-
     return Container(
       height: ScreenUtil().setWidth(86),
       decoration: BoxDecoration(
@@ -325,7 +362,10 @@ class PostItem extends StatelessWidget {
     );
   }
 
-  Widget _buildPostViewImages({List<ImageInfo> imageViewList}) {
+  Widget _buildPostViewImages({
+    List<ImageItem> imageViewList,
+    CurrentTap onTap,
+  }) {
     int length = imageViewList.length;
     double maxWidth = ScreenUtil().setWidth(710);
     double marginWidth = ScreenUtil().setWidth(20);
@@ -334,24 +374,53 @@ class PostItem extends StatelessWidget {
       var item = imageViewList.first;
       var width = maxWidth;
       var height = width / 2;
-      return ImageWrapper(
-        url: item.url,
-        width: width,
-        height: height,
+      return CropImage(
+        item: item,
+        index: 0,
+        thumbWidth: width,
+        thumbHeight: height,
+        fit: BoxFit.cover,
+        autoSetSize: false,
+        knowImageSize: false,
+        imageList: imageViewList,
       );
+      // return GestureDetector(
+      //   onTap: () {
+      //     onTap(0);
+      //   },
+      //   child: Hero(
+      //     tag: item.url + 0.toString(),
+      //     child: ImageWrapper(
+      //       url: item.url,
+      //       width: width,
+      //       height: height,
+      //     ),
+      //   ),
+      // );
     }
+
     if (length == 2) {
       var width = (maxWidth - marginWidth) / 2;
       var height = width;
+      List<Widget> _children = [];
+
+      for (int i = 0; i < length; i++) {
+        var item = imageViewList[i];
+        _children.add(CropImage(
+          item: item,
+          index: i,
+          thumbWidth: width,
+          thumbHeight: height,
+          fit: BoxFit.cover,
+          autoSetSize: false,
+          knowImageSize: false,
+          imageList: imageViewList,
+        ));
+      }
+
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: imageViewList.map((item) {
-          return ImageWrapper(
-            url: item.url,
-            width: width,
-            height: height,
-          );
-        }).toList(),
+        children: _children,
       );
     }
 
@@ -367,25 +436,40 @@ class PostItem extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        ImageWrapper(
-          url: item1.url,
-          width: firthWidth,
-          height: firthHeight,
+        CropImage(
+          item: item1,
+          index: 0,
+          thumbWidth: firthWidth,
+          thumbHeight: firthHeight,
+          fit: BoxFit.cover,
+          autoSetSize: false,
+          knowImageSize: false,
+          imageList: imageViewList,
         ),
         Container(
           height: firthHeight,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              ImageWrapper(
-                url: item2.url,
-                width: secondWidth,
-                height: secondHeight,
+              CropImage(
+                item: item2,
+                index: 1,
+                thumbWidth: secondWidth,
+                thumbHeight: secondHeight,
+                fit: BoxFit.cover,
+                autoSetSize: false,
+                knowImageSize: false,
+                imageList: imageViewList,
               ),
-              ImageWrapper(
-                url: item3.url,
-                width: secondWidth,
-                height: secondHeight,
+              CropImage(
+                item: item3,
+                index: 2,
+                thumbWidth: secondWidth,
+                thumbHeight: secondHeight,
+                fit: BoxFit.cover,
+                autoSetSize: false,
+                knowImageSize: false,
+                imageList: imageViewList,
               ),
             ],
           ),
@@ -437,14 +521,14 @@ class PostItem extends StatelessWidget {
   }
 }
 
-class ImageInfo {
-  final String url;
-  final int width;
-  final int height;
+// class ImageItem {
+//   final String url;
+//   final int width;
+//   final int height;
 
-  ImageInfo({
-    this.url,
-    this.width,
-    this.height,
-  });
-}
+//   ImageItem({
+//     this.url,
+//     this.width,
+//     this.height,
+//   });
+// }

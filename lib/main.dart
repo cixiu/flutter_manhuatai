@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             backgroundColor: Colors.white,
             canvasColor: Colors.white,
+            dialogBackgroundColor: Colors.black,
             appBarTheme: AppBarTheme(
               elevation: 0.0,
               color: Colors.white,

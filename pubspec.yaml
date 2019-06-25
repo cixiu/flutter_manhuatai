@@ -37,6 +37,7 @@ dependencies:
   device_info: ^0.4.0+1
   html_unescape: ^1.0.1+2
   extended_text: ^0.5.8
+  extended_image: ^0.5.1
 
 dependency_overrides:
   path_provider: ^1.1.0
