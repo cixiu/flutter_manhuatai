@@ -2,23 +2,30 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+// import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 class PicSwiper extends StatefulWidget {
   final int index;
   final List<PicSwiperItem> pics;
+  final bool needHero;
 
-  PicSwiper(this.index, this.pics);
+  PicSwiper(
+    this.index,
+    this.pics, {
+    this.needHero = true,
+  });
 
   @override
   _PicSwiperState createState() => _PicSwiperState();
 }
 
 class _PicSwiperState extends State<PicSwiper>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   var rebuildIndex = StreamController<int>.broadcast();
   var rebuildSwiper = StreamController<bool>.broadcast();
   AnimationController _animationController;
@@ -41,6 +48,10 @@ class _PicSwiperState extends State<PicSwiper>
     currentIndex = widget.index;
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 150), vsync: this);
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    });
     super.initState();
   }
 
@@ -51,6 +62,7 @@ class _PicSwiperState extends State<PicSwiper>
     _animationController?.dispose();
     clearGestureDetailsCache();
     //cancelToken?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -139,10 +151,12 @@ class _PicSwiperState extends State<PicSwiper>
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Hero(
-                      tag: item + index.toString(),
-                      child: image,
-                    ),
+                    child: widget.needHero
+                        ? Hero(
+                            tag: item + index.toString(),
+                            child: image,
+                          )
+                        : image,
                   );
                 } else {
                   return GestureDetector(
@@ -201,7 +215,7 @@ class _PicSwiperState extends State<PicSwiper>
         return true;
       },
       slidePageBackgroundHandler: (offset, size) {
-        Color color = Colors.grey[700];
+        Color color = Colors.grey[850];
         double opacity = 0.0;
         if (slideAxis == SlideAxis.both) {
           opacity = offset.distance /
@@ -257,53 +271,68 @@ class MySwiperPlugin extends StatelessWidget {
   final List<PicSwiperItem> pics;
   final int index;
   final StreamController<int> reBuild;
+
   MySwiperPlugin(this.pics, this.index, this.reBuild);
+
   @override
   Widget build(BuildContext context) {
+    TextStyle style = TextStyle(
+      color: Colors.white,
+      fontSize: ScreenUtil().setSp(28),
+    );
+
     return StreamBuilder<int>(
       builder: (BuildContext context, data) {
         return DefaultTextStyle(
-          style: TextStyle(color: Colors.blue),
+          style: style,
           child: Container(
             height: 50.0,
             width: double.infinity,
-            color: Colors.grey.withOpacity(0.2),
+            // color: Colors.grey.withOpacity(0.2),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 10.0,
+                  width: ScreenUtil().setWidth(40),
                 ),
                 Text(
                   "${data.data + 1}",
                 ),
                 Text(
-                  " / ${pics.length}",
+                  "/${pics.length}",
                 ),
                 Expanded(
-                    child: Text(pics[data.data].des ?? "",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 16.0, color: Colors.blue))),
+                  child: Text(
+                    pics[data.data].des ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: style,
+                  ),
+                ),
                 Container(
                   width: 10.0,
                 ),
                 GestureDetector(
-                  child: Container(
-                    padding: EdgeInsets.only(right: 10.0),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Save",
-                      style: TextStyle(fontSize: 16.0, color: Colors.blue),
-                    ),
-                  ),
+                  behavior: HitTestBehavior.opaque,
                   onTap: () {
+                    print('点击保持图片');
                     // saveNetworkImageToPhoto(pics[index].picUrl)
                     //     .then((bool done) {
                     //   showToast(done ? "save succeed" : "save failed",
                     //       position: ToastPosition(align: Alignment.topCenter));
                     // });
                   },
-                )
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "保存",
+                      style: style,
+                    ),
+                  ),
+                ),
+                Container(
+                  width: ScreenUtil().setWidth(40),
+                ),
               ],
             ),
           ),
@@ -318,5 +347,9 @@ class MySwiperPlugin extends StatelessWidget {
 class PicSwiperItem {
   String picUrl;
   String des;
-  PicSwiperItem(this.picUrl, {this.des = ""});
+
+  PicSwiperItem(
+    this.picUrl, {
+    this.des = "",
+  });
 }

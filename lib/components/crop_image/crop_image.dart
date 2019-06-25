@@ -9,14 +9,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CropImage extends StatelessWidget {
   final ImageItem item;
+  final List<ImageItem> imageList;
   final int index;
   final double thumbWidth;
   final double thumbHeight;
   final BoxFit fit;
   final bool autoSetSize;
-  final double margin;
   final bool knowImageSize;
-  final List<ImageItem> imageList;
+  final bool needHero;
+
   CropImage({
     this.item,
     this.index,
@@ -24,9 +25,9 @@ class CropImage extends StatelessWidget {
     this.thumbHeight,
     this.fit,
     this.autoSetSize = false,
-    this.margin = 0.0,
     this.knowImageSize = false,
     this.imageList,
+    this.needHero = true,
   });
 
   @override
@@ -90,14 +91,18 @@ class CropImage extends StatelessWidget {
               //image will not to be limited by size which you set for ExtendedImage first time.
               state.returnLoadStateChangedWidget = !knowImageSize;
 
-              widget = Hero(
-                tag: item.url + index.toString(),
-                child: buildImage(
-                  state.extendedImageInfo.image,
-                  num300,
-                  num400,
-                ),
+              Widget loadedImage = buildImage(
+                state.extendedImageInfo.image,
+                num300,
+                num400,
               );
+
+              widget = needHero
+                  ? Hero(
+                      tag: item.url + index.toString(),
+                      child: loadedImage,
+                    )
+                  : loadedImage;
               break;
             case LoadState.failed:
               widget = GestureDetector(
@@ -132,8 +137,11 @@ class CropImage extends StatelessWidget {
               var page = PicSwiper(
                 index,
                 imageList
-                    .map<PicSwiperItem>((f) => PicSwiperItem(f.url))
+                    .map<PicSwiperItem>((f) => PicSwiperItem(
+                          f.url,
+                        ))
                     .toList(),
+                needHero: needHero,
               );
 
               Navigator.push(

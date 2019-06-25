@@ -38,6 +38,7 @@ dependencies:
   html_unescape: ^1.0.1+2
   extended_text: ^0.5.8
   extended_image: ^0.5.1
+  flutter_statusbarcolor: ^0.2.0
 
 dependency_overrides:
   path_provider: ^1.1.0

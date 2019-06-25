@@ -376,13 +376,13 @@ class PostItem extends StatelessWidget {
       var height = width / 2;
       return CropImage(
         item: item,
+        imageList: imageViewList,
         index: 0,
         thumbWidth: width,
         thumbHeight: height,
         fit: BoxFit.cover,
         autoSetSize: false,
         knowImageSize: false,
-        imageList: imageViewList,
       );
       // return GestureDetector(
       //   onTap: () {
