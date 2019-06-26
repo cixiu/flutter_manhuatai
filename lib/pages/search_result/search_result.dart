@@ -108,6 +108,7 @@ class _SearchResultPageState extends State<SearchResultPage>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        brightness: Brightness.light,
         title: Text('${widget.keyword}'),
       ),
       body: RefreshIndicator(
