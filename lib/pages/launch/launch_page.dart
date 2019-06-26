@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+// import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/pages/home/home.dart';
@@ -22,6 +23,8 @@ class _LaunchPageState extends State<LaunchPage> {
   @override
   void initState() {
     super.initState();
+    // FlutterStatusbarcolor.setStatusBarWhiteForeground(true);
+
     Future.delayed(Duration(milliseconds: 3000), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

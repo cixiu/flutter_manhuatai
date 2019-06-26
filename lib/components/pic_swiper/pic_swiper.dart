@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-// import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 class PicSwiper extends StatefulWidget {
   final int index;
@@ -48,10 +49,6 @@ class _PicSwiperState extends State<PicSwiper>
     currentIndex = widget.index;
     _animationController = AnimationController(
         duration: const Duration(milliseconds: 150), vsync: this);
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
-    });
     super.initState();
   }
 
@@ -86,6 +83,55 @@ class _PicSwiperState extends State<PicSwiper>
                   fit: BoxFit.contain,
                   enableSlideOutPage: true,
                   mode: ExtendedImageMode.Gesture,
+                  loadStateChanged: (state) {
+                    if (state.extendedImageLoadState == LoadState.loading) {
+                      return Center(
+                        child: Platform.isIOS
+                            ? CupertinoActivityIndicator(
+                                animating: true,
+                                radius: 16.0,
+                              )
+                            : CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor: AlwaysStoppedAnimation(
+                                    Theme.of(context).primaryColor),
+                              ),
+                      );
+                    }
+                    if (state.extendedImageLoadState == LoadState.failed) {
+                      return Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            state.reLoadImage();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Icon(
+                                Icons.error,
+                                size: ScreenUtil().setSp(50),
+                                color: Colors.grey,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10),
+                                ),
+                                child: Text(
+                                  '点击重新加载',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: ScreenUtil().setSp(24),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                  },
                   initGestureConfigHandler: (state) {
                     double initialScale = 1.0;
 
@@ -101,13 +147,14 @@ class _PicSwiperState extends State<PicSwiper>
                     //   print(initialScale);
                     // }
                     return GestureConfig(
-                        inPageView: true,
-                        initialScale: initialScale,
-                        maxScale: max(initialScale, 5.0),
-                        animationMaxScale: max(initialScale, 5.0),
-                        //you can cache gesture state even though page view page change.
-                        //remember call clearGestureDetailsCache() method at the right time.(for example,this page dispose)
-                        cacheGesture: false);
+                      inPageView: true,
+                      initialScale: initialScale,
+                      maxScale: max(initialScale, 5.0),
+                      animationMaxScale: max(initialScale, 5.0),
+                      //you can cache gesture state even though page view page change.
+                      //remember call clearGestureDetailsCache() method at the right time.(for example,this page dispose)
+                      cacheGesture: false,
+                    );
                   },
                   onDoubleTap: (ExtendedImageGestureState state) {
                     ///you can use define pointerDownPosition as you can,

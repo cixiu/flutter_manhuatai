@@ -56,6 +56,7 @@ class _HomeIndexState extends State<HomeIndex>
           centerTitle: true,
           elevation: 0.0,
           backgroundColor: Colors.blue,
+          brightness: Brightness.dark,
           title: GestureDetector(
             onTap: () {
               Application.router.navigateTo(context, '${Routes.comicSearch}');

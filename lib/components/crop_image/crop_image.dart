@@ -75,12 +75,12 @@ class CropImage extends StatelessWidget {
                 color: Colors.grey[200],
                 width: num300,
                 height: num400,
-                alignment: Alignment.center,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.0,
-                  valueColor:
-                      AlwaysStoppedAnimation(Theme.of(context).primaryColor),
-                ),
+                // alignment: Alignment.center,
+                // child: CircularProgressIndicator(
+                //   strokeWidth: 2.0,
+                //   valueColor:
+                //       AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                // ),
               );
               break;
             case LoadState.completed:
@@ -106,27 +106,40 @@ class CropImage extends StatelessWidget {
               break;
             case LoadState.failed:
               widget = GestureDetector(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    Image.asset(
-                      "assets/failed.jpg",
-                      fit: fit ?? BoxFit.fill,
-                    ),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Text(
-                        "load image failed, click to reload",
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  ],
-                ),
                 onTap: () {
                   state.reLoadImage();
                 },
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Container(
+                      color: Colors.grey[200],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.error,
+                            size: ScreenUtil().setSp(50),
+                            color: Colors.grey,
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(
+                              left: ScreenUtil().setWidth(10),
+                            ),
+                            child: Text(
+                              '点击重连',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: ScreenUtil().setSp(24),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               );
               break;
           }
@@ -206,9 +219,12 @@ class CropImage extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(2.0),
                   color: Colors.grey,
-                  child: const Text(
-                    "long image",
-                    style: TextStyle(color: Colors.white, fontSize: 10.0),
+                  child: Text(
+                    "长图",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil().setSp(20),
+                    ),
                   ),
                 ),
               )
@@ -257,9 +273,12 @@ class CropImage extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(2.0),
                   color: Colors.grey,
-                  child: const Text(
-                    "long image",
-                    style: TextStyle(color: Colors.white, fontSize: 10.0),
+                  child: Text(
+                    "长图",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: ScreenUtil().setSp(20),
+                    ),
                   ),
                 ),
               )

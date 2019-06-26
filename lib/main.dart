@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
+// import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
@@ -13,6 +14,8 @@ import 'package:flutter_manhuatai/pages/launch/launch_page.dart';
 main() async {
   var initialState = await initState();
   final store = Store<AppState>(rootReducer, initialState: initialState);
+  // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+  // await FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
 
   runApp(MyApp(
     store: store,
@@ -43,13 +46,13 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             backgroundColor: Colors.white,
             canvasColor: Colors.white,
-            dialogBackgroundColor: Colors.black,
             appBarTheme: AppBarTheme(
               elevation: 0.0,
               color: Colors.white,
               iconTheme: IconThemeData(
                 color: Colors.blue,
               ),
+              brightness: Brightness.dark,
               textTheme: TextTheme(
                 title: TextStyle(
                   color: Colors.black,
