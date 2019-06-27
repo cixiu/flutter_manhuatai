@@ -62,6 +62,7 @@ class _HomeMineState extends State<HomeMine>
       body: StoreBuilder<AppState>(
         builder: (context, store) {
           var userInfo = store.state.userInfo;
+          var guestInfo = store.state.guestInfo;
           print(userInfo.uname);
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -84,18 +85,19 @@ class _HomeMineState extends State<HomeMine>
                         Container(
                           height: ScreenUtil().setHeight(100),
                           padding: EdgeInsets.symmetric(
-                              horizontal: ScreenUtil().setWidth(80)),
+                            horizontal: ScreenUtil().setWidth(80),
+                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                '粉丝 ${userInfo?.uname != null ? userInfo.cfans : 0}',
+                                '粉丝 ${userInfo?.uname != null ? userInfo.cfans : guestInfo.cfans}',
                                 style: TextStyle(
                                   fontSize: ScreenUtil().setSp(24),
                                 ),
                               ),
                               Text(
-                                '关注 ${userInfo?.uname != null ? userInfo.cfocus : 0}',
+                                '关注 ${userInfo?.uname != null ? userInfo.cfocus : guestInfo.cfocus}',
                                 style: TextStyle(
                                   fontSize: ScreenUtil().setSp(24),
                                 ),
@@ -184,7 +186,7 @@ class _HomeMineState extends State<HomeMine>
                         bottom: ScreenUtil().setHeight(20),
                       ),
                       child: Text(
-                        userInfo?.uname ?? '游客',
+                        userInfo?.uname ?? guestInfo.uname,
                         style: TextStyle(
                           fontSize: ScreenUtil().setSp(32),
                           fontWeight: FontWeight.bold,
@@ -194,7 +196,9 @@ class _HomeMineState extends State<HomeMine>
                     Text(
                       userInfo?.usign != null
                           ? userInfo?.usign
-                          : '这个家伙很懒，什么都没留下',
+                          : guestInfo.usign != null
+                              ? guestInfo.usign
+                              : '这个家伙很懒，什么都没留下',
                       style: TextStyle(
                         fontSize: ScreenUtil().setSp(24),
                         color: Colors.grey,
@@ -217,25 +221,25 @@ class _HomeMineState extends State<HomeMine>
                       assetIcon: 'lib/images/icon_mine_wow1.png',
                       text: userInfo?.uname != null
                           ? userInfo.cgold.toString()
-                          : '5000',
+                          : guestInfo.cgold.toString(),
                     ),
                     _getGiftItem(
                       assetIcon: 'lib/images/icon_mine_wow2.png',
                       text: userInfo?.uname != null
                           ? userInfo.coins.toString()
-                          : '0',
+                          : guestInfo.coins.toString(),
                     ),
                     _getGiftItem(
                       assetIcon: 'lib/images/icon_mine_wow3.png',
                       text: userInfo?.uname != null
                           ? userInfo.recommend.toString()
-                          : '0',
+                          : guestInfo.recommend.toString(),
                     ),
                     _getGiftItem(
                       assetIcon: 'lib/images/icon_mine_wow4.png',
                       text: userInfo?.uname != null
                           ? userInfo.cticket.toString()
-                          : '0',
+                          : guestInfo.cticket.toString(),
                     ),
                   ],
                 ),
