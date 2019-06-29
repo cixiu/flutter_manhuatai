@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'components/manhuatai_focus.dart';
+import 'components/manhuatai_recommend.dart';
+import 'components/manhuatai_tab_bar.dart';
 
 class HomeManhuatai extends StatefulWidget {
   @override
@@ -7,15 +12,27 @@ class HomeManhuatai extends StatefulWidget {
 
 class _HomeManhuataiState extends State<HomeManhuatai>
     with AutomaticKeepAliveClientMixin {
+  int _currentIndex = 0;
+  PageController _controller = PageController(initialPage: 0);
+
   @override
-  // TODO: implement wantKeepAlive
+  void initState() {
+    super.initState();
+  }
+
+  @override
   bool get wantKeepAlive => true;
 
-  int _counter = 0;
-
-  void _incrementCounter() {
+  onChangeIndex(int index) {
+    _controller.animateToPage(
+      index,
+      duration: Duration(
+        milliseconds: 250,
+      ),
+      curve: Curves.ease,
+    );
     setState(() {
-      _counter++;
+      _currentIndex = index;
     });
   }
 
@@ -24,13 +41,31 @@ class _HomeManhuataiState extends State<HomeManhuatai>
     super.build(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('漫画台'),
-      ),
-      body: new Center(
-        child: Text(
-          '漫画台',
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(ScreenUtil().setWidth(86)),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          titleSpacing: 0.0,
+          title: ManhuataiTabBar(
+            _currentIndex,
+            onChangeIndex,
+          ),
         ),
+      ),
+      body: PageView(
+        physics: ClampingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        controller: _controller,
+        children: <Widget>[
+          ManhuataiRecommend(),
+          ManhuataiFocus(),
+        ],
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }
