@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/book_list.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
+import 'package:flutter_manhuatai/models/recommend_stars.dart';
 import 'package:flutter_manhuatai/models/search_author.dart';
 import 'package:flutter_manhuatai/models/search_comic.dart';
 import 'package:flutter_manhuatai/models/sort_list.dart';
+import 'package:flutter_manhuatai/models/topic_hot_list.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
@@ -467,5 +470,80 @@ class Api {
     );
 
     return CommentUser.fromJson(response);
+  }
+
+  /// 获取推荐帖子列表中的 banner 数据
+  static Future<BookList> getBookByPosition({
+    positionId = 7,
+  }) async {
+    final String url =
+        'https://cms-booklist.321mh.com/api/v1/bookList/getBookByPosition';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'position_id': positionId,
+      'page': 1,
+      'pagesize': 20,
+      'platformname': 'android',
+      'productname': 'mht'
+    });
+    return BookList.fromJson(response);
+  }
+
+  /// 获取推荐帖子列表中的圈子
+  static Future<RecommendStars> getRecommendStars({
+    String type = 'mkxq',
+    String openid,
+    String authorization,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/banner/getrecommendstars';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'type': type,
+        'openid': openid,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht',
+        'client-version': '2.0.2'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        headers: {
+          HttpHeaders.authorizationHeader: '$authorization',
+        },
+      ),
+    );
+    return RecommendStars.fromJson(response);
+  }
+
+  /// 获取推荐帖子列表中的热门话题数据
+  static Future<TopicHotList> getTopicHotList({
+    String type = 'device',
+    String openid,
+    String authorization,
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    final String url = 'http://community-new.321mh.com/v1/topic/hotlist';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'type': type,
+        'openid': openid,
+        'page': page,
+        'page_size': pageSize,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return TopicHotList.fromJson(response);
   }
 }
