@@ -13,6 +13,7 @@ import 'package:flutter_manhuatai/models/search_comic.dart';
 import 'package:flutter_manhuatai/models/sort_list.dart';
 import 'package:flutter_manhuatai/models/topic_hot_list.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
+import 'package:flutter_manhuatai/models/user_role_info.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
@@ -548,7 +549,7 @@ class Api {
     return TopicHotList.fromJson(response);
   }
 
-  /// 获取推荐帖子列表中的热门话题数据
+  /// 获取推荐帖子列表中的热门帖子数据
   static Future<RecommendSatellite> getRecommendSatellite({
     String type = 'device',
     String openid,
@@ -576,5 +577,30 @@ class Api {
       ),
     );
     return RecommendSatellite.fromJson(response);
+  }
+
+  /// 获取用户的角色信息
+  static Future<UserRoleInfo> getUserroleInfoByUserids({
+    List<int> userids,
+    String authorization,
+  }) async {
+    final String url =
+        'http://kanmanapi-main.321mh.com/v1/user/getuserroleinfobyuserids';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'userids': userids,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return UserRoleInfo.fromJson(response);
   }
 }

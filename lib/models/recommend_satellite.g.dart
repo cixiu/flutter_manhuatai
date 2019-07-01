@@ -62,7 +62,7 @@ List_List _$List_ListFromJson(Map<String, dynamic> json) {
       json['title_color'] as String,
       json['usertype'] as int,
       json['lng_lat'] as String,
-      json['topic_list'] as dynamic,
+      json['topic_list'],
       json['productlineid_list'] as String,
       json['circle_order'] as int,
       json['noticetype'] as int,

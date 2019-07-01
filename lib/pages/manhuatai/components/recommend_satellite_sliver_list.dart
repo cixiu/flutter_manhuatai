@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/models/recommend_satellite.dart'
-    as RecommendSatellite;
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/models/recommend_satellite.dart'
+    as RecommendSatellite;
+import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
+
 class RecommendSatelliteSliverList extends StatelessWidget {
   final List<RecommendSatellite.List_List> recommendSatelliteList;
+  final List<UserRoleInfo.Data> userRoleInfoList;
 
-  RecommendSatelliteSliverList({this.recommendSatelliteList});
+  RecommendSatelliteSliverList({
+    this.recommendSatelliteList,
+    this.userRoleInfoList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +21,18 @@ class RecommendSatelliteSliverList extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           var item = recommendSatelliteList[index];
+          UserRoleInfo.Data roleInfo;
+          roleInfo = userRoleInfoList.firstWhere(
+            (userRole) {
+              return item.useridentifier == userRole.userId;
+              // if () {
+              //   roleInfo = userRole;
+              //   return;
+              // }
+            },
+            orElse: () => null,
+          );
+
           return Column(
             children: <Widget>[
               Container(
@@ -84,10 +102,27 @@ class RecommendSatelliteSliverList extends StatelessWidget {
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                Text(item.username),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    right: ScreenUtil().setWidth(10),
+                                  ),
+                                  child: Text(
+                                    item.username,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: ScreenUtil().setSp(24),
+                                    ),
+                                  ),
+                                ),
+                                _buildRoleImage(roleInfo),
                               ],
                             ),
-                            Text('${item.createtime}'),
+                            Row(
+                              children: <Widget>[
+                                Text('${item.createtime}'),
+                                Text('${item.deviceTail}'),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -103,6 +138,35 @@ class RecommendSatelliteSliverList extends StatelessWidget {
         },
         childCount: recommendSatelliteList.length,
       ),
+    );
+  }
+
+  Widget _buildRoleImage(UserRoleInfo.Data roleInfo) {
+    if (roleInfo == null) {
+      return Container();
+    }
+    print(roleInfo.roleId);
+    String url;
+    // 官方
+    if (roleInfo.roleId == 18) {
+      url = 'lib/images/icon_circle_official.png';
+    }
+    // 圈子
+    if (roleInfo.roleId == 20) {
+      url = 'lib/images/icon_circle_master.png';
+    }
+    // 话事人
+    if (roleInfo.roleId == 21) {
+      url = 'lib/images/icon_topic_master.png';
+    }
+    // 纪律委员
+    if (roleInfo.roleId == 22) {
+      url = 'lib/images/icon_circle_manager.png';
+    }
+    return Image.asset(
+      url,
+      width: ScreenUtil().setWidth(60),
+      height: ScreenUtil().setWidth(40),
     );
   }
 }

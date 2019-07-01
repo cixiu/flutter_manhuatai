@@ -15,6 +15,7 @@ import 'package:flutter_manhuatai/models/recommend_stars.dart'
 import 'package:flutter_manhuatai/models/topic_hot_list.dart' as TopicHotList;
 import 'package:flutter_manhuatai/models/recommend_satellite.dart'
     as RecommendSatellite;
+import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
 import 'recommend_banner_sliver_list.dart';
 import 'recommend_satellite_sliver_list.dart';
@@ -37,6 +38,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
   List<RecommendStars.Data> _recommendStars = [];
   List<TopicHotList.List_List> _topicHotList = [];
   List<RecommendSatellite.List_List> _recommendSatelliteList = [];
+  List<UserRoleInfo.Data> _userRoleInfoList = [];
 
   @override
   bool get wantKeepAlive => true;
@@ -59,6 +61,17 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
     var authorization = userInfo.uid != null
         ? userInfo.authData.authcode
         : guestInfo.authData.authcode;
+    var userids = [
+      2573857,
+      3062527,
+      23410185,
+      24950958,
+      1336170,
+      3468809,
+      47726095,
+      3145539,
+      3218465
+    ];
 
     List<Future<dynamic>> futures = List()
       ..add(Api.getBookByPosition())
@@ -78,6 +91,10 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
         openid: openid,
         authorization: authorization,
         page: 1,
+      ))
+      ..add(Api.getUserroleInfoByUserids(
+        userids: userids,
+        authorization: authorization,
       ));
     var result = await Future.wait(futures);
 
@@ -90,6 +107,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
     var getTopicHotListRes = result[2] as TopicHotList.TopicHotList;
     var getRecommendSatelliteRes =
         result[3] as RecommendSatellite.RecommendSatellite;
+    var getUserroleInfoByUserids = result[4] as UserRoleInfo.UserRoleInfo;
 
     setState(() {
       _isLoading = false;
@@ -97,8 +115,8 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
       _recommendStars = getRecommendStarsRes.data;
       _topicHotList = getTopicHotListRes.data.list;
       _recommendSatelliteList = getRecommendSatelliteRes.data.list;
+      _userRoleInfoList = getUserroleInfoByUserids.data;
     });
-    print(_recommendSatelliteList);
   }
 
   void _listenenScroll() {
@@ -141,6 +159,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
                 ),
                 RecommendSatelliteSliverList(
                   recommendSatelliteList: _recommendSatelliteList,
+                  userRoleInfoList: _userRoleInfoList,
                 ),
               ],
             ),
