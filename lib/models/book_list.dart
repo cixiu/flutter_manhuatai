@@ -193,7 +193,7 @@ class Comic_info extends Object {
   dynamic totalViewNum; // total_view_num 可能是int 或者 String
 
   @JsonKey(name: 'update_time')
-  String updateTime;
+  dynamic updateTime; // 可能是int 或者 String
 
   @JsonKey(name: 'score')
   dynamic score; // score 可能是int 或者 String

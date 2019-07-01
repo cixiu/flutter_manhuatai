@@ -13,8 +13,11 @@ import 'package:flutter_manhuatai/models/book_list.dart' as BookList;
 import 'package:flutter_manhuatai/models/recommend_stars.dart'
     as RecommendStars;
 import 'package:flutter_manhuatai/models/topic_hot_list.dart' as TopicHotList;
+import 'package:flutter_manhuatai/models/recommend_satellite.dart'
+    as RecommendSatellite;
 
 import 'recommend_banner_sliver_list.dart';
+import 'recommend_satellite_sliver_list.dart';
 import 'recommend_stars_sliver_list.dart';
 import 'recommend_topic_sliver_list.dart';
 
@@ -33,6 +36,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
   List<BookList.Book> _bannerList = [];
   List<RecommendStars.Data> _recommendStars = [];
   List<TopicHotList.List_List> _topicHotList = [];
+  List<RecommendSatellite.List_List> _recommendSatelliteList = [];
 
   @override
   bool get wantKeepAlive => true;
@@ -68,6 +72,12 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
         openid: openid,
         authorization: authorization,
         page: 1,
+      ))
+      ..add(Api.getRecommendSatellite(
+        type: type,
+        openid: openid,
+        authorization: authorization,
+        page: 1,
       ));
     var result = await Future.wait(futures);
 
@@ -78,13 +88,17 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
     var getBookByPositionRes = result[0] as BookList.BookList;
     var getRecommendStarsRes = result[1] as RecommendStars.RecommendStars;
     var getTopicHotListRes = result[2] as TopicHotList.TopicHotList;
+    var getRecommendSatelliteRes =
+        result[3] as RecommendSatellite.RecommendSatellite;
 
     setState(() {
       _isLoading = false;
       _bannerList = getBookByPositionRes.data.book;
       _recommendStars = getRecommendStarsRes.data;
       _topicHotList = getTopicHotListRes.data.list;
+      _recommendSatelliteList = getRecommendSatelliteRes.data.list;
     });
+    print(_recommendSatelliteList);
   }
 
   void _listenenScroll() {
@@ -124,6 +138,9 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
                 ),
                 RecommendTopicSliverList(
                   topicHotList: _topicHotList,
+                ),
+                RecommendSatelliteSliverList(
+                  recommendSatelliteList: _recommendSatelliteList,
                 ),
               ],
             ),

@@ -6,6 +6,7 @@ import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
+import 'package:flutter_manhuatai/models/recommend_satellite.dart';
 import 'package:flutter_manhuatai/models/recommend_stars.dart';
 import 'package:flutter_manhuatai/models/search_author.dart';
 import 'package:flutter_manhuatai/models/search_comic.dart';
@@ -545,5 +546,35 @@ class Api {
       ),
     );
     return TopicHotList.fromJson(response);
+  }
+
+  /// 获取推荐帖子列表中的热门话题数据
+  static Future<RecommendSatellite> getRecommendSatellite({
+    String type = 'device',
+    String openid,
+    String authorization,
+    int page = 1,
+    int pageSize = 10,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/satellite/getrecommendsatellite';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'type': type,
+        'openid': openid,
+        'page': page,
+        'page_size': pageSize,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return RecommendSatellite.fromJson(response);
   }
 }

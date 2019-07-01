@@ -114,7 +114,7 @@ Comic_info _$Comic_infoFromJson(Map<String, dynamic> json) {
       json['content'] as String,
       json['comic_name'] as String,
       json['total_view_num'],
-      json['update_time'] as String,
+      json['update_time'],
       json['score'],
       json['url'] as String,
       json['img_url'] as String,

@@ -22,6 +22,9 @@ class RecommendBannerSliverList extends StatelessWidget {
             ? Container()
             : Container(
                 height: ScreenUtil().setWidth(250),
+                margin: EdgeInsets.only(
+                  bottom: ScreenUtil().setWidth(30),
+                ),
                 child: Swiper(
                   itemCount: bannerList.first.comicInfo.length,
                   itemBuilder: (context, index) {
