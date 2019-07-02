@@ -33,6 +33,10 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
         RefreshCommonState,
         WidgetsBindingObserver {
   bool _isLoading = true;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+  int page = 1;
+
   ScrollController _scrollController = ScrollController();
   List<BookList.Book> _bannerList = [];
   List<RecommendStars.Data> _recommendStars = [];
@@ -53,6 +57,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
   }
 
   Future<void> _handleRefresh() async {
+    page = 1;
     Store<AppState> store = StoreProvider.of(context);
     var guestInfo = store.state.guestInfo;
     var userInfo = store.state.userInfo;
@@ -130,7 +135,40 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
 
   // 上拉加载更多
   Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) {
+      return;
+    }
+    _isLoadingMore = true;
+
+    page++;
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
     print('加载更多');
+    var getRecommendSatelliteRes = await Api.getRecommendSatellite(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      page: page,
+    );
+    _isLoadingMore = false;
+
+    var recommendSatelliteList = getRecommendSatelliteRes.data.list;
+    if (recommendSatelliteList.length == 0) {
+      setState(() {
+        _hasMore = false;
+      });
+    }
+
+    setState(() {
+      _recommendSatelliteList.addAll(recommendSatelliteList);
+    });
   }
 
   @override
@@ -160,6 +198,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
                 RecommendSatelliteSliverList(
                   recommendSatelliteList: _recommendSatelliteList,
                   userRoleInfoList: _userRoleInfoList,
+                  hasMore: _hasMore,
                 ),
               ],
             ),

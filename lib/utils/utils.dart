@@ -175,4 +175,34 @@ class Utils {
 
     return '${date.year}年第${week}周';
   }
+
+  static String fromNow(int timestamp, [pattern = 'yyyy-MM-dd']) {
+    if (timestamp == null) return '';
+    int diff = DateTime.now().millisecondsSinceEpoch - timestamp;
+    double seconds = diff / 1000;
+    if (seconds < 60) {
+      return '刚刚';
+    }
+
+    double minutes = seconds / 60;
+    if (minutes < 60) {
+      return '${minutes.floor()}分钟前';
+    }
+
+    double hours = minutes / 60;
+    if (hours >= 1 && hours <= 24) {
+      return '${hours.floor()}小时前';
+    }
+
+    double days = hours / 24;
+    if (days >= 1 && days <= 2) {
+      return '昨天';
+    }
+
+    if (days > 2 && days <= 7) {
+      return '${days.floor()}' + '天前';
+    }
+
+    return formatDate(timestamp, pattern);
+  }
 }
