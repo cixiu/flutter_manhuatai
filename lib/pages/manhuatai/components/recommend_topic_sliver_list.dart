@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/models/topic_hot_list.dart' as TopicHotList;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'manhuatai_sliver_title.dart';
+
 class RecommendTopicSliverList extends StatelessWidget {
   final List<TopicHotList.List_List> topicHotList;
 
@@ -13,47 +15,11 @@ class RecommendTopicSliverList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildListDelegate([
-        Container(
-          margin: EdgeInsets.only(
-            top: ScreenUtil().setWidth(30),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: ScreenUtil().setWidth(30),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                '热门话题',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: ScreenUtil().setSp(32),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Stack(
-                alignment: Alignment.centerRight,
-                children: <Widget>[
-                  Image.asset(
-                    'lib/images/icon_special_details.png',
-                    height: ScreenUtil().setWidth(46),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(
-                      right: ScreenUtil().setWidth(10),
-                    ),
-                    child: Text(
-                      '更多',
-                      style: TextStyle(
-                        color: Colors.pink[200],
-                        fontSize: ScreenUtil().setSp(20),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
+        ManhuataiSliverTitle(
+          title: '热门话题',
+          onTap: () {
+            print('跳转至热门话题页面');
+          },
         ),
         Container(
           height: ScreenUtil().setWidth(50),

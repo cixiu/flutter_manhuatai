@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/models/book_list.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
+import 'package:flutter_manhuatai/models/follow_list.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
 import 'package:flutter_manhuatai/models/recommend_satellite.dart';
 import 'package:flutter_manhuatai/models/recommend_stars.dart';
+import 'package:flutter_manhuatai/models/recommend_users.dart';
 import 'package:flutter_manhuatai/models/search_author.dart';
 import 'package:flutter_manhuatai/models/search_comic.dart';
 import 'package:flutter_manhuatai/models/sort_list.dart';
@@ -602,5 +604,65 @@ class Api {
       ),
     );
     return UserRoleInfo.fromJson(response);
+  }
+
+  /// 获取推荐的用户
+  static Future<RecommendUsers> getRecommendUsers({
+    String type = 'device',
+    String openid,
+    String authorization,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/banner/getrecommendusers';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return RecommendUsers.fromJson(response);
+  }
+
+  /// 获取推荐的用户
+  static Future<FollowList> getUsergFollowList({
+    String type = 'device',
+    String openid,
+    String deviceid = '',
+    int myuid,
+    int row = 10,
+    int page = 1,
+  }) async {
+    final String url =
+        'https://follow-list.321mh.com/app_api/v5/getuserguanzhu/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'deviceid': deviceid,
+        'myuid': myuid,
+        'row': row,
+        'page': page,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+    return FollowList.fromJson(response);
   }
 }

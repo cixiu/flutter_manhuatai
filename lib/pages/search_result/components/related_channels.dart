@@ -83,7 +83,7 @@ class RelatedChannels extends StatelessWidget {
                                   matchText: keyword,
                                   matchedStyle: TextStyle(
                                     color: Colors.blue,
-                                    fontSize: ScreenUtil().setSp(32),
+                                    fontSize: ScreenUtil().setSp(28),
                                   ),
                                 ),
                                 Text(
