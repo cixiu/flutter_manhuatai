@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/components/crop_image/crop_image.dart';
 import 'package:flutter_manhuatai/components/pic_swiper/pic_swiper.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
@@ -17,7 +18,7 @@ import 'package:html_unescape/html_unescape.dart';
 typedef void CurrentTap(int index);
 
 class SatelliteContent extends StatelessWidget {
-  final RecommendSatellite.List_List item;
+  final Satellite item;
   // final UserRoleInfo.Data roleInfo;
 
   SatelliteContent({
@@ -96,18 +97,19 @@ class SatelliteContent extends StatelessWidget {
                           height: ScreenUtil().setWidth(36),
                         ),
                       )
-                    : item.iselite == 1
-                        ? Container(
-                            margin: EdgeInsets.only(
-                              right: ScreenUtil().setWidth(10),
-                            ),
-                            child: Image.asset(
-                              'lib/images/icon_task_jiajing_words_bg.png',
-                              width: ScreenUtil().setWidth(70),
-                              height: ScreenUtil().setWidth(36),
-                            ),
-                          )
-                        : Container(),
+                    : Container(),
+                item.iselite == 1
+                    ? Container(
+                        margin: EdgeInsets.only(
+                          right: ScreenUtil().setWidth(10),
+                        ),
+                        child: Image.asset(
+                          'lib/images/icon_task_jiajing_words_bg.png',
+                          width: ScreenUtil().setWidth(70),
+                          height: ScreenUtil().setWidth(36),
+                        ),
+                      )
+                    : Container(),
                 Expanded(
                   child: Text(
                     item.title.replaceAll('\n', ' '),

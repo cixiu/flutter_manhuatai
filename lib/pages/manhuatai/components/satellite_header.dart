@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_manhuatai/models/recommend_satellite.dart'
-    as RecommendSatellite;
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
 class SatelliteHeader extends StatelessWidget {
-  final RecommendSatellite.List_List item;
+  final Satellite item;
   final UserRoleInfo.Data roleInfo;
+  final bool showFollowBtn;
 
   SatelliteHeader({
     this.item,
     this.roleInfo,
+    this.showFollowBtn = true,
   });
 
   @override
@@ -131,23 +132,25 @@ class SatelliteHeader extends StatelessWidget {
               ),
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Image.asset(
-                'lib/images/icon_follow_small_noshadow.png',
-                width: ScreenUtil().setWidth(90),
-                height: ScreenUtil().setWidth(36),
-              ),
-              Text(
-                '关注',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: ScreenUtil().setSp(24),
-                ),
-              )
-            ],
-          ),
+          showFollowBtn
+              ? Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      'lib/images/icon_follow_small_noshadow.png',
+                      width: ScreenUtil().setWidth(90),
+                      height: ScreenUtil().setWidth(36),
+                    ),
+                    Text(
+                      '关注',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenUtil().setSp(24),
+                      ),
+                    )
+                  ],
+                )
+              : Container(),
         ],
       ),
     );

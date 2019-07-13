@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
@@ -41,7 +41,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
   List<BookList.Book> _bannerList = [];
   List<RecommendStars.Data> _recommendStars = [];
   List<TopicHotList.List_List> _topicHotList = [];
-  List<RecommendSatellite.List_List> _recommendSatelliteList = [];
+  List<Satellite> _recommendSatelliteList = [];
   List<UserRoleInfo.Data> _userRoleInfoList = [];
 
   @override

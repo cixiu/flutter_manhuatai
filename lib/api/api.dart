@@ -15,6 +15,7 @@ import 'package:flutter_manhuatai/models/search_comic.dart';
 import 'package:flutter_manhuatai/models/sort_list.dart';
 import 'package:flutter_manhuatai/models/topic_hot_list.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
+import 'package:flutter_manhuatai/models/user_follow_line.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
@@ -634,7 +635,7 @@ class Api {
     return RecommendUsers.fromJson(response);
   }
 
-  /// 获取推荐的用户
+  /// 获取用户的关注列表
   static Future<FollowList> getUsergFollowList({
     String type = 'device',
     String openid,
@@ -664,5 +665,50 @@ class Api {
       ),
     );
     return FollowList.fromJson(response);
+  }
+
+  /// 获取关注用的帖子列表
+  static Future<UserFollowLine> getUserFollowLine({
+    String type = 'device',
+    String openid,
+    String authorization,
+    int pageSize = 10,
+    int createTime,
+    int dataType,
+    int targetId,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/timeline/getuserfollowline';
+    Map<String, dynamic> params = {
+      'openid': openid,
+      'type': type,
+      'page_size': pageSize,
+      'platformname': 'android',
+      'productname': 'mht'
+    };
+
+    if (dataType != null) {
+      params['data_type'] = dataType;
+      params['create_time'] = createTime;
+    }
+
+    if (targetId != null) {
+      params['target_id'] = targetId;
+    }
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+      options: Options(
+        // contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    if (response['status'] == 500) {
+      return UserFollowLine.fromJson({});
+    }
+    return UserFollowLine.fromJson(response);
   }
 }
