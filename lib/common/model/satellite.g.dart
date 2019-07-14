@@ -30,7 +30,7 @@ Satellite _$SatelliteFromJson(Map<String, dynamic> json) {
       json['iswater'] as int,
       (json['starid_list'] as List)?.map((e) => e as int)?.toList(),
       json['productlineid_list'] as String,
-      json['topic_list'] as dynamic,
+      json['topic_list'],
       json['is_recommend'] as int,
       json['location'] as String,
       json['lng_lat'] as String,

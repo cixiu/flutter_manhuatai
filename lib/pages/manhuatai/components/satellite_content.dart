@@ -8,6 +8,8 @@ import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/components/crop_image/crop_image.dart';
 import 'package:flutter_manhuatai/components/pic_swiper/pic_swiper.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/models/recommend_satellite.dart'
@@ -57,6 +59,13 @@ class SatelliteContent extends StatelessWidget {
     );
   }
 
+  void navigateToSatelliteDetail(BuildContext context) {
+    Application.router.navigateTo(
+      context,
+      '${Routes.satelliteDetail}?satelliteId=${item.id}',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -68,14 +77,26 @@ class SatelliteContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _buildContentTitle(),
-              _buildContentContent(),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  navigateToSatelliteDetail(context);
+                },
+                child: _buildContentTitle(),
+              ),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  navigateToSatelliteDetail(context);
+                },
+                child: _buildContentContent(),
+              ),
               _buildContentImages(context),
               _buildContentStarName(),
             ],
           ),
         ),
-        _buildContentBottomAction(),
+        _buildContentBottomAction(context),
       ],
     );
   }
@@ -424,7 +445,7 @@ class SatelliteContent extends StatelessWidget {
     );
   }
 
-  Widget _buildContentBottomAction() {
+  Widget _buildContentBottomAction(BuildContext context) {
     return Container(
       height: ScreenUtil().setWidth(86),
       decoration: BoxDecoration(
@@ -444,6 +465,9 @@ class SatelliteContent extends StatelessWidget {
           _buildContentBottomActionItem(
             text: '${item.replynum}',
             icon: 'lib/images/icon_pinglun_pinglun_m.png',
+            onTap: () {
+              navigateToSatelliteDetail(context);
+            },
           ),
           _buildContentBottomActionItem(
               text: '${item.supportnum.toInt()}',

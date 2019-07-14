@@ -10,6 +10,8 @@ class Routes {
   static String comicRank = '/comic_rank'; // 漫画排行榜
   static String comicSearch = '/comic_search'; // 搜索
   static String searchResult = '/search_result'; // 搜索结果
+  static String satelliteDetail =
+      '/satellite_detail'; // 帖子详情 eg: /satellite_detail?satelliteId=123456
 
   static configureRoutes(Router router) {
     router.define(
@@ -45,6 +47,12 @@ class Routes {
     router.define(
       searchResult,
       handler: searchResultHandler,
+      transitionType: TransitionType.inFromRight,
+    );
+
+    router.define(
+      satelliteDetail,
+      handler: satelliteDetailHandler,
       transitionType: TransitionType.inFromRight,
     );
   }

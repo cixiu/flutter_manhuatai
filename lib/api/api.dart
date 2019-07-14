@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/satellite.dart';
+import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/book_list.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/follow_list.dart';
@@ -459,8 +461,10 @@ class Api {
     return GetSatelliteRes.fromJson(response);
   }
 
-  /// 获取用户列表信息
+  /// 根据用户的id列表获取用户的列表信息
   static Future<CommentUser> getCommentUser({
+    int relationId,
+    int opreateType,
     List<int> userids,
   }) async {
     String url = 'https://community-hots.321mh.com/user/commentuser/?appId=2';
@@ -469,6 +473,10 @@ class Api {
     userids.forEach((item) {
       url += '&userids=$item';
     });
+
+    if (relationId != null && opreateType != null) {
+      url += '&relationId=$relationId&opreateType=$opreateType';
+    }
 
     Map<String, dynamic> response = await HttpRequest.get(
       url,
@@ -593,12 +601,13 @@ class Api {
     Map<String, dynamic> response = await HttpRequest.post(
       url,
       data: {
-        'userids': userids,
+        'userids': userids.toString(),
         'localtime': DateTime.now().millisecondsSinceEpoch,
         'platformname': 'android',
         'productname': 'mht'
       },
       options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
         headers: {
           'auth_token': '$authorization',
         },
@@ -711,7 +720,7 @@ class Api {
     return UserFollowLine.fromJson(response);
   }
 
-  /// 获取用户的关注列表
+  /// 帖子的点赞或者取消点缀
   static Future<bool> supportSatellite({
     String type = 'device',
     String openid,
@@ -741,5 +750,135 @@ class Api {
       ),
     );
     return response['status'] == 0;
+  }
+
+  /// 获取帖子的详情
+  static Future<Satellite> getSatelliteDetail({
+    String type = 'device',
+    String openid,
+    String authorization,
+    int satelliteId,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/satellite/getsatellitedetail';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'openid': openid,
+        'type': type,
+        'satellite_id': satelliteId,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return Satellite.fromJson(response['data']);
+  }
+
+  /// 获取帖子的一级评论
+  ///
+  /// type = 'hot' 表示热门评论
+  ///
+  /// type = 'new' 表示最新评论
+  static Future<List<SatelliteComment>> getSatelliteFatherComments({
+    String authorization,
+    int ssid,
+    int ssidtype = 1,
+    int page = 1,
+    int size = 20,
+    int contenttype = 3,
+    int fatherid = 0,
+    int relateid = 0,
+    String type = 'hot',
+  }) async {
+    final String url = type == 'hot'
+        ? 'http://community-new.321mh.com/v1/comment/gethotscomment'
+        : 'http://community-new.321mh.com/v1/comment/newgetsv2';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'appid': 2,
+        'ssid': ssid,
+        'ssidtype': ssidtype,
+        'page': page,
+        'size': size,
+        'contenttype': contenttype,
+        'fatherid': fatherid,
+        'relateid': relateid
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return (response['data'] as List)
+        ?.map((item) => item == null
+            ? null
+            : SatelliteComment.fromJson(item as Map<String, dynamic>))
+        ?.toList();
+  }
+
+  /// 根据帖子的一级comment的fatherid来获取childrenComments
+  static Future<List<SatelliteComment>> getSatelliteChildrenComments({
+    String type = 'device',
+    String openid,
+    String authorization,
+    @required List<int> commentIds,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/comment/getchildrencomment';
+    String commentIdsString = '';
+    commentIds.forEach((item) {
+      commentIdsString += '$item,';
+    });
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'openid': openid,
+        'type': type,
+        'comment_ids': commentIdsString,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return (response['data'] as List)
+        ?.map((item) => item == null
+            ? null
+            : SatelliteComment.fromJson(item as Map<String, dynamic>))
+        ?.toList();
+  }
+
+  /// 获取帖子的评论总数
+  static Future<int> getSatelliteCommentCount({
+    int ssid,
+    int appId = 2,
+    int ssidType = 1,
+    int commentType = 2,
+  }) async {
+    final String url = 'http://community-hots.321mh.com/comment/count/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'appid': appId,
+        'ssid': ssid,
+        'ssidType': ssidType,
+        'commentType': commentType,
+      },
+    );
+    return (response['data'] as int);
   }
 }

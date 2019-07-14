@@ -4,6 +4,7 @@ import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
+import 'package:flutter_manhuatai/pages/satellite_detail/satellite_detail.dart';
 import 'package:flutter_manhuatai/pages/search_result/search_result.dart';
 import 'package:flutter_manhuatai/pages/user_center/user_center.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/comic_detail_page.dart';
@@ -52,6 +53,17 @@ var searchResultHandler = Handler(
 
     return SearchResultPage(
       keyword: keyword,
+    );
+  },
+);
+
+// 搜索结果
+var satelliteDetailHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String satelliteId = params['satelliteId']?.first;
+
+    return SatelliteDetailPage(
+      satelliteId: int.tryParse(satelliteId),
     );
   },
 );
