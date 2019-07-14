@@ -19,10 +19,12 @@ typedef void CurrentTap(int index);
 
 class SatelliteContent extends StatelessWidget {
   final Satellite item;
+  final VoidCallback supportSatellite;
   // final UserRoleInfo.Data roleInfo;
 
   SatelliteContent({
     this.item,
+    this.supportSatellite,
   });
 
   void previewImage({
@@ -437,16 +439,22 @@ class SatelliteContent extends StatelessWidget {
         children: <Widget>[
           _buildContentBottomActionItem(
             text: '更多',
-            icon: 'lib/images/icon_newsc_more.png',
+            icon: 'lib/images/icon_pinglun_gengduo_m.png',
           ),
           _buildContentBottomActionItem(
             text: '${item.replynum}',
-            icon: 'lib/images/icon_newsc_comment.png',
+            icon: 'lib/images/icon_pinglun_pinglun_m.png',
           ),
           _buildContentBottomActionItem(
-            text: '${item.supportnum.toInt()}',
-            icon: 'lib/images/icon_weidianzan_cat.png',
-          ),
+              text: '${item.supportnum.toInt()}',
+              icon: 'lib/images/icon_pinglun_weidianzan_m.png',
+              activeIcon: 'lib/images/icon_pinglun_yidianzan_m.png',
+              isActive: item.issupport == 1,
+              onTap: () {
+                if (supportSatellite != null) {
+                  supportSatellite();
+                }
+              }),
         ],
       ),
     );
@@ -455,10 +463,13 @@ class SatelliteContent extends StatelessWidget {
   Widget _buildContentBottomActionItem({
     String text,
     String icon,
+    String activeIcon,
+    bool isActive = false,
+    VoidCallback onTap,
   }) {
     return Expanded(
       child: InkResponse(
-        onTap: () {},
+        onTap: onTap ?? () {},
         containedInkWell: true,
         highlightShape: BoxShape.rectangle,
         child: Container(
@@ -474,16 +485,16 @@ class SatelliteContent extends StatelessWidget {
                   right: ScreenUtil().setWidth(10),
                 ),
                 child: Image.asset(
-                  '$icon',
-                  width: ScreenUtil().setWidth(28),
-                  height: ScreenUtil().setWidth(28),
+                  isActive ? '$activeIcon' : '$icon',
+                  width: ScreenUtil().setWidth(48),
+                  height: ScreenUtil().setWidth(48),
                   fit: BoxFit.fill,
                 ),
               ),
               Text(
                 '$text',
                 style: TextStyle(
-                  color: Colors.grey[400],
+                  color: isActive ? Colors.blue : Colors.grey[400],
                   fontSize: ScreenUtil().setSp(24),
                 ),
               ),

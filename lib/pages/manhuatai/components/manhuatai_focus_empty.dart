@@ -26,7 +26,7 @@ class ManhuataiFocusEmpty extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 Image.asset(
-                  'lib/images/icon_redeem_code_empty.png',
+                  'lib/images/icon_quesheng_2cats.png',
                   height: ScreenUtil().setWidth(200),
                 ),
                 Text(

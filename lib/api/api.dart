@@ -700,7 +700,6 @@ class Api {
       url,
       params: params,
       options: Options(
-        // contentType: ContentType.parse('application/x-www-form-urlencoded'),
         headers: {
           'auth_token': '$authorization',
         },
@@ -710,5 +709,37 @@ class Api {
       return UserFollowLine.fromJson({});
     }
     return UserFollowLine.fromJson(response);
+  }
+
+  /// 获取用户的关注列表
+  static Future<bool> supportSatellite({
+    String type = 'device',
+    String openid,
+    String authorization,
+    int satelliteId,
+    int status, // 1是点缀， 0是取消点缀
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/v1/satellite/supportsatellite';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'satellite_id': satelliteId,
+        'status': status,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        headers: {
+          'auth_token': '$authorization',
+        },
+      ),
+    );
+    return response['status'] == 0;
   }
 }

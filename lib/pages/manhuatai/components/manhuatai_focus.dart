@@ -170,6 +170,38 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
     }
   }
 
+  Future<void> _supportSatellite(int index) async {
+    var item = _followTimeLineList[index].satellite;
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
+    var success = await Api.supportSatellite(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      satelliteId: item.id,
+      status: item.issupport == 1 ? 0 : 1,
+    );
+
+    if (success) {
+      setState(() {
+        if (item.issupport == 1) {
+          item.issupport = 0;
+          item.supportnum -= 1;
+        } else {
+          item.issupport = 1;
+          item.supportnum += 1;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -329,6 +361,9 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
                                 ),
                                 SatelliteContent(
                                   item: item.satellite,
+                                  supportSatellite: () {
+                                    _supportSatellite(index);
+                                  },
                                 ),
                               ],
                             );

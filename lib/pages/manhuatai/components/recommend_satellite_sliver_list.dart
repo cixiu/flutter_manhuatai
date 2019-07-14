@@ -7,15 +7,19 @@ import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 import 'satellite_content.dart';
 import 'satellite_header.dart';
 
+typedef void IndexCallBack(int index);
+
 class RecommendSatelliteSliverList extends StatelessWidget {
   final List<Satellite> recommendSatelliteList;
   final List<UserRoleInfo.Data> userRoleInfoList;
   final bool hasMore;
+  final IndexCallBack supportSatellite;
 
   RecommendSatelliteSliverList({
     this.recommendSatelliteList,
     this.userRoleInfoList,
     this.hasMore,
+    this.supportSatellite,
   });
 
   @override
@@ -46,6 +50,9 @@ class RecommendSatelliteSliverList extends StatelessWidget {
               ),
               SatelliteContent(
                 item: item,
+                supportSatellite: () {
+                  supportSatellite(index);
+                },
               ),
             ],
           );
