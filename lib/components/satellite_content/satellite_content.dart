@@ -21,11 +21,13 @@ typedef void CurrentTap(int index);
 
 class SatelliteContent extends StatelessWidget {
   final Satellite item;
+  final bool isDetail;
   final VoidCallback supportSatellite;
   // final UserRoleInfo.Data roleInfo;
 
   SatelliteContent({
     this.item,
+    this.isDetail = false,
     this.supportSatellite,
   });
 
@@ -89,14 +91,14 @@ class SatelliteContent extends StatelessWidget {
                 onTap: () {
                   navigateToSatelliteDetail(context);
                 },
-                child: _buildContentContent(),
+                child: _buildContentContent(context),
               ),
-              _buildContentImages(context),
-              _buildContentStarName(),
+              isDetail ? Container() : _buildContentImages(context),
+              isDetail ? Container() : _buildContentStarName(),
             ],
           ),
         ),
-        _buildContentBottomAction(context),
+        isDetail ? Container() : _buildContentBottomAction(context),
       ],
     );
   }
@@ -152,11 +154,28 @@ class SatelliteContent extends StatelessWidget {
         : Container();
   }
 
-  Widget _buildContentContent() {
+  Widget _buildContentContent(BuildContext context) {
     var unescape = HtmlUnescape();
+    var content = item.content;
+
     // 将 html 标签去掉
-    var htmlReg = RegExp('<[^>]+>');
-    var content = item.content.replaceAll(htmlReg, '').replaceAll(' ', '');
+    if (!isDetail) {
+      var htmlReg = RegExp('<[^>]+>');
+      content = content.replaceAll(htmlReg, '').replaceAll(' ', '');
+    } else {
+      List<dynamic> images = json.decode(item.images);
+      print('dddddddddddddddddddddddddddd');
+      content = content.replaceAllMapped(
+        RegExp(r'<!--IMG#(\d+)-->'),
+        (matches) {
+          int index = int.tryParse(matches[1]);
+          print(index);
+          return images[index];
+        },
+      );
+
+    }
+
     content = unescape.convert(content);
 
     return content.isEmpty
@@ -168,9 +187,9 @@ class SatelliteContent extends StatelessWidget {
             ),
             child: ExtendedText(
               content,
-              overflow: ExtendedTextOverflow.ellipsis,
+              overflow: isDetail ? null : ExtendedTextOverflow.ellipsis,
               specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
-              maxLines: 3,
+              maxLines: isDetail ? null : 3,
               style: TextStyle(
                 color: Colors.grey[800],
                 fontSize: ScreenUtil().setSp(24),

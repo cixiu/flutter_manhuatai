@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/components/post_item/image_text.dart';
 
 import 'emoji_text.dart';
+import 'image_span_text.dart';
 
 class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   /// whether show background for @somebody
@@ -44,6 +45,11 @@ class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
       return ImageText(
         textStyle,
         start: index - (ImageText.flag.length - 1),
+      );
+    } else if (isStart(flag, ImageSpanText.flag)) {
+      return ImageSpanText(
+        textStyle,
+        start: index - (ImageSpanText.flag.length - 1),
       );
     }
 

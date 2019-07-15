@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/model/satellite.dart';
-import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 
+import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
-import 'satellite_content.dart';
-import 'satellite_header.dart';
+import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
+import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
+import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
 
 typedef void IndexCallBack(int index);
 

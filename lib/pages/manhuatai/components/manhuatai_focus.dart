@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
-import 'package:flutter_manhuatai/pages/manhuatai/components/manhuatai_focus_empty.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,10 +18,11 @@ import 'package:flutter_manhuatai/models/user_follow_line.dart'
     as UserFollowLine;
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
+import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
+import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
+import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
+import 'package:flutter_manhuatai/pages/manhuatai/components/manhuatai_focus_empty.dart';
 import 'manhuatai_focus_empty.dart';
-import 'manhuatai_sliver_title.dart';
-import 'satellite_content.dart';
-import 'satellite_header.dart';
 
 class ManhuataiFocus extends StatefulWidget {
   @override

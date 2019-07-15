@@ -1,13 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+
+import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+
+import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
+import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
 
 /// 帖子详情页
 class SatelliteDetailPage extends StatefulWidget {
@@ -34,6 +40,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   int _satelliteCommentCount;
   List<SatelliteComment> _fatherCommentList;
   List<SatelliteComment> _childrenCommentList;
+  UserRoleInfo.Data _roleInfo;
 
   @override
   void initState() {
@@ -94,6 +101,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       List<int> commentIds =
           getSatelliteFatherComments.map((item) => item.id).toList();
 
+      // 获取帖子的一级评论下需要显示的二级评论
       var getSatelliteChildrenCommentsRes =
           await Api.getSatelliteChildrenComments(
         type: type,
@@ -102,12 +110,26 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         commentIds: commentIds,
       );
 
+      // 获取帖子的作者的角色信息
+      var userRoleInfo = await Api.getUserroleInfoByUserids(
+        userids: [getSatelliteDetail.useridentifier],
+        authorization: authorization,
+      );
+
+      var roleInfo = userRoleInfo.data.firstWhere(
+        (userRole) {
+          return getSatelliteDetail.useridentifier == userRole.userId;
+        },
+        orElse: () => null,
+      );
+
       setState(() {
         _isLoading = false;
         _satellite = getSatelliteDetail;
         _satelliteCommentCount = getSatelliteCommentCount;
         _fatherCommentList = getSatelliteFatherComments;
         _childrenCommentList = getSatelliteChildrenCommentsRes;
+        _roleInfo = roleInfo;
       });
       print(_satellite.title);
       print(_satelliteCommentCount);
@@ -158,7 +180,15 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
-                      Text(_satellite.title),
+                      SatelliteHeader(
+                        item: _satellite,
+                        roleInfo: _roleInfo,
+                        showFollowBtn: true,
+                      ),
+                      SatelliteContent(
+                        item: _satellite,
+                        isDetail: true,
+                      )
                     ]),
                   ),
                 ],
