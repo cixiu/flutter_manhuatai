@@ -6,6 +6,7 @@ import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
 import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 typedef void IndexCallBack(int index);
 
@@ -44,9 +45,15 @@ class RecommendSatelliteSliverList extends StatelessWidget {
 
           return Column(
             children: <Widget>[
-              SatelliteHeader(
-                item: item,
-                roleInfo: roleInfo,
+              Container(
+                margin: EdgeInsets.only(
+                  top: ScreenUtil().setWidth(30),
+                  bottom: ScreenUtil().setWidth(20),
+                ),
+                child: SatelliteHeader(
+                  item: item,
+                  roleInfo: roleInfo,
+                ),
               ),
               SatelliteContent(
                 item: item,

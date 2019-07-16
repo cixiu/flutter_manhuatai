@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/components/crop_image/crop_image.dart';
 import 'package:flutter_manhuatai/components/pic_swiper/pic_swiper.dart';
@@ -12,8 +13,6 @@ import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_manhuatai/models/recommend_satellite.dart'
-    as RecommendSatellite;
 import 'package:html_unescape/html_unescape.dart';
 // import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
@@ -82,14 +81,18 @@ class SatelliteContent extends StatelessWidget {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  navigateToSatelliteDetail(context);
+                  if (!isDetail) {
+                    navigateToSatelliteDetail(context);
+                  }
                 },
                 child: _buildContentTitle(),
               ),
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  navigateToSatelliteDetail(context);
+                  if (!isDetail) {
+                    navigateToSatelliteDetail(context);
+                  }
                 },
                 child: _buildContentContent(context),
               ),
@@ -107,7 +110,7 @@ class SatelliteContent extends StatelessWidget {
     return item.showTitle == 1 || item.iselite == 1 || item.istop == 1
         ? Container(
             margin: EdgeInsets.only(
-              top: ScreenUtil().setWidth(20),
+              bottom: ScreenUtil().setWidth(20),
             ),
             child: Row(
               children: <Widget>[
@@ -162,45 +165,175 @@ class SatelliteContent extends StatelessWidget {
     if (!isDetail) {
       var htmlReg = RegExp('<[^>]+>');
       content = content.replaceAll(htmlReg, '').replaceAll(' ', '');
+      content = unescape.convert(content);
+
+      return content.isEmpty
+          ? Container()
+          : Container(
+              width: MediaQuery.of(context).size.width,
+              margin: EdgeInsets.only(
+                bottom: ScreenUtil().setWidth(20),
+                // top: ScreenUtil().setWidth(10),
+              ),
+              child: ExtendedText(
+                content,
+                overflow: isDetail ? null : TextOverflow.ellipsis,
+                specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
+                maxLines: isDetail ? null : 3,
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: ScreenUtil().setSp(24),
+                  height: 1.2,
+                ),
+              ),
+            );
     } else {
-      List<dynamic> images = json.decode(item.images);
-      print('dddddddddddddddddddddddddddd');
+      List<dynamic> images =
+          item.images.endsWith(']') ? json.decode(item.images) : [];
+      content = unescape.convert(content);
+
       content = content.replaceAllMapped(
         RegExp(r'<!--IMG#(\d+)-->'),
         (matches) {
+          String imgFlagString = matches[0];
           int index = int.tryParse(matches[1]);
-          print(index);
-          return images[index];
+          if (images.length == 0) {
+            return '\n\${insert}\$%!--error--%\n\${insert}\$';
+          } else {
+            // 将images中对应的图片地址取出
+            imgFlagString = images[index];
+            return '\n\${insert}\$%!--$imgFlagString--%\n\${insert}\$';
+          }
         },
       );
+      List<String> contentList = content.split('\${insert}\$');
 
-    }
+      List<ImageItem> imageList = [];
+      contentList.forEach((item) {
+        var match = RegExp(r'^%!--((.?)+)--%$').firstMatch(item.trim());
+        if (match != null) {
+          item = match.group(1);
+          if (item != 'error') {
+            var reg = RegExp(r'@#de<!--IMG#(\d+)-->@#de(\d+:\d+)');
+            String url = '';
+            double originWidth = 0;
+            double originHeight = 0;
+            String imgUrl = item.replaceAllMapped(
+              reg,
+              (matches) {
+                List<String> imgWidthAndHeight = matches[2].split(':');
+                originWidth = double.parse(imgWidthAndHeight[0]);
+                originHeight = double.parse(imgWidthAndHeight[1]);
+                return '';
+              },
+            );
+            url = '${AppConst.commentImgHost}/$imgUrl';
 
-    content = unescape.convert(content);
+            imageList.add(ImageItem(
+              url: url,
+              width: originWidth,
+              height: originHeight,
+            ));
+          }
+        }
+      });
 
-    return content.isEmpty
-        ? Container()
-        : Container(
-            margin: EdgeInsets.only(
-              bottom: ScreenUtil().setWidth(20),
-              top: ScreenUtil().setWidth(10),
-            ),
-            child: ExtendedText(
-              content,
-              overflow: isDetail ? null : ExtendedTextOverflow.ellipsis,
-              specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
-              maxLines: isDetail ? null : 3,
-              style: TextStyle(
-                color: Colors.grey[800],
-                fontSize: ScreenUtil().setSp(24),
-                height: 1.2,
+      return contentList.length == 0
+          ? Container()
+          : Container(
+              width: MediaQuery.of(context).size.width,
+              margin: EdgeInsets.only(
+                bottom: ScreenUtil().setWidth(20),
               ),
-            ),
-          );
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: contentList.map((item) {
+                  if (!item.startsWith('%!--') && !item.endsWith('--%')) {
+                    return item.trim().isEmpty
+                        ? Container()
+                        : ExtendedText(
+                            item,
+                            overflow: isDetail ? null : TextOverflow.ellipsis,
+                            specialTextSpanBuilder:
+                                PostSpecialTextSpanBuilder(),
+                            maxLines: isDetail ? null : 3,
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: ScreenUtil().setSp(24),
+                              height: 1.2,
+                            ),
+                          );
+                  } else {
+                    item = RegExp(r'^%!--((.?)+)--%$')
+                        .firstMatch(item.trim())
+                        .group(1);
+                    if (item == 'error') {
+                      return Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setWidth(15),
+                        ),
+                        color: Colors.grey[200],
+                        width: ScreenUtil().setWidth(690),
+                        height: ScreenUtil().setWidth(330),
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          'lib/images/pic_cache.png',
+                          width: ScreenUtil().setWidth(120),
+                          height: ScreenUtil().setWidth(120),
+                        ),
+                      );
+                    } else {
+                      var reg = RegExp(r'@#de<!--IMG#(\d+)-->@#de(\d+:\d+)');
+                      String url = '';
+                      int index = 0;
+                      double originWidth = 0;
+                      double originHeight = 0;
+                      double width = ScreenUtil().setWidth(690);
+                      double height = 0;
+                      String imgUrl = item.replaceAllMapped(
+                        reg,
+                        (matches) {
+                          index = int.tryParse(matches[1]);
+                          List<String> imgWidthAndHeight =
+                              matches[2].split(':');
+                          originWidth = double.parse(imgWidthAndHeight[0]);
+                          originHeight = double.parse(imgWidthAndHeight[1]);
+                          height = width * originHeight / originWidth;
+                          return '';
+                        },
+                      );
+                      url = '${AppConst.commentImgHost}/$imgUrl';
+
+                      return Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setWidth(15),
+                        ),
+                        child: CropImage(
+                          item: ImageItem(
+                            url: url,
+                            width: originWidth,
+                            height: originHeight,
+                          ),
+                          imageList: imageList,
+                          index: index,
+                          thumbWidth: width,
+                          thumbHeight: height,
+                          fit: BoxFit.cover,
+                          autoSetSize: false,
+                          knowImageSize: false,
+                        ),
+                      );
+                    }
+                  }
+                }).toList(),
+              ),
+            );
+    }
   }
 
   Widget _buildContentImages(BuildContext context) {
-    List<dynamic> images = json.decode(item.images);
+    List<dynamic> images =
+        item.images.endsWith(']') ? json.decode(item.images) : [];
     if (images.length == 0) {
       return Container();
     }
@@ -210,19 +343,19 @@ class SatelliteContent extends StatelessWidget {
 
     images.forEach((item) {
       String url = '';
-      int width = 0;
-      int height = 0;
+      double width = 0;
+      double height = 0;
       String imgUrl = (item as String).replaceAllMapped(
         reg,
         (matches) {
           List<String> imgWidthAndHeight = matches[1].split(':');
-          width = int.parse(imgWidthAndHeight[0]);
-          height = int.parse(imgWidthAndHeight[1]);
+          width = double.parse(imgWidthAndHeight[0]);
+          height = double.parse(imgWidthAndHeight[1]);
           return '';
         },
       );
 
-      url = 'https://comment.yyhao.com/${imgUrl}';
+      url = '${AppConst.commentImgHost}/$imgUrl';
       imageViewList.add(ImageItem(
         url: url,
         width: width,

@@ -23,9 +23,6 @@ class SatelliteHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: ScreenUtil().setWidth(30),
       ),
-      margin: EdgeInsets.only(
-        top: ScreenUtil().setWidth(30),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

@@ -294,8 +294,8 @@ class CropImage extends StatelessWidget {
 
 class ImageItem {
   final String url;
-  final int width;
-  final int height;
+  final double width;
+  final double height;
 
   ImageItem({
     this.url,

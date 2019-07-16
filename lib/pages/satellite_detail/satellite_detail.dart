@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
@@ -90,10 +91,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         ));
       var result = await Future.wait(futures);
 
-      if (!this.mounted) {
-        return;
-      }
-
       var getSatelliteDetail = result[0] as Satellite;
       var getSatelliteCommentCount = result[1] as int;
       var getSatelliteFatherComments = result[2] as List<SatelliteComment>;
@@ -122,6 +119,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         },
         orElse: () => null,
       );
+
+      if (!this.mounted) {
+        return;
+      }
 
       setState(() {
         _isLoading = false;
@@ -175,15 +176,22 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                 controller: _scrollController,
                 slivers: <Widget>[
                   SliverAppBar(
+                    elevation: 0.0,
                     centerTitle: true,
                     title: Text('帖子详情'),
+                    pinned: true,
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate([
-                      SatelliteHeader(
-                        item: _satellite,
-                        roleInfo: _roleInfo,
-                        showFollowBtn: true,
+                      Container(
+                        margin: EdgeInsets.only(
+                          bottom: ScreenUtil().setWidth(30),
+                        ),
+                        child: SatelliteHeader(
+                          item: _satellite,
+                          roleInfo: _roleInfo,
+                          showFollowBtn: true,
+                        ),
                       ),
                       SatelliteContent(
                         item: _satellite,

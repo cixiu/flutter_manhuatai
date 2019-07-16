@@ -191,7 +191,7 @@ class PostItem extends StatelessWidget {
             ),
             child: ExtendedText(
               content,
-              overflow: ExtendedTextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis,
               specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
               maxLines: 3,
               style: TextStyle(
@@ -213,14 +213,14 @@ class PostItem extends StatelessWidget {
 
     images.forEach((item) {
       String url = '';
-      int width = 0;
-      int height = 0;
+      double width = 0;
+      double height = 0;
       String imgUrl = (item as String).replaceAllMapped(
         reg,
         (matches) {
           List<String> imgWidthAndHeight = matches[1].split(':');
-          width = int.parse(imgWidthAndHeight[0]);
-          height = int.parse(imgWidthAndHeight[1]);
+          width = double.parse(imgWidthAndHeight[0]);
+          height = double.parse(imgWidthAndHeight[1]);
           return '';
         },
       );

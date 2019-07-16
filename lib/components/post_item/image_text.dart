@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
@@ -13,7 +14,7 @@ class ImageText extends SpecialText {
   }) : super(ImageText.flag, "}", textStyle);
 
   @override
-  TextSpan finishText() {
+  InlineSpan finishText() {
     var key = toString();
     var content = getContent();
     // if (ImageUitl.instance.imageMap.containsKey(key)) {

@@ -116,7 +116,7 @@ class _ComicReadPageState extends State<ComicReadPage>
             readerChapter.chapterImage.middle.replaceAll(RegExp(r'\$\$'), '$i');
         var _imageStream =
             Image.network(imgUrl).image.resolve(ImageConfiguration());
-        _imageStream.addListener(
+        _imageStream.addListener(ImageStreamListener(
           (info, _) {
             if (!this.mounted) {
               return;
@@ -158,7 +158,7 @@ class _ComicReadPageState extends State<ComicReadPage>
               print(_customImageListState.imageNum);
             }
           },
-        );
+        ));
       }
     }
 
@@ -238,7 +238,7 @@ class _ComicReadPageState extends State<ComicReadPage>
         var _imageStream =
             Image.network(imgUrl).image.resolve(ImageConfiguration());
 
-        _imageStream.addListener(
+        _imageStream.addListener(ImageStreamListener(
           (info, _) {
             if (!this.mounted) {
               return;
@@ -277,7 +277,7 @@ class _ComicReadPageState extends State<ComicReadPage>
               });
             }
           },
-        );
+        ));
       }
     }
   }

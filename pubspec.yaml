@@ -31,13 +31,13 @@ dependencies:
   shared_preferences: ^0.5.1+1
   oktoast: ^2.1.5
   flutter_screenutil: ^0.5.2
-  extended_nested_scroll_view: ^0.3.4
+  extended_nested_scroll_view: ^0.3.6
   transparent_image: ^0.1.0
   intl: ^0.15.8
   device_info: ^0.4.0+1
   html_unescape: ^1.0.1+2
-  extended_text: ^0.5.8
-  extended_image: ^0.5.1
+  extended_text: ^0.6.0
+  extended_image: ^0.5.3
   flutter_statusbarcolor: ^0.2.0
 
 dependency_overrides:
