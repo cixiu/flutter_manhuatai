@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -201,6 +203,34 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
     }
   }
 
+  Future<void> navigateToSatelliteDetail(
+    BuildContext context,
+    Satellite item,
+    int index,
+  ) async {
+    Satellite _satellite = await Application.router.navigateTo(
+      context,
+      '${Routes.satelliteDetail}?satelliteId=${item.id}',
+    );
+    if (_satellite != null) {
+      _updateSatellite(_satellite, index);
+    }
+  }
+
+  void _updateSatellite(Satellite item, int index) {
+    var _item = _followTimeLineList[index].satellite;
+    setState(() {
+      if (_item.issupport != item.issupport) {
+        _item.issupport = item.issupport;
+        if (item.issupport == 1) {
+          _item.supportnum += 1;
+        } else {
+          _item.supportnum -= 1;
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -353,16 +383,32 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
 
                             return Column(
                               children: <Widget>[
-                                SatelliteHeader(
-                                  item: item.satellite,
-                                  roleInfo: roleInfo,
-                                  showFollowBtn: false,
+                                Container(
+                                  margin: EdgeInsets.only(
+                                    top: ScreenUtil().setWidth(30),
+                                    bottom: ScreenUtil().setWidth(20),
+                                  ),
+                                  child: SatelliteHeader(
+                                    item: item.satellite,
+                                    roleInfo: roleInfo,
+                                    showFollowBtn: false,
+                                  ),
                                 ),
-                                SatelliteContent(
-                                  item: item.satellite,
-                                  supportSatellite: () {
-                                    _supportSatellite(index);
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    navigateToSatelliteDetail(
+                                      context,
+                                      item.satellite,
+                                      index,
+                                    );
                                   },
+                                  child: SatelliteContent(
+                                    item: item.satellite,
+                                    supportSatellite: () {
+                                      _supportSatellite(index);
+                                    },
+                                  ),
                                 ),
                               ],
                             );

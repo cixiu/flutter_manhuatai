@@ -78,26 +78,10 @@ class SatelliteContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  if (!isDetail) {
-                    navigateToSatelliteDetail(context);
-                  }
-                },
-                child: _buildContentTitle(),
-              ),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  if (!isDetail) {
-                    navigateToSatelliteDetail(context);
-                  }
-                },
-                child: _buildContentContent(context),
-              ),
+              _buildContentTitle(),
+              _buildContentContent(context),
               isDetail ? Container() : _buildContentImages(context),
-              isDetail ? Container() : _buildContentStarName(),
+              _buildContentStarName(),
             ],
           ),
         ),
@@ -182,7 +166,7 @@ class SatelliteContent extends StatelessWidget {
                 maxLines: isDetail ? null : 3,
                 style: TextStyle(
                   color: Colors.grey[800],
-                  fontSize: ScreenUtil().setSp(24),
+                  fontSize: ScreenUtil().setSp(28),
                   height: 1.2,
                 ),
               ),
@@ -259,7 +243,7 @@ class SatelliteContent extends StatelessWidget {
                             maxLines: isDetail ? null : 3,
                             style: TextStyle(
                               color: Colors.grey[800],
-                              fontSize: ScreenUtil().setSp(24),
+                              fontSize: ScreenUtil().setSp(28),
                               height: 1.2,
                             ),
                           );
@@ -321,6 +305,7 @@ class SatelliteContent extends StatelessWidget {
                           fit: BoxFit.cover,
                           autoSetSize: false,
                           knowImageSize: false,
+                          needHero: false,
                         ),
                       );
                     }
@@ -561,6 +546,7 @@ class SatelliteContent extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(
+        top: isDetail ? ScreenUtil().setWidth(40) : 0.0,
         bottom: ScreenUtil().setWidth(20),
       ),
       child: Row(
@@ -617,9 +603,9 @@ class SatelliteContent extends StatelessWidget {
           _buildContentBottomActionItem(
             text: '${item.replynum}',
             icon: 'lib/images/icon_pinglun_pinglun_m.png',
-            onTap: () {
-              navigateToSatelliteDetail(context);
-            },
+            // onTap: () {
+            //   navigateToSatelliteDetail(context);
+            // },
           ),
           _buildContentBottomActionItem(
               text: '${item.supportnum.toInt()}',
@@ -645,7 +631,7 @@ class SatelliteContent extends StatelessWidget {
   }) {
     return Expanded(
       child: InkResponse(
-        onTap: onTap ?? () {},
+        onTap: onTap,
         containedInkWell: true,
         highlightShape: BoxShape.rectangle,
         child: Container(

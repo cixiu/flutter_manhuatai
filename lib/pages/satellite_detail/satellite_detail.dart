@@ -16,6 +16,8 @@ import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
 import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
 
+import 'components/satellite_detail_content_sliver_list.dart';
+
 /// 帖子详情页
 class SatelliteDetailPage extends StatefulWidget {
   final int satelliteId;
@@ -161,46 +163,71 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     print('加载更多');
   }
 
+  // 点赞帖子
+  Future<void> _supportSatellite() async {
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
+    var success = await Api.supportSatellite(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      satelliteId: _satellite.id,
+      status: _satellite.issupport == 1 ? 0 : 1,
+    );
+
+    if (success) {
+      setState(() {
+        if (_satellite.issupport == 1) {
+          _satellite.issupport = 0;
+          _satellite.supportnum -= 1;
+        } else {
+          _satellite.issupport = 1;
+          _satellite.supportnum += 1;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: RefreshIndicator(
-        key: refreshIndicatorKey,
-        onRefresh: _handleRefresh,
-        child: _isLoading
-            ? Container()
-            : CustomScrollView(
-                physics: ClampingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, _satellite);
+        return false;
+      },
+      child: Scaffold(
+        body: RefreshIndicator(
+          key: refreshIndicatorKey,
+          onRefresh: _handleRefresh,
+          child: _isLoading
+              ? Container()
+              : CustomScrollView(
+                  physics: ClampingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  controller: _scrollController,
+                  slivers: <Widget>[
+                    SliverAppBar(
+                      elevation: 0.0,
+                      centerTitle: true,
+                      title: Text('帖子详情'),
+                      pinned: true,
+                    ),
+                    SatelliteDetailContentSliverList(
+                      satellite: _satellite,
+                      roleInfo: _roleInfo,
+                      supportSatellite: _supportSatellite,
+                    ),
+                  ],
                 ),
-                controller: _scrollController,
-                slivers: <Widget>[
-                  SliverAppBar(
-                    elevation: 0.0,
-                    centerTitle: true,
-                    title: Text('帖子详情'),
-                    pinned: true,
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: ScreenUtil().setWidth(30),
-                        ),
-                        child: SatelliteHeader(
-                          item: _satellite,
-                          roleInfo: _roleInfo,
-                          showFollowBtn: true,
-                        ),
-                      ),
-                      SatelliteContent(
-                        item: _satellite,
-                        isDetail: true,
-                      )
-                    ]),
-                  ),
-                ],
-              ),
+        ),
       ),
     );
   }

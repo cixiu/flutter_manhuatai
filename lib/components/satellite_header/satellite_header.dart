@@ -91,7 +91,7 @@ class SatelliteHeader extends StatelessWidget {
                           item.username,
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: ScreenUtil().setSp(24),
+                            fontSize: ScreenUtil().setSp(28),
                           ),
                         ),
                       ),

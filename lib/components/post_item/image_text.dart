@@ -33,11 +33,11 @@ class ImageText extends SpecialText {
       imageHeight: size,
       start: start,
       fit: BoxFit.fill,
-      // margin: EdgeInsets.only(
-      //   left: 1.0,
-      //   top: 1.0,
-      //   right: 1.0,
-      // ),
+      margin: EdgeInsets.only(
+        left: 1.0,
+        top: 1.0,
+        right: 1.0,
+      ),
     );
     // }
 

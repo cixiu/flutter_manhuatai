@@ -171,8 +171,8 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
     });
   }
 
-  Future<void> _supportSatellite(int index) async {
-    var item = _recommendSatelliteList[index];
+  Future<void> _supportSatellite(Satellite item, int index) async {
+    // var item = _recommendSatelliteList[index];
     Store<AppState> store = StoreProvider.of(context);
     var guestInfo = store.state.guestInfo;
     var userInfo = store.state.userInfo;
@@ -201,6 +201,20 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
         }
       });
     }
+  }
+
+  void _updateSatellite(Satellite item, int index) {
+    var _item = _recommendSatelliteList[index];
+    setState(() {
+      if (_item.issupport != item.issupport) {
+        _item.issupport = item.issupport;
+        if (item.issupport == 1) {
+          _item.supportnum += 1;
+        } else {
+          _item.supportnum -= 1;
+        }
+      }
+    });
   }
 
   @override
@@ -232,6 +246,7 @@ class _ManhuataiRecommendState extends State<ManhuataiRecommend>
                   userRoleInfoList: _userRoleInfoList,
                   hasMore: _hasMore,
                   supportSatellite: _supportSatellite,
+                  updateSatellite: _updateSatellite,
                 ),
               ],
             ),
