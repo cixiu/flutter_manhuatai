@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
+import 'package:flutter_manhuatai/pages/satellite_detail/components/satellite_detail_comment_sliver_list.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:redux/redux.dart';
@@ -36,6 +38,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   bool _isLoading = true;
   bool _hasMore = true;
   bool _isLoadingMore = false;
+  bool _isLoadingError = false;
   int page = 1;
 
   ScrollController _scrollController = ScrollController();
@@ -134,12 +137,17 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         _childrenCommentList = getSatelliteChildrenCommentsRes;
         _roleInfo = roleInfo;
       });
-      print(_satellite.title);
-      print(_satelliteCommentCount);
-      print(_fatherCommentList.length);
-      print(_childrenCommentList.length);
+      // print(_satellite.title);
+      // print(_satelliteCommentCount);
+      // print(_fatherCommentList.length);
+      // print(_childrenCommentList.length);
     } catch (e) {
-      print(e);
+      if (this.mounted) {
+        setState(() {
+          _isLoadingError = true;
+        });
+        print(e);
+      }
     }
   }
 
@@ -203,31 +211,93 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         return false;
       },
       child: Scaffold(
-        body: RefreshIndicator(
-          key: refreshIndicatorKey,
-          onRefresh: _handleRefresh,
-          child: _isLoading
-              ? Container()
-              : CustomScrollView(
-                  physics: ClampingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
+        body: _isLoadingError
+            ? Center(
+                child: Container(
+                  width: 200,
+                  child: FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLoadingError = false;
+                      });
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        showRefreshLoading();
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          '加载失败，点击重试',
+                        ),
+                        Icon(Icons.refresh),
+                      ],
+                    ),
                   ),
-                  controller: _scrollController,
-                  slivers: <Widget>[
-                    SliverAppBar(
-                      elevation: 0.0,
-                      centerTitle: true,
-                      title: Text('帖子详情'),
-                      pinned: true,
-                    ),
-                    SatelliteDetailContentSliverList(
-                      satellite: _satellite,
-                      roleInfo: _roleInfo,
-                      supportSatellite: _supportSatellite,
-                    ),
-                  ],
                 ),
-        ),
+              )
+            : RefreshIndicator(
+                key: refreshIndicatorKey,
+                onRefresh: _handleRefresh,
+                child: _isLoading
+                    ? Container()
+                    : CustomScrollView(
+                        physics: ClampingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        controller: _scrollController,
+                        slivers: <Widget>[
+                          SliverAppBar(
+                            elevation: 0.0,
+                            centerTitle: true,
+                            title: Text('帖子详情'),
+                            pinned: true,
+                          ),
+                          SatelliteDetailContentSliverList(
+                            satellite: _satellite,
+                            roleInfo: _roleInfo,
+                            supportSatellite: _supportSatellite,
+                          ),
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: CommonSliverPersistentHeaderDelegate(
+                              height: ScreenUtil().setWidth(80),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil().setWidth(30),
+                                ),
+                                color: Colors.white,
+                                height: ScreenUtil().setWidth(80),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      '评论 （$_satelliteCommentCount）',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: ScreenUtil().setWidth(32),
+                                      ),
+                                    ),
+                                    Text(
+                                      '最热',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: ScreenUtil().setWidth(24),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SatelliteDetailCommentSliverList(
+                            fatherCommentList: _fatherCommentList,
+                            hasMore: _hasMore,
+                          ),
+                        ],
+                      ),
+              ),
       ),
     );
   }

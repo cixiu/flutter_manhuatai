@@ -96,36 +96,39 @@ class SatelliteContent extends StatelessWidget {
             margin: EdgeInsets.only(
               bottom: ScreenUtil().setWidth(20),
             ),
-            child: Row(
-              children: <Widget>[
-                item.istop == 1
-                    ? Container(
-                        margin: EdgeInsets.only(
-                          right: ScreenUtil().setWidth(10),
-                        ),
-                        child: Image.asset(
-                          'lib/images/icon_task_zhiding_words_bg.png',
-                          width: ScreenUtil().setWidth(70),
-                          height: ScreenUtil().setWidth(36),
-                        ),
-                      )
-                    : Container(),
-                item.iselite == 1
-                    ? Container(
-                        margin: EdgeInsets.only(
-                          right: ScreenUtil().setWidth(10),
-                        ),
-                        child: Image.asset(
-                          'lib/images/icon_task_jiajing_words_bg.png',
-                          width: ScreenUtil().setWidth(70),
-                          height: ScreenUtil().setWidth(36),
-                        ),
-                      )
-                    : Container(),
-                Expanded(
-                  child: Text(
-                    item.title.replaceAll('\n', ' '),
-                    overflow: TextOverflow.ellipsis,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: item.istop == 1
+                        ? Container(
+                            margin: EdgeInsets.only(
+                              right: ScreenUtil().setWidth(10),
+                            ),
+                            child: Image.asset(
+                              'lib/images/icon_task_zhiding_words_bg.png',
+                              width: ScreenUtil().setWidth(70),
+                              height: ScreenUtil().setWidth(36),
+                            ),
+                          )
+                        : Text(''),
+                  ),
+                  WidgetSpan(
+                    child: item.iselite == 1
+                        ? Container(
+                            margin: EdgeInsets.only(
+                              right: ScreenUtil().setWidth(10),
+                            ),
+                            child: Image.asset(
+                              'lib/images/icon_task_jiajing_words_bg.png',
+                              width: ScreenUtil().setWidth(70),
+                              height: ScreenUtil().setWidth(36),
+                            ),
+                          )
+                        : Text(''),
+                  ),
+                  TextSpan(
+                    text: item.title.replaceAll('\n', ' '),
                     style: TextStyle(
                       color: item.titleColor.isEmpty
                           ? Colors.black
@@ -133,9 +136,9 @@ class SatelliteContent extends StatelessWidget {
                       fontSize: ScreenUtil().setSp(32),
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           )
         : Container();

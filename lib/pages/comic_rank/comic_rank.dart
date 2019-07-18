@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -240,34 +241,5 @@ class _ComicRankPageState extends State<ComicRankPage> with RefreshCommonState {
         style: style,
       ),
     );
-  }
-}
-
-class CommonSliverPersistentHeaderDelegate
-    extends SliverPersistentHeaderDelegate {
-  final double height;
-  final Widget child;
-
-  CommonSliverPersistentHeaderDelegate({
-    this.height,
-    this.child,
-  });
-
-  @override
-  double get minExtent => height;
-
-  @override
-  double get maxExtent => height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return child;
-  }
-
-  @override
-  bool shouldRebuild(CommonSliverPersistentHeaderDelegate oldDelegate) {
-    //print("shouldRebuild---------------");
-    return oldDelegate != this;
   }
 }
