@@ -1,4 +1,5 @@
 import 'package:extended_text/extended_text.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
@@ -7,13 +8,20 @@ import 'package:flutter_manhuatai/components/post_item/post_special_text_span_bu
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SatelliteDetailCommentSliverList extends StatelessWidget {
-  final List<SatelliteComment> fatherCommentList;
+  final List<CommonSatelliteComment> fatherCommentList;
   final bool hasMore;
 
   SatelliteDetailCommentSliverList({
     this.fatherCommentList,
     this.hasMore,
   });
+
+  String _formatSupportCount(int count) {
+    if (count > 10000) {
+      return '${(count / 10000).toStringAsFixed(1)}万';
+    }
+    return count.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +53,26 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
                   bottom: ScreenUtil().setWidth(20),
                 ),
                 child: CommentUserHeader(
-                  item: item,
+                  item: item.fatherComment,
                 ),
               ),
               _buildFatherCommentContent(
                 context: context,
                 margin: margin,
-                content: item.content,
+                content: item.fatherComment.content,
               ),
+              item.childrenCommentList.length != 0
+                  ? _buildChildrenComments(
+                      context: context,
+                      margin: margin,
+                      fatherComment: item.fatherComment,
+                      childrenComments: item.childrenCommentList,
+                    )
+                  : Container(),
               _buildBottomActionIcons(
                 context: context,
                 margin: margin,
-                supportCount: item.supportcount,
+                supportCount: item.fatherComment.supportcount,
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -88,8 +104,72 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
         specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
         style: TextStyle(
           color: Colors.grey[800],
-          fontSize: ScreenUtil().setSp(28),
+          fontSize: ScreenUtil().setSp(26),
         ),
+      ),
+    );
+  }
+
+  // 二级评论
+  Widget _buildChildrenComments({
+    BuildContext context,
+    EdgeInsetsGeometry margin,
+    SatelliteComment fatherComment,
+    List<SatelliteComment> childrenComments,
+  }) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      margin: margin,
+      padding: EdgeInsets.symmetric(
+        vertical: ScreenUtil().setWidth(20),
+        horizontal: ScreenUtil().setWidth(15),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(
+          ScreenUtil().setWidth(8),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(
+              bottom: ScreenUtil().setWidth(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: childrenComments.take(2).map((comment) {
+                return ExtendedText(
+                  '@${comment.uname}：：${comment.content}',
+                  specialTextSpanBuilder: PostSpecialTextSpanBuilder(
+                    replyStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: ScreenUtil().setSp(22),
+                      fontWeight: FontWeight.bold,
+                    ),
+                    replyTap: () {
+                      print('${comment.uname}: ${comment.uid}');
+                    },
+                  ),
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontSize: ScreenUtil().setSp(22),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          Container(
+            child: Text(
+              '共${fatherComment.revertcount}条回复>',
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: ScreenUtil().setWidth(22),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -116,7 +196,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
             ),
           ),
           Container(
-            width: ScreenUtil().setWidth(80),
+            width: ScreenUtil().setWidth(100),
             margin: EdgeInsets.only(
               left: ScreenUtil().setWidth(20),
             ),
@@ -128,7 +208,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
                   height: ScreenUtil().setWidth(40),
                 ),
                 Text(
-                  '${supportCount == 0 ? ' ' : supportCount}',
+                  '${supportCount == 0 ? ' ' : _formatSupportCount(supportCount)}',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: ScreenUtil().setSp(24),
@@ -141,4 +221,14 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
       ),
     );
   }
+}
+
+class CommonSatelliteComment {
+  final SatelliteComment fatherComment;
+  final List<SatelliteComment> childrenCommentList;
+
+  CommonSatelliteComment({
+    this.fatherComment,
+    this.childrenCommentList,
+  });
 }

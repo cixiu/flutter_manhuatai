@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
+import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
@@ -44,8 +45,8 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   ScrollController _scrollController = ScrollController();
   Satellite _satellite;
   int _satelliteCommentCount;
-  List<SatelliteComment> _fatherCommentList;
-  List<SatelliteComment> _childrenCommentList;
+  List<CommonSatelliteComment> _fatherCommentList;
+  // List<SatelliteComment> _childrenCommentList;
   UserRoleInfo.Data _roleInfo;
 
   @override
@@ -88,29 +89,11 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         ))
         ..add(Api.getSatelliteCommentCount(
           ssid: widget.satelliteId,
-        ))
-        ..add(Api.getSatelliteFatherComments(
-          authorization: authorization,
-          page: page,
-          ssid: widget.satelliteId,
         ));
       var result = await Future.wait(futures);
 
       var getSatelliteDetail = result[0] as Satellite;
       var getSatelliteCommentCount = result[1] as int;
-      var getSatelliteFatherComments = result[2] as List<SatelliteComment>;
-
-      List<int> commentIds =
-          getSatelliteFatherComments.map((item) => item.id).toList();
-
-      // 获取帖子的一级评论下需要显示的二级评论
-      var getSatelliteChildrenCommentsRes =
-          await Api.getSatelliteChildrenComments(
-        type: type,
-        openid: openid,
-        authorization: authorization,
-        commentIds: commentIds,
-      );
 
       // 获取帖子的作者的角色信息
       var userRoleInfo = await Api.getUserroleInfoByUserids(
@@ -125,6 +108,13 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         orElse: () => null,
       );
 
+      var fatherCommentList = await _getCommentListInfo(
+        type: type,
+        openid: openid,
+        authorization: authorization,
+        starId: getSatelliteDetail.starid,
+      );
+
       if (!this.mounted) {
         return;
       }
@@ -133,14 +123,9 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         _isLoading = false;
         _satellite = getSatelliteDetail;
         _satelliteCommentCount = getSatelliteCommentCount;
-        _fatherCommentList = getSatelliteFatherComments;
-        _childrenCommentList = getSatelliteChildrenCommentsRes;
+        _fatherCommentList = fatherCommentList;
         _roleInfo = roleInfo;
       });
-      // print(_satellite.title);
-      // print(_satelliteCommentCount);
-      // print(_fatherCommentList.length);
-      // print(_childrenCommentList.length);
     } catch (e) {
       if (this.mounted) {
         setState(() {
@@ -168,7 +153,94 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         ? userInfo.authData.authcode
         : guestInfo.authData.authcode;
 
+    var fatherCommentList = await _getCommentListInfo(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      starId: _satellite.starid,
+    );
+    _isLoadingMore = false;
+
+    if (!this.mounted) {
+      return;
+    }
+
+    setState(() {
+      if (fatherCommentList.length == 0) {
+        _hasMore = false;
+      }
+      _fatherCommentList.addAll(fatherCommentList);
+    });
+
     print('加载更多');
+  }
+
+  Future<List<CommonSatelliteComment>> _getCommentListInfo({
+    String type,
+    String openid,
+    String authorization,
+    int starId,
+  }) async {
+    var getSatelliteFatherComments = await Api.getSatelliteFatherComments(
+      authorization: authorization,
+      page: page,
+      ssid: widget.satelliteId,
+    );
+    List<int> commentIds =
+        getSatelliteFatherComments.map((item) => item.id).toList();
+    // 获取帖子的一级评论下需要显示的二级评论
+    var getSatelliteChildrenCommentsRes =
+        await Api.getSatelliteChildrenComments(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      commentIds: commentIds,
+    );
+
+    List<int> userIds = [];
+    getSatelliteChildrenCommentsRes.forEach((comment) {
+      if (!userIds.contains(comment.useridentifier)) {
+        userIds.add(comment.useridentifier);
+      }
+    });
+
+    var getCommentUserRes = await Api.getCommentUser(
+      relationId: starId,
+      opreateType: 2,
+      userids: userIds,
+    );
+
+    Map<int, CommentUser.Data> commentUserMap = Map();
+    if (getCommentUserRes.data != null) {
+      getCommentUserRes.data.forEach((item) {
+        if (commentUserMap[item.uid] == null) {
+          commentUserMap[item.uid] = item;
+        }
+      });
+    }
+
+    getSatelliteChildrenCommentsRes =
+        getSatelliteChildrenCommentsRes.map((child) {
+      if (commentUserMap[child.useridentifier] != null) {
+        var commentUser = commentUserMap[child.useridentifier];
+        child.uid = commentUser.uid;
+        child.uname = commentUser.uname;
+      }
+      return child;
+    }).toList();
+
+    return getSatelliteFatherComments.map((item) {
+      List<SatelliteComment> childrenCommentList = [];
+      getSatelliteChildrenCommentsRes.forEach((child) {
+        if (child.fatherid == item.id) {
+          childrenCommentList.add(child);
+        }
+      });
+      return CommonSatelliteComment(
+        fatherComment: item,
+        childrenCommentList: childrenCommentList,
+      );
+    }).toList();
   }
 
   // 点赞帖子
