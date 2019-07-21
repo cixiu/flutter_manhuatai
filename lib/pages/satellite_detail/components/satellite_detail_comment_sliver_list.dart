@@ -9,13 +9,17 @@ import 'package:flutter_manhuatai/components/post_item/post_special_text_span_bu
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
+typedef void SupportComment(SatelliteComment comment);
+
 class SatelliteDetailCommentSliverList extends StatelessWidget {
   final List<CommonSatelliteComment> fatherCommentList;
   final bool hasMore;
+  final SupportComment supportComment;
 
   SatelliteDetailCommentSliverList({
     this.fatherCommentList,
     this.hasMore,
+    this.supportComment,
   });
 
   String _formatSupportCount(int count) {
@@ -73,7 +77,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
               _buildBottomActionIcons(
                 context: context,
                 margin: margin,
-                supportCount: item.fatherComment.supportcount,
+                comment: item.fatherComment,
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -212,7 +216,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
   Widget _buildBottomActionIcons({
     BuildContext context,
     EdgeInsetsGeometry margin,
-    int supportCount,
+    SatelliteComment comment,
   }) {
     return Container(
       margin: margin,
@@ -229,26 +233,36 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
               height: ScreenUtil().setWidth(40),
             ),
           ),
-          Container(
-            width: ScreenUtil().setWidth(100),
-            margin: EdgeInsets.only(
-              left: ScreenUtil().setWidth(20),
-            ),
-            child: Row(
-              children: <Widget>[
-                Image.asset(
-                  'lib/images/icon_pinglun_weidianzan_m.png',
-                  width: ScreenUtil().setWidth(40),
-                  height: ScreenUtil().setWidth(40),
-                ),
-                Text(
-                  '${supportCount == 0 ? ' ' : _formatSupportCount(supportCount)}',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: ScreenUtil().setSp(24),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              if (supportComment != null) {
+                supportComment(comment);
+              }
+            },
+            child: Container(
+              width: ScreenUtil().setWidth(100),
+              margin: EdgeInsets.only(
+                left: ScreenUtil().setWidth(20),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Image.asset(
+                    comment.status == 1
+                        ? 'lib/images/icon_pinglun_weidianzan_m.png'
+                        : 'lib/images/icon_pinglun_yidianzan_m.png',
+                    width: ScreenUtil().setWidth(40),
+                    height: ScreenUtil().setWidth(40),
                   ),
-                ),
-              ],
+                  Text(
+                    '${comment.supportcount == 0 ? ' ' : _formatSupportCount(comment.supportcount)}',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: ScreenUtil().setSp(24),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

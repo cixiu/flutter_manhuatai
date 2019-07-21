@@ -61,4 +61,20 @@ class HttpRequest {
     );
     return response.data;
   }
+
+  static Future<Map> put(
+    String url, {
+    Map<String, dynamic> data,
+    Map<String, dynamic> params,
+    Options options,
+  }) async {
+    _proxyClient();
+    Response<Map> response = await dio.put<Map>(
+      url,
+      data: data,
+      queryParameters: params,
+      options: options,
+    );
+    return response.data;
+  }
 }

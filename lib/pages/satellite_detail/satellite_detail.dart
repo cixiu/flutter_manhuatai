@@ -1,24 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
-import 'package:flutter_manhuatai/pages/satellite_detail/components/satellite_detail_comment_sliver_list.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:redux/redux.dart';
-
-import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
-import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
+import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/common/model/satellite.dart';
-import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 
-import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
-import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
+import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
+import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
+import 'package:flutter_manhuatai/common/model/satellite.dart';
+import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 
+import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
+import 'components/satellite_detail_comment_sliver_list.dart';
 import 'components/satellite_detail_content_sliver_list.dart';
 
 /// 帖子详情页
@@ -289,6 +287,47 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     }
   }
 
+  // 点赞或者取消点赞
+  Future<void> _supportComment(SatelliteComment comment) async {
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    if (userInfo.uid == null) {
+      showToast('点赞失败，请先登录');
+      return;
+    }
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var userIdentifier = userInfo.uid != null ? userInfo.uid : guestInfo.uid;
+    var userLevel = userInfo.uid != null ? userInfo.ulevel : guestInfo.ulevel;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
+    var success = await Api.supportComment(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      userIdentifier: userIdentifier,
+      userLevel: userLevel,
+      status: comment.status == 1 ? 0 : 1,
+      ssid: _satellite.id,
+      commentId: comment.id,
+    );
+
+    if (success) {
+      setState(() {
+        if (comment.status == 1) {
+          comment.status = 0;
+          comment.supportcount += 1;
+        } else {
+          comment.status = 1;
+          comment.supportcount -= 1;
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -380,6 +419,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                           SatelliteDetailCommentSliverList(
                             fatherCommentList: _fatherCommentList,
                             hasMore: _hasMore,
+                            supportComment: _supportComment,
                           ),
                         ],
                       ),

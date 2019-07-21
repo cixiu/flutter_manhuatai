@@ -881,4 +881,49 @@ class Api {
     );
     return (response['data'] as int);
   }
+
+  /// 帖子的评论点赞或者取消点赞
+  static Future<bool> supportComment({
+    int appId = 2,
+    String type = 'device',
+    @required String openid,
+    @required String authorization,
+    @required int commentId,
+    @required int userLevel,
+    @required int userIdentifier,
+    @required int ssid,
+    int siteId = 8,
+    int ssidType = 1,
+    @required status,
+  }) async {
+    final String url = 'http://community.321mh.com/comment/support/';
+
+    Map<String, dynamic> response = await HttpRequest.put(
+      url,
+      data: {
+        "appId": appId,
+        "auth_token": "$authorization",
+        "authorization": "Bearer $authorization",
+        "commentId": commentId,
+        "level": "$userLevel",
+        "openid": "$openid",
+        "siteId": siteId,
+        "ssid": '$ssid',
+        "ssidType": ssidType,
+        "status": status,
+        "type": "$type",
+        "userIdentifier": '$userIdentifier',
+        "userloglevel": 1
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authorization',
+        },
+      ),
+    );
+    if (response['data'] != true) {
+      return false;
+    }
+    return (response['data'] as bool);
+  }
 }
