@@ -199,6 +199,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
     List<int> userIds = [];
     getSatelliteChildrenCommentsRes.forEach((comment) {
+      var match = RegExp(r'{reply:“(\d+)”}').firstMatch(comment.content.trim());
+      if (match != null) {
+        userIds.add(int.tryParse(match.group(1)));
+      }
       if (!userIds.contains(comment.useridentifier)) {
         userIds.add(comment.useridentifier);
       }
@@ -231,14 +235,24 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
     return getSatelliteFatherComments.map((item) {
       List<SatelliteComment> childrenCommentList = [];
+      Map<int, CommentUser.Data> replyUserMap = {};
+
       getSatelliteChildrenCommentsRes.forEach((child) {
         if (child.fatherid == item.id) {
           childrenCommentList.add(child);
         }
+
+        var match = RegExp(r'{reply:“(\d+)”}').firstMatch(child.content.trim());
+        if (match != null) {
+          int replyCommentUserId = int.tryParse(match.group(1));
+          replyUserMap[replyCommentUserId] = commentUserMap[replyCommentUserId];
+        }
       });
+
       return CommonSatelliteComment(
         fatherComment: item,
         childrenCommentList: childrenCommentList,
+        replyUserMap: replyUserMap,
       );
     }).toList();
   }

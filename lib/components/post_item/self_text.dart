@@ -4,26 +4,26 @@ import 'package:flutter/material.dart';
 
 import 'post_special_text_span_builder.dart';
 
-class ReplyText extends SpecialText {
-  static const String flag = "{reply:";
+class SelfText extends SpecialText {
+  static const String flag = "@";
   final int start;
 
   /// whether show background for @somebody
   final bool showAtBackground;
 
   final BuilderType type;
-  final TextStyle replyStyle;
-  final VoidCallback replyTap;
+  final TextStyle selfStyle;
+  final VoidCallback selfTap;
 
-  ReplyText(
+  SelfText(
     TextStyle textStyle,
     SpecialTextGestureTapCallback onTap, {
     this.showAtBackground = false,
     this.type,
     this.start,
-    this.replyStyle,
-    this.replyTap,
-  }) : super(flag, "}", textStyle, onTap: onTap);
+    this.selfStyle,
+    this.selfTap,
+  }) : super(flag, "：", textStyle, onTap: onTap);
 
   @override
   TextSpan finishText() {
@@ -42,12 +42,12 @@ class ReplyText extends SpecialText {
 
             ///caret can move into special text
             deleteAll: true,
-            style: replyStyle ?? textStyle,
+            style: selfStyle ?? textStyle,
             recognizer: type == BuilderType.extendedText
                 ? (TapGestureRecognizer()
                   ..onTap = () {
-                    if (replyTap != null) {
-                      replyTap();
+                    if (selfTap != null) {
+                      selfTap();
                       return;
                     }
                     if (onTap != null) onTap(content);
@@ -58,12 +58,12 @@ class ReplyText extends SpecialText {
             text: content,
             actualText: content,
             start: start,
-            style: replyStyle ?? textStyle,
+            style: selfStyle ?? textStyle,
             recognizer: type == BuilderType.extendedText
                 ? (TapGestureRecognizer()
                   ..onTap = () {
-                    if (replyTap != null) {
-                      replyTap();
+                    if (selfTap != null) {
+                      selfTap();
                       return;
                     }
                     if (onTap != null) onTap(content);

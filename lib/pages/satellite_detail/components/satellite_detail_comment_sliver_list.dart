@@ -1,11 +1,13 @@
 import 'package:extended_text/extended_text.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
 import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
+import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
 class SatelliteDetailCommentSliverList extends StatelessWidget {
   final List<CommonSatelliteComment> fatherCommentList;
@@ -65,8 +67,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
                   ? _buildChildrenComments(
                       context: context,
                       margin: margin,
-                      fatherComment: item.fatherComment,
-                      childrenComments: item.childrenCommentList,
+                      item: item,
                     )
                   : Container(),
               _buildBottomActionIcons(
@@ -114,8 +115,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
   Widget _buildChildrenComments({
     BuildContext context,
     EdgeInsetsGeometry margin,
-    SatelliteComment fatherComment,
-    List<SatelliteComment> childrenComments,
+    CommonSatelliteComment item,
   }) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -135,26 +135,60 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(
-              bottom: ScreenUtil().setWidth(20),
+              bottom: ScreenUtil().setWidth(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: childrenComments.take(2).map((comment) {
-                return ExtendedText(
-                  '@${comment.uname}：：${comment.content}',
-                  specialTextSpanBuilder: PostSpecialTextSpanBuilder(
-                    replyStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: ScreenUtil().setSp(22),
-                      fontWeight: FontWeight.bold,
-                    ),
-                    replyTap: () {
-                      print('${comment.uname}: ${comment.uid}');
+              children: item.childrenCommentList.take(2).map((comment) {
+                String content = '';
+                var replyReg = RegExp(r'{reply:“(\d+)”}');
+                var match = replyReg.firstMatch(comment.content.trim());
+                int replyCommentUserId;
+                CommentUser.Data replyCommentUser;
+                // 如果这条评论是回复的另一条评论，则拼凑出回复评论的格式
+                if (match != null) {
+                  replyCommentUserId = int.tryParse(match.group(1));
+                  replyCommentUser = item.replyUserMap[replyCommentUserId];
+                  content = comment.content.replaceAllMapped(
+                    replyReg,
+                    (matches) {
+                      return '{reply:${replyCommentUser.uname}：}';
                     },
+                  );
+                  content = '@${comment.uname}： 回复 $content';
+                } else {
+                  content = '@${comment.uname}：：${comment.content}';
+                }
+
+                return Container(
+                  margin: EdgeInsets.only(
+                    bottom: ScreenUtil().setWidth(10),
                   ),
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: ScreenUtil().setSp(22),
+                  child: ExtendedText(
+                    '$content',
+                    specialTextSpanBuilder: PostSpecialTextSpanBuilder(
+                      selfStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil().setSp(22),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      selfTap: () {
+                        print('${comment.uname}: ${comment.uid}');
+                      },
+                      replyStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ScreenUtil().setSp(22),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      replyTap: () {
+                        print(
+                            '${replyCommentUser.uname}: ${replyCommentUser.uid}');
+                      },
+                    ),
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: ScreenUtil().setSp(22),
+                    ),
                   ),
                 );
               }).toList(),
@@ -162,7 +196,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
           ),
           Container(
             child: Text(
-              '共${fatherComment.revertcount}条回复>',
+              '共${item.fatherComment.revertcount}条回复>',
               style: TextStyle(
                 color: Colors.blue,
                 fontSize: ScreenUtil().setWidth(22),
@@ -226,9 +260,11 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
 class CommonSatelliteComment {
   final SatelliteComment fatherComment;
   final List<SatelliteComment> childrenCommentList;
+  final Map<int, CommentUser.Data> replyUserMap;
 
   CommonSatelliteComment({
     this.fatherComment,
     this.childrenCommentList,
+    this.replyUserMap,
   });
 }
