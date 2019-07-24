@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:redux/redux.dart';
@@ -47,12 +49,16 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   // List<SatelliteComment> _childrenCommentList;
   UserRoleInfo.Data _roleInfo;
 
+  TextEditingController _textEditingController = TextEditingController();
+  FocusNode _focusNode; // 底部输入框的焦点
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_listenenScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
+      _focusNode = FocusNode();
     });
   }
 
@@ -366,60 +372,172 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                 onRefresh: _handleRefresh,
                 child: _isLoading
                     ? Container()
-                    : CustomScrollView(
-                        physics: ClampingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        controller: _scrollController,
-                        slivers: <Widget>[
-                          SliverAppBar(
-                            elevation: 0.0,
-                            centerTitle: true,
-                            title: Text('帖子详情'),
-                            pinned: true,
-                          ),
-                          SatelliteDetailContentSliverList(
-                            satellite: _satellite,
-                            roleInfo: _roleInfo,
-                            supportSatellite: _supportSatellite,
-                          ),
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: CommonSliverPersistentHeaderDelegate(
-                              height: ScreenUtil().setWidth(80),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: ScreenUtil().setWidth(30),
+                    : Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: CustomScrollView(
+                              physics: ClampingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics(),
+                              ),
+                              controller: _scrollController,
+                              slivers: <Widget>[
+                                SliverAppBar(
+                                  elevation: 0.0,
+                                  centerTitle: true,
+                                  title: Text('帖子详情'),
+                                  pinned: true,
                                 ),
-                                color: Colors.white,
-                                height: ScreenUtil().setWidth(80),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      '评论 （$_satelliteCommentCount）',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: ScreenUtil().setWidth(32),
+                                SatelliteDetailContentSliverList(
+                                  satellite: _satellite,
+                                  roleInfo: _roleInfo,
+                                  supportSatellite: _supportSatellite,
+                                ),
+                                SliverPersistentHeader(
+                                  pinned: true,
+                                  delegate:
+                                      CommonSliverPersistentHeaderDelegate(
+                                    height: ScreenUtil().setWidth(80),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: ScreenUtil().setWidth(30),
+                                      ),
+                                      color: Colors.white,
+                                      height: ScreenUtil().setWidth(80),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Text(
+                                            '评论 （$_satelliteCommentCount）',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize:
+                                                  ScreenUtil().setWidth(32),
+                                            ),
+                                          ),
+                                          Text(
+                                            '最热',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize:
+                                                  ScreenUtil().setWidth(24),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Text(
-                                      '最热',
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ScreenUtil().setWidth(24),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
+                                ),
+                                SatelliteDetailCommentSliverList(
+                                  fatherCommentList: _fatherCommentList,
+                                  hasMore: _hasMore,
+                                  supportComment: _supportComment,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            constraints: BoxConstraints(
+                              minHeight: ScreenUtil().setWidth(100),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil().setWidth(30),
+                              vertical: ScreenUtil().setWidth(20),
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                top: BorderSide(
+                                  color: Colors.grey[350],
+                                  width: ScreenUtil().setWidth(1),
                                 ),
                               ),
                             ),
-                          ),
-                          SatelliteDetailCommentSliverList(
-                            fatherCommentList: _fatherCommentList,
-                            hasMore: _hasMore,
-                            supportComment: _supportComment,
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      minHeight: ScreenUtil().setWidth(60),
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey[350],
+                                        width: ScreenUtil().setWidth(1),
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        ScreenUtil().setWidth(8),
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: ExtendedTextField(
+                                      specialTextSpanBuilder:
+                                          PostSpecialTextSpanBuilder(
+                                        showAtBackground: true,
+                                        type: BuilderType.extendedTextField,
+                                      ),
+                                      controller: _textEditingController,
+                                      minLines: 1,
+                                      maxLines: 6,
+                                      focusNode: _focusNode,
+                                      strutStyle: StrutStyle(
+                                        forceStrutHeight: true,
+                                        fontSize: ScreenUtil().setSp(28),
+                                      ),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: ScreenUtil().setSp(28),
+                                      ),
+                                      decoration: InputDecoration(
+                                        hintText: '神评机会近在眼前~',
+                                        border: InputBorder.none,
+                                        hintStyle: TextStyle(
+                                          fontSize: ScreenUtil().setWidth(28),
+                                          color: Colors.grey[350],
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil().setWidth(10),
+                                          vertical: ScreenUtil().setWidth(10),
+                                        ),
+                                      ),
+                                      //textDirection: TextDirection.rtl,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    FocusScope.of(context)
+                                        .requestFocus(_focusNode);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: ScreenUtil().setWidth(20),
+                                    ),
+                                    child: Image.asset(
+                                      'lib/images/ico_expression.png',
+                                      width: ScreenUtil().setWidth(44),
+                                      height: ScreenUtil().setWidth(44),
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    print(_textEditingController.text);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: ScreenUtil().setWidth(20),
+                                    ),
+                                    child: Text(
+                                      '发表',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: ScreenUtil().setSp(32),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

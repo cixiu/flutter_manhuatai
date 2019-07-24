@@ -81,6 +81,7 @@ class CommentUserHeader extends StatelessWidget {
                     margin: EdgeInsets.only(
                       right: ScreenUtil().setWidth(10),
                     ),
+                    height:  ScreenUtil().setSp(42),
                     child: Text(
                       item.uname,
                       style: TextStyle(
