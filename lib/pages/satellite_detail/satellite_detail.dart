@@ -377,7 +377,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).autofocus(_focusNode);
+    // FocusScope.of(context).autofocus(_focusNode);
     var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     if (keyboardHeight > 0) {
       activeEmojiGird = false;
@@ -387,6 +387,12 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
     return WillPopScope(
       onWillPop: () async {
+        if (showCustomKeyBoard) {
+          setState(() {
+            activeEmojiGird = false;
+          });
+          return false;
+        }
         Navigator.pop(context, _satellite);
         return false;
       },
@@ -424,65 +430,75 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                     : Column(
                         children: <Widget>[
                           Expanded(
-                            child: CustomScrollView(
-                              physics: ClampingScrollPhysics(
-                                parent: AlwaysScrollableScrollPhysics(),
-                              ),
-                              controller: _scrollController,
-                              slivers: <Widget>[
-                                SliverAppBar(
-                                  elevation: 0.0,
-                                  centerTitle: true,
-                                  title: Text('帖子详情'),
-                                  pinned: true,
+                            child: GestureDetector(
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                if (activeEmojiGird) {
+                                  setState(() {
+                                    activeEmojiGird = false;
+                                  });
+                                }
+                              },
+                              child: CustomScrollView(
+                                physics: ClampingScrollPhysics(
+                                  parent: AlwaysScrollableScrollPhysics(),
                                 ),
-                                SatelliteDetailContentSliverList(
-                                  satellite: _satellite,
-                                  roleInfo: _roleInfo,
-                                  supportSatellite: _supportSatellite,
-                                ),
-                                SliverPersistentHeader(
-                                  pinned: true,
-                                  delegate:
-                                      CommonSliverPersistentHeaderDelegate(
-                                    height: ScreenUtil().setWidth(80),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil().setWidth(30),
-                                      ),
-                                      color: Colors.white,
+                                controller: _scrollController,
+                                slivers: <Widget>[
+                                  SliverAppBar(
+                                    elevation: 0.0,
+                                    centerTitle: true,
+                                    title: Text('帖子详情'),
+                                    pinned: true,
+                                  ),
+                                  SatelliteDetailContentSliverList(
+                                    satellite: _satellite,
+                                    roleInfo: _roleInfo,
+                                    supportSatellite: _supportSatellite,
+                                  ),
+                                  SliverPersistentHeader(
+                                    pinned: true,
+                                    delegate:
+                                        CommonSliverPersistentHeaderDelegate(
                                       height: ScreenUtil().setWidth(80),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            '评论 （$_satelliteCommentCount）',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize:
-                                                  ScreenUtil().setWidth(32),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil().setWidth(30),
+                                        ),
+                                        color: Colors.white,
+                                        height: ScreenUtil().setWidth(80),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              '评论 （$_satelliteCommentCount）',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize:
+                                                    ScreenUtil().setWidth(32),
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            '最热',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize:
-                                                  ScreenUtil().setWidth(24),
+                                            Text(
+                                              '最热',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize:
+                                                    ScreenUtil().setWidth(24),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SatelliteDetailCommentSliverList(
-                                  fatherCommentList: _fatherCommentList,
-                                  hasMore: _hasMore,
-                                  supportComment: _supportComment,
-                                ),
-                              ],
+                                  SatelliteDetailCommentSliverList(
+                                    fatherCommentList: _fatherCommentList,
+                                    hasMore: _hasMore,
+                                    supportComment: _supportComment,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Container(
@@ -563,8 +579,8 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                     update(() {
                                       setState(() {
                                         activeEmojiGird = true;
-                                        FocusScope.of(context)
-                                            .requestFocus(_focusNode);
+                                        // FocusScope.of(context)
+                                        //     .requestFocus(_focusNode);
                                       });
                                     });
                                   },
@@ -581,7 +597,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    print(_textEditingController.value);
+                                    print(_value);
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(
@@ -627,14 +643,15 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         ),
       ),
       child: GridView.builder(
-        padding: EdgeInsets.symmetric(
-          horizontal: ScreenUtil().setWidth(40),
-          vertical: ScreenUtil().setWidth(30),
-        ),
+        // padding: EdgeInsets.symmetric(
+        //   horizontal: ScreenUtil().setWidth(40),
+        //   vertical: ScreenUtil().setWidth(30),
+        // ),
+        padding: EdgeInsets.all(0.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 6,
-          crossAxisSpacing: 40.0,
-          mainAxisSpacing: 40.0,
+          crossAxisSpacing: 0.0,
+          mainAxisSpacing: 0.0,
         ),
         itemBuilder: (context, index) {
           var key = EmojiUitl.instance.emojiList[index];
@@ -643,8 +660,14 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
             onTap: () {
               _insertText('$key');
             },
-            child: Image.asset(
-              EmojiUitl.instance.emojiMap['$key'],
+            child: Container(
+              child: Center(
+                child: Image.asset(
+                  EmojiUitl.instance.emojiMap['$key'],
+                  width: ScreenUtil().setWidth(60),
+                  height: ScreenUtil().setWidth(60),
+                ),
+              ),
             ),
           );
         },
