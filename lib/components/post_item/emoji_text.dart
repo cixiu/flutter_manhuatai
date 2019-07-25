@@ -1,6 +1,7 @@
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 ///emoji/image text
 class EmojiText extends SpecialText {
@@ -17,7 +18,7 @@ class EmojiText extends SpecialText {
     if (EmojiUitl.instance.emojiMap.containsKey(key)) {
       //fontsize id define image height
       //size = 30.0/26.0 * fontSize
-      final double size = 20.0;
+      final double size = ScreenUtil().setSp(36);
 
       ///fontSize 26 and text height =30.0
       //final double fontSize = 26.0;
@@ -49,6 +50,8 @@ class EmojiUitl {
   final Map<String, String> _emojiMap = AppConst.emojiMap;
 
   Map<String, String> get emojiMap => _emojiMap;
+
+  List<String> get emojiList => emojiMap.keys.toList();
 
   // final String _emojiFilePath = "assets";
 

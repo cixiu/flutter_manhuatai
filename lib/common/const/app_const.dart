@@ -93,6 +93,7 @@ class AppConst {
     '[/打酱油]': 'lib/images/emojis/face21.png',
     '[/握手]': 'lib/images/emojis/face22.png',
     '[/拳头]': 'lib/images/emojis/face23.png',
+    '[/返回]': 'lib/images/emojis/back.png',
   };
 }
 

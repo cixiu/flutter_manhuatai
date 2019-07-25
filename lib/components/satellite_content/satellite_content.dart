@@ -151,7 +151,10 @@ class SatelliteContent extends StatelessWidget {
     // 将 html 标签去掉
     if (!isDetail) {
       var htmlReg = RegExp('<[^>]+>');
-      content = content.replaceAll(htmlReg, '').replaceAll(' ', '');
+      content = content
+          .replaceAll(htmlReg, '')
+          .replaceAll(' ', '')
+          .replaceAll(RegExp(r'^\n+'), '');
       content = unescape.convert(content);
 
       return content.isEmpty

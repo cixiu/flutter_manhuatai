@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_manhuatai/components/post_item/emoji_text.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
@@ -49,8 +52,12 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   // List<SatelliteComment> _childrenCommentList;
   UserRoleInfo.Data _roleInfo;
 
+  String _value = '';
   TextEditingController _textEditingController = TextEditingController();
-  FocusNode _focusNode; // 底部输入框的焦点
+  FocusNode _focusNode = FocusNode(); // 底部输入框的焦点
+  double _keyboardHeight = 267.0;
+  bool activeEmojiGird = false;
+  bool get showCustomKeyBoard => activeEmojiGird;
 
   @override
   void initState() {
@@ -58,7 +65,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     _scrollController.addListener(_listenenScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
-      _focusNode = FocusNode();
     });
   }
 
@@ -334,8 +340,51 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     }
   }
 
+  void _insertText(String text) {
+    bool isBack = text == '[/返回]';
+    if (isBack) {
+      if (_value == '') {
+        return;
+      }
+      var backReg = RegExp(r'(\[\/[\u2E80-\u9FFF]+\])$');
+      int index = _value.lastIndexOf(backReg);
+      if (index > -1) {
+        setState(() {
+          _value = _value.replaceFirst(backReg, '');
+        });
+      } else {
+        print(_value.substring(0, _value.length - 1));
+        setState(() {
+          _value = _value.substring(0, _value.length - 1);
+        });
+      }
+    } else {
+      setState(() {
+        _value += text;
+      });
+    }
+
+    _textEditingController.value = TextEditingValue(
+      text: _value ?? '',
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          affinity: TextAffinity.downstream,
+          offset: _value.length,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).autofocus(_focusNode);
+    var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    if (keyboardHeight > 0) {
+      activeEmojiGird = false;
+    }
+
+    _keyboardHeight = max(_keyboardHeight, keyboardHeight);
+
     return WillPopScope(
       onWillPop: () async {
         Navigator.pop(context, _satellite);
@@ -469,12 +518,18 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                       ),
                                     ),
                                     alignment: Alignment.center,
-                                    child: ExtendedTextField(
-                                      specialTextSpanBuilder:
-                                          PostSpecialTextSpanBuilder(
-                                        showAtBackground: true,
-                                        type: BuilderType.extendedTextField,
-                                      ),
+                                    child: TextField(
+                                      // specialTextSpanBuilder:
+                                      //     PostSpecialTextSpanBuilder(
+                                      //   showAtBackground: true,
+                                      //   type: BuilderType.extendedTextField,
+                                      // ),
+
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _value = val;
+                                        });
+                                      },
                                       controller: _textEditingController,
                                       minLines: 1,
                                       maxLines: 6,
@@ -491,7 +546,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                         hintText: '神评机会近在眼前~',
                                         border: InputBorder.none,
                                         hintStyle: TextStyle(
-                                          fontSize: ScreenUtil().setWidth(28),
+                                          fontSize: ScreenUtil().setSp(28),
                                           color: Colors.grey[350],
                                         ),
                                         contentPadding: EdgeInsets.symmetric(
@@ -505,8 +560,13 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    FocusScope.of(context)
-                                        .requestFocus(_focusNode);
+                                    update(() {
+                                      setState(() {
+                                        activeEmojiGird = true;
+                                        FocusScope.of(context)
+                                            .requestFocus(_focusNode);
+                                      });
+                                    });
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(
@@ -521,7 +581,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    print(_textEditingController.text);
+                                    print(_textEditingController.value);
                                   },
                                   child: Container(
                                     margin: EdgeInsets.only(
@@ -539,10 +599,69 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                               ],
                             ),
                           ),
+                          Container(
+                            height: showCustomKeyBoard ? _keyboardHeight : 0.0,
+                            child: buildCustomKeyBoard(),
+                          )
                         ],
                       ),
               ),
       ),
     );
+  }
+
+  Widget buildCustomKeyBoard() {
+    if (!showCustomKeyBoard) return Container();
+    if (activeEmojiGird) return buildEmojiGird();
+    return Container();
+  }
+
+  Widget buildEmojiGird() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[300],
+            width: ScreenUtil().setWidth(1),
+          ),
+        ),
+      ),
+      child: GridView.builder(
+        padding: EdgeInsets.symmetric(
+          horizontal: ScreenUtil().setWidth(40),
+          vertical: ScreenUtil().setWidth(30),
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 6,
+          crossAxisSpacing: 40.0,
+          mainAxisSpacing: 40.0,
+        ),
+        itemBuilder: (context, index) {
+          var key = EmojiUitl.instance.emojiList[index];
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _insertText('$key');
+            },
+            child: Image.asset(
+              EmojiUitl.instance.emojiMap['$key'],
+            ),
+          );
+        },
+        itemCount: EmojiUitl.instance.emojiMap.length,
+      ),
+    );
+  }
+
+  void update(Function change) {
+    if (showCustomKeyBoard) {
+      change();
+    } else {
+      SystemChannels.textInput.invokeMethod('TextInput.hide').whenComplete(() {
+        Future.delayed(Duration(milliseconds: 200)).whenComplete(() {
+          change();
+        });
+      });
+    }
   }
 }
