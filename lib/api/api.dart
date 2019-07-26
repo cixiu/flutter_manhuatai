@@ -926,4 +926,62 @@ class Api {
     }
     return (response['data'] as bool);
   }
+
+  /// 帖子的评论点赞或者取消点赞
+  static Future<Map<String, dynamic>> addComment({
+    int appId = 2,
+    String type = 'device',
+    @required String openid,
+    @required String authorization,
+    @required int userLevel,
+    @required int userIdentifier,
+    @required String userName,
+    @required int ssid,
+    int fatherId = 0,
+    int siteId = 8,
+    @required int satelliteUserId,
+    int ssidType = 1,
+    int starId,
+    @required String content,
+    @required String title,
+    List<String> images,
+    String deviceTail = '',
+    String relateId = '',
+  }) async {
+    final String url = 'http://community-new.321mh.com/v1/comment/add/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        "appId": "$appId",
+        "auth_token": authorization,
+        "authorization": "Bearer $authorization",
+        "content": content,
+        "device_tail": deviceTail,
+        "fatherId": fatherId,
+        "images": images == null ? images.toString() : "[]",
+        "level": "$userLevel",
+        "openid": "$openid",
+        "opreateId": satelliteUserId,
+        "relateId": relateId,
+        "satelliteId": ssid,
+        "selfName": userName,
+        "siteId": siteId,
+        "ssid": ssid,
+        "ssidType": ssidType,
+        "starId": starId,
+        "title": title,
+        "type": type,
+        "url": "",
+        "userIdentifier": "$userIdentifier",
+        "userloglevel": 1
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authorization',
+        },
+      ),
+    );
+    return response;
+  }
 }

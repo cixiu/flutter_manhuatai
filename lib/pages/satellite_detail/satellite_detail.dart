@@ -375,9 +375,56 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     );
   }
 
+  // 发表评论
+  Future<void> _submitComment() async {
+    if (_value.trim().isEmpty) {
+      showToast('还是写点什么吧');
+      return;
+    }
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var userIdentifier = userInfo.uid != null ? userInfo.uid : guestInfo.uid;
+    var userName = userInfo.uid != null ? userInfo.uname : guestInfo.uname;
+    var userLevel = userInfo.uid != null ? userInfo.ulevel : guestInfo.ulevel;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
+    var response = await Api.addComment(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      userLevel: userLevel,
+      userIdentifier: userIdentifier,
+      userName: userName,
+      ssid: _satellite.id,
+      fatherId: 0,
+      satelliteUserId: _satellite.ulevel,
+      starId: _satellite.starid,
+      content: _value,
+      title: _satellite.title,
+      images: [],
+    );
+    if (response['status'] == 1) {
+      showToast('正在快马加鞭审核中');
+    } else {
+      showToast('${response['msg']}');
+    }
+    setState(() {
+      _value = '';
+      _textEditingController.value = TextEditingValue(
+        text: _value,
+      );
+      activeEmojiGird = false;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // FocusScope.of(context).autofocus(_focusNode);
     var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     if (keyboardHeight > 0) {
       activeEmojiGird = false;
@@ -579,8 +626,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                     update(() {
                                       setState(() {
                                         activeEmojiGird = true;
-                                        // FocusScope.of(context)
-                                        //     .requestFocus(_focusNode);
                                       });
                                     });
                                   },
@@ -596,9 +641,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {
-                                    print(_value);
-                                  },
+                                  onTap: _submitComment,
                                   child: Container(
                                     margin: EdgeInsets.only(
                                       left: ScreenUtil().setWidth(20),
@@ -643,14 +686,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         ),
       ),
       child: GridView.builder(
-        // padding: EdgeInsets.symmetric(
-        //   horizontal: ScreenUtil().setWidth(40),
-        //   vertical: ScreenUtil().setWidth(30),
-        // ),
         padding: EdgeInsets.all(0.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 6,
-          crossAxisSpacing: 0.0,
+          crossAxisSpacing: ScreenUtil().setWidth(10),
           mainAxisSpacing: 0.0,
         ),
         itemBuilder: (context, index) {
