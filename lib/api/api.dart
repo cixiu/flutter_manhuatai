@@ -908,7 +908,7 @@ class Api {
         "level": "$userLevel",
         "openid": "$openid",
         "siteId": siteId,
-        "ssid": '$ssid',
+        "ssid": ssid,
         "ssidType": ssidType,
         "status": status,
         "type": "$type",

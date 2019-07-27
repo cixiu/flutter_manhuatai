@@ -40,5 +40,8 @@ child: Text(
   ),
 ),
 ```
-7. [borderRadius必须有统一的border才能设置](https://github.com/flutter/flutter/issues/12583)
-8. [border属性不支持dashed(虚线)设置，需要自己绘制](https://github.com/flutter/flutter/issues/4858)
+
+7. [borderRadius 必须有统一的 border 才能设置](https://github.com/flutter/flutter/issues/12583)
+8. [border 属性不支持 dashed(虚线)设置，需要自己绘制](https://github.com/flutter/flutter/issues/4858)
+9. [Flutter 真机(魅族)开发卡在 Installing build\app\outputs\apk\app.apk 的问题](https://blog.csdn.net/donkor_/article/details/82972790)
+   - 解决方法： 开发者选项 -> 性能优化 -> 高级日志输出 -> 全部允许
