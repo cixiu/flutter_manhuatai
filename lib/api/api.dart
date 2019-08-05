@@ -18,6 +18,7 @@ import 'package:flutter_manhuatai/models/sort_list.dart';
 import 'package:flutter_manhuatai/models/topic_hot_list.dart';
 import 'package:flutter_manhuatai/models/update_list.dart';
 import 'package:flutter_manhuatai/models/user_follow_line.dart';
+import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
@@ -983,5 +984,35 @@ class Api {
       ),
     );
     return response;
+  }
+
+  /// 帖子的点赞或者取消点缀
+  static Future<UserRecord> getUserRecord({
+    String type = 'device',
+    String openid,
+    String deviceid,
+    int myUid,
+    int autologo = 1,
+  }) async {
+    final String url =
+        'https://kanmanapi-main.321mh.com/app_api/v5/getuserrecord/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'deviceid': deviceid,
+        'myuid': myUid,
+        'autologo': autologo,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+    return UserRecord.fromJson(response);
   }
 }

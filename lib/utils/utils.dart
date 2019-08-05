@@ -178,6 +178,8 @@ class Utils {
 
   static String fromNow(int timestamp, [pattern = 'yyyy-MM-dd']) {
     if (timestamp == null) return '';
+    String timestampString = timestamp.toString().padRight(13, '0');
+    timestamp = int.parse(timestampString);
     int diff = DateTime.now().millisecondsSinceEpoch - timestamp;
     double seconds = diff / 1000;
     if (seconds < 60) {
