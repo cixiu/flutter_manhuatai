@@ -986,7 +986,7 @@ class Api {
     return response;
   }
 
-  /// 帖子的点赞或者取消点缀
+  /// 获取用户的收藏和阅读历史记录
   static Future<UserRecord> getUserRecord({
     String type = 'device',
     String openid,
@@ -1014,5 +1014,63 @@ class Api {
       ),
     );
     return UserRecord.fromJson(response);
+  }
+
+  /// 设置用户对漫画的订阅状态
+  /// action = 'add' 表示收藏 此时 comicId 必填
+  /// action = 'dels' 表示删除 此时 comicIdList 必填
+  static Future<bool> setUserCollect({
+    String type = 'device',
+    String openid,
+    String deviceid,
+    int myUid,
+    int comicId,
+    List<int> comicIdList,
+    String action,
+    int autologo = 1,
+  }) async {
+    final String url =
+        'https://kanmanapi-main.321mh.com/app_api/v5/setusercollect/';
+
+    Map<String, dynamic> data = {
+      'openid': openid,
+      'type': type,
+      'deviceid': deviceid,
+      'myuid': myUid,
+      'localtime': DateTime.now().millisecondsSinceEpoch,
+      'platformname': 'android',
+      'productname': 'mht'
+    };
+
+    data['action'] = action;
+    if (action == 'add') {
+      if (comicId == null) {
+        throw ErrorDescription('订阅漫画时，comicId不能为空');
+      } else {
+        data['comic_id'] = comicId;
+      }
+    }
+
+    if (action == 'dels') {
+      if (comicIdList == null) {
+        throw ErrorDescription('取消订阅的漫画时，comicIdList不能为空');
+      } else {
+        String comicIdListString = '';
+        comicIdList.forEach((id) {
+          comicIdListString += '$id,';
+        });
+        data['comic_id_list'] = comicIdListString;
+      }
+    }
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: data,
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+
+    return response['status'];
   }
 }

@@ -9,8 +9,12 @@ import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:redux/redux.dart';
 
 class HomeBookshelf extends StatefulWidget {
   @override
@@ -39,6 +43,7 @@ class _HomeBookshelfState extends State<HomeBookshelf>
 
   Future<void> _handleRefresh() async {
     var user = User(context);
+
     String deviceid = '';
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
@@ -56,6 +61,9 @@ class _HomeBookshelfState extends State<HomeBookshelf>
       myUid: user.info.uid,
     );
 
+    Store<AppState> store = StoreProvider.of(context);
+    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+
     if (!this.mounted) {
       return;
     }
@@ -68,7 +76,6 @@ class _HomeBookshelfState extends State<HomeBookshelf>
         return collectB.updateTime - collectA.updateTime;
       });
     });
-    print(getUserRecordRes);
   }
 
   @override
@@ -83,147 +90,156 @@ class _HomeBookshelfState extends State<HomeBookshelf>
       body: RefreshIndicator(
         key: refreshIndicatorKey,
         onRefresh: _handleRefresh,
-        child: _isLoading
-            ? Container()
-            : _userCollect.length == 0
-                ? Center(
-                    child: Text('小主暂时还没有收藏任何漫画哦~~'),
-                  )
-                : ListView.builder(
-                    itemCount: _userCollect.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == _userCollect.length) {
-                        return Container(
-                          margin: EdgeInsets.only(
-                            top: ScreenUtil().setWidth(30),
-                          ),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
+        child: StoreBuilder<AppState>(
+          builder: (context, store) {
+            var userCollects = store.state.userCollects;
+
+            return _isLoading
+                ? Container()
+                : _userCollect.length == 0
+                    ? Center(
+                        child: Text('小主暂时还没有收藏任何漫画哦~~'),
+                      )
+                    : ListView.builder(
+                        itemCount: userCollects.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == userCollects.length) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                top: ScreenUtil().setWidth(30),
+                              ),
+                              child: Column(
                                 children: <Widget>[
-                                  Expanded(
-                                    child: Container(
-                                      height: ScreenUtil().setWidth(1),
-                                      color: Colors.grey[300],
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: ScreenUtil().setWidth(20),
-                                    ),
-                                    child: Text(
-                                      '共${_userCollect.length}部漫画~',
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: ScreenUtil().setSp(24),
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Container(
+                                          height: ScreenUtil().setWidth(1),
+                                          color: Colors.grey[300],
+                                        ),
                                       ),
-                                    ),
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: ScreenUtil().setWidth(20),
+                                        ),
+                                        child: Text(
+                                          '共${userCollects.length}部漫画~',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: ScreenUtil().setSp(24),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          height: ScreenUtil().setWidth(1),
+                                          color: Colors.grey[300],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      height: ScreenUtil().setWidth(1),
-                                      color: Colors.grey[300],
-                                    ),
+                                  LoadMoreWidget(
+                                    hasMore: false,
                                   ),
                                 ],
                               ),
-                              LoadMoreWidget(
-                                hasMore: false,
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      var item = _userCollect[index];
+                            );
+                          }
+                          var item = userCollects[index];
 
-                      return Container(
-                        padding: EdgeInsets.all(
-                          ScreenUtil().setWidth(20),
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.grey[300],
-                              width: ScreenUtil().setWidth(1),
+                          return Container(
+                            padding: EdgeInsets.all(
+                              ScreenUtil().setWidth(20),
                             ),
-                          ),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            ImageWrapper(
-                              url: Utils.generateImgUrlFromId(
-                                id: item.comicId,
-                                aspectRatio: '3:4',
-                              ),
-                              width: ScreenUtil().setWidth(200),
-                              height: ScreenUtil().setWidth(267),
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: ScreenUtil().setWidth(267),
-                                margin: EdgeInsets.only(
-                                  left: ScreenUtil().setWidth(20),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.grey[300],
+                                  width: ScreenUtil().setWidth(1),
                                 ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      '${item.comicName}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: ScreenUtil().setSp(32),
-                                      ),
+                              ),
+                            ),
+                            child: Row(
+                              children: <Widget>[
+                                ImageWrapper(
+                                  url: Utils.generateImgUrlFromId(
+                                    id: item.comicId,
+                                    aspectRatio: '3:4',
+                                  ),
+                                  width: ScreenUtil().setWidth(200),
+                                  height: ScreenUtil().setWidth(267),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: ScreenUtil().setWidth(267),
+                                    margin: EdgeInsets.only(
+                                      left: ScreenUtil().setWidth(20),
                                     ),
-                                    Column(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(
-                                            bottom: ScreenUtil().setWidth(20),
-                                          ),
-                                          child: Text(
-                                            '${Utils.fromNow(item.updateTime)}',
-                                            style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: ScreenUtil().setSp(24),
-                                            ),
+                                        Text(
+                                          '${item.comicName}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: ScreenUtil().setSp(32),
                                           ),
                                         ),
-                                        Text.rich(
-                                          TextSpan(
-                                              text: '更新至  ',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize:
-                                                    ScreenUtil().setSp(28),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Container(
+                                              margin: EdgeInsets.only(
+                                                bottom:
+                                                    ScreenUtil().setWidth(20),
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text:
-                                                      '${item.lastChapterName}',
+                                              child: Text(
+                                                '${Utils.fromNow(item.updateTime)}',
+                                                style: TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize:
+                                                      ScreenUtil().setSp(24),
+                                                ),
+                                              ),
+                                            ),
+                                            Text.rich(
+                                              TextSpan(
+                                                  text: '更新至  ',
                                                   style: TextStyle(
-                                                    color: Colors.blue,
+                                                    color: Colors.grey,
                                                     fontSize:
                                                         ScreenUtil().setSp(28),
                                                   ),
-                                                ),
-                                              ]),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                                  children: [
+                                                    TextSpan(
+                                                      text:
+                                                          '${item.lastChapterName}',
+                                                      style: TextStyle(
+                                                        color: Colors.blue,
+                                                        fontSize: ScreenUtil()
+                                                            .setSp(28),
+                                                      ),
+                                                    ),
+                                                  ]),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        )
                                       ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       );
-                    },
-                  ),
+          },
+        ),
       ),
     );
   }

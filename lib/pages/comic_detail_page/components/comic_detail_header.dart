@@ -1,5 +1,17 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_collects.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:redux/redux.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
@@ -22,6 +34,49 @@ class ComicDetailHeader extends StatelessWidget {
     this.comicCommentCount,
   });
 
+  Future<void> _setUserCollect(BuildContext context, bool hasCollected) async {
+    var user = User(context);
+    String action = hasCollected ? 'dels' : 'add';
+    int _comicId = int.parse(comicId);
+
+    String deviceid = '';
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceid = androidInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceid = iosInfo.identifierForVendor;
+    }
+
+    var status = await Api.setUserCollect(
+      type: user.info.type,
+      openid: user.info.openid,
+      deviceid: deviceid,
+      myUid: user.info.uid,
+      action: action,
+      comicId: _comicId,
+      comicIdList: [_comicId],
+    );
+
+    var getUserRecordRes = await Api.getUserRecord(
+      type: user.info.type,
+      openid: user.info.openid,
+      deviceid: deviceid,
+      myUid: user.info.uid,
+    );
+
+    Store<AppState> store = StoreProvider.of(context);
+    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+
+    String message = hasCollected ? '已取消收藏' : '收藏成功~~';
+    if (status) {
+      showToast(message);
+    } else {
+      showToast('操作失败');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -36,7 +91,7 @@ class ComicDetailHeader extends StatelessWidget {
           fit: BoxFit.cover,
         ),
         _buildHeaderComicBodyInfo(),
-        _buildHeaderTabBar(),
+        _buildHeaderTabBar(context),
       ],
     );
   }
@@ -237,7 +292,7 @@ class ComicDetailHeader extends StatelessWidget {
   }
 
   // 收藏，开始阅读，吐槽区域
-  Widget _buildHeaderTabBar() {
+  Widget _buildHeaderTabBar(BuildContext context) {
     return Positioned(
       right: 0,
       bottom: 0,
@@ -254,26 +309,43 @@ class ComicDetailHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                width: ScreenUtil().setWidth(200),
-                height: ScreenUtil().setWidth(64),
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    Image.asset(
-                      'lib/images/icon_detail_collect.png',
+              StoreConnector<AppState, List<User_collect>>(
+                converter: (store) => store.state.userCollects,
+                builder: (context, userCollects) {
+                  int collectIndex = userCollects.indexWhere((collect) {
+                    return collect.comicId == int.parse(comicId);
+                  });
+                  // 是否已经收藏过漫画了
+                  bool hasCollected = collectIndex > -1;
+
+                  return GestureDetector(
+                    onTap: () {
+                      _setUserCollect(context, hasCollected);
+                    },
+                    child: Container(
                       width: ScreenUtil().setWidth(200),
                       height: ScreenUtil().setWidth(64),
-                    ),
-                    Positioned(
-                      bottom: ScreenUtil().setWidth(6),
-                      child: _buildTabText(
-                        text: '收藏',
-                        subText: '${Utils.formatNumber(influenceData.collect)}',
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: <Widget>[
+                          Image.asset(
+                            'lib/images/icon_detail_collect.png',
+                            width: ScreenUtil().setWidth(200),
+                            height: ScreenUtil().setWidth(64),
+                          ),
+                          Positioned(
+                            bottom: ScreenUtil().setWidth(6),
+                            child: _buildTabText(
+                              text: hasCollected ? '已收藏' : '收藏',
+                              subText:
+                                  '${Utils.formatNumber(influenceData.collect)}',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               Container(
                 width: ScreenUtil().setWidth(248),

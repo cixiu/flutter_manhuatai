@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/pages/comic_detail_page/components/comic_detail_header.dart';
@@ -17,6 +21,9 @@ import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/models/comic_info_role.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_collects.dart';
 
 /// 漫画详情
 class ComicDetailPage extends StatefulWidget {
@@ -144,11 +151,40 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     }
   }
 
+  // 获取用户的收藏和阅读记录
+  Future<void> _getUserRecord() async {
+    Store<AppState> store = StoreProvider.of(context);
+    if (store.state.userCollects != null) {
+      return;
+    }
+
+    var user = User(context);
+    String deviceid = '';
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceid = androidInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceid = iosInfo.identifierForVendor;
+    }
+
+    var getUserRecordRes = await Api.getUserRecord(
+      type: user.info.type,
+      openid: user.info.openid,
+      deviceid: deviceid,
+      myUid: user.info.uid,
+    );
+
+    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+  }
+
   Future<void> onRefresh() async {
     await _getComicInfoBody();
     await _getComicInfoInfluence();
     await _getComicCommentCount();
     await _getComicInfoRole();
+    await _getUserRecord();
     if (this.mounted) {
       setState(() {
         isFirstLoading = false;
