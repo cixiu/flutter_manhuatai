@@ -180,6 +180,9 @@ class SatelliteContent extends StatelessWidget {
     } else {
       List<dynamic> images =
           item.images.endsWith(']') ? json.decode(item.images) : [];
+      // 帖子链接reg, 用于解析帖子中的有关的其他帖子的链接
+      RegExp satelliteLinkTagReg = RegExp(
+          r'<a href=".*&satellite_id=(\d+)" target=".*" [^>]+>(.*)<\/a>');
       content = unescape.convert(content);
 
       content = content.replaceAllMapped(
@@ -194,6 +197,14 @@ class SatelliteContent extends StatelessWidget {
             imgFlagString = images[index];
             return '\n\${insert}\$%!--$imgFlagString--%\n\${insert}\$';
           }
+        },
+      ).replaceAllMapped(
+        satelliteLinkTagReg,
+        (matches) {
+          String satelliteId = matches[1];
+          String satelliteTitle = matches[2];
+          // 对于匹配到的satelliteLink，返回被解析的格式
+          return '[satelliteLink:{"$satelliteId":"$satelliteTitle"}]';
         },
       );
       List<String> contentList = content.split('\${insert}\$');
@@ -244,8 +255,14 @@ class SatelliteContent extends StatelessWidget {
                         : ExtendedText(
                             item,
                             overflow: isDetail ? null : TextOverflow.ellipsis,
-                            specialTextSpanBuilder:
-                                PostSpecialTextSpanBuilder(),
+                            specialTextSpanBuilder: PostSpecialTextSpanBuilder(
+                              context: context,
+                              linkStyle: TextStyle(
+                                color: Colors.blue,
+                                fontSize: ScreenUtil().setSp(28),
+                                height: 1.2,
+                              ),
+                            ),
                             maxLines: isDetail ? null : 3,
                             style: TextStyle(
                               color: Colors.grey[800],

@@ -2,6 +2,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_manhuatai/components/post_item/image_text.dart';
+import 'package:flutter_manhuatai/components/post_item/satellite_link_text.dart';
 import 'emoji_text.dart';
 import 'reply_text.dart';
 import 'self_text.dart';
@@ -15,6 +16,8 @@ class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   final VoidCallback selfTap;
   final TextStyle replyStyle;
   final VoidCallback replyTap;
+  final TextStyle linkStyle;
+  final BuildContext context;
 
   PostSpecialTextSpanBuilder({
     this.showAtBackground = false,
@@ -22,6 +25,8 @@ class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     this.selfTap,
     this.replyStyle,
     this.replyTap,
+    this.linkStyle,
+    this.context,
     this.type = BuilderType.extendedText,
   });
 
@@ -80,6 +85,19 @@ class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
         type: type,
         replyStyle: replyStyle,
         replyTap: replyTap,
+      );
+    } else if (isStart(flag, SatelliteLinkText.flag)) {
+      /// 解析帖子中的帖子链接
+      /// 将格式如：'<a href=".*&satellite_id=(\d+)" target=".*" [^>]+>(.*)<\/a>'
+      /// 转成'[satelliteLink:{"$satelliteId":"$satelliteTitle"}]'再进行解析
+      return SatelliteLinkText(
+        textStyle,
+        onTap,
+        start: index - (SatelliteLinkText.flag.length - 1),
+        showAtBackground: showAtBackground,
+        type: type,
+        linkStyle: linkStyle,
+        context: context,
       );
     }
 
