@@ -7,7 +7,7 @@ class RequestLoading extends StatelessWidget {
 
   RequestLoading({
     Key key,
-    this.message = '正在接入萝卜星球...请稍后',
+    this.message,
   }) : super(key: key);
 
   @override
@@ -37,7 +37,7 @@ class RequestLoading extends StatelessWidget {
                 left: ScreenUtil().setWidth(20),
               ),
               child: Text(
-                '$message',
+                message ?? '正在接入萝卜星球...请稍后',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(24),

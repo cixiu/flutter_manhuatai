@@ -44,7 +44,7 @@ class CancelDialog extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(60),
+                horizontal: ScreenUtil().setWidth(100),
               ),
               margin: EdgeInsets.only(
                 bottom: ScreenUtil().setWidth(40),
@@ -62,8 +62,8 @@ class CancelDialog extends StatelessWidget {
                     text: '确定',
                     onTap: () {
                       if (confirm != null) {
-                        confirm();
                         Navigator.pop(context);
+                        confirm();
                       }
                     },
                   ),

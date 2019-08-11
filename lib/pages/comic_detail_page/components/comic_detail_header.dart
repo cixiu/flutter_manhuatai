@@ -5,6 +5,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_collects.dart';
@@ -35,44 +36,54 @@ class ComicDetailHeader extends StatelessWidget {
   });
 
   Future<void> _setUserCollect(BuildContext context, bool hasCollected) async {
-    var user = User(context);
-    String action = hasCollected ? 'dels' : 'add';
-    int _comicId = int.parse(comicId);
+    try {
+      showLoading(context);
+      var user = User(context);
+      String action = hasCollected ? 'dels' : 'add';
+      int _comicId = int.parse(comicId);
 
-    String deviceid = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceid = androidInfo.androidId;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceid = iosInfo.identifierForVendor;
-    }
+      String deviceid = '';
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceid = androidInfo.androidId;
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceid = iosInfo.identifierForVendor;
+      }
 
-    var status = await Api.setUserCollect(
-      type: user.info.type,
-      openid: user.info.openid,
-      deviceid: deviceid,
-      myUid: user.info.uid,
-      action: action,
-      comicId: _comicId,
-      comicIdList: [_comicId],
-    );
+      var status = await Api.setUserCollect(
+        type: user.info.type,
+        openid: user.info.openid,
+        deviceid: deviceid,
+        myUid: user.info.uid,
+        action: action,
+        comicId: _comicId,
+        comicIdList: [_comicId],
+      );
 
-    var getUserRecordRes = await Api.getUserRecord(
-      type: user.info.type,
-      openid: user.info.openid,
-      deviceid: deviceid,
-      myUid: user.info.uid,
-    );
+      var getUserRecordRes = await Api.getUserRecord(
+        type: user.info.type,
+        openid: user.info.openid,
+        deviceid: deviceid,
+        myUid: user.info.uid,
+      );
+      getUserRecordRes.userCollect.sort((collectA, collectB) {
+        return collectB.updateTime - collectA.updateTime;
+      });
 
-    Store<AppState> store = StoreProvider.of(context);
-    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+      Store<AppState> store = StoreProvider.of(context);
+      store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+      hideLoading(context);
 
-    String message = hasCollected ? '已取消收藏' : '收藏成功~~';
-    if (status) {
-      showToast(message);
-    } else {
+      String message = hasCollected ? '已取消收藏' : '收藏成功~~';
+      if (status) {
+        showToast(message);
+      } else {
+        showToast('操作失败');
+      }
+    } catch (e) {
+      hideLoading(context);
       showToast('操作失败');
     }
   }
