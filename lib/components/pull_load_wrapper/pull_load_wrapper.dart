@@ -20,6 +20,9 @@ class PullLoadWrapper extends StatefulWidget {
   /// 下拉刷新的回调
   final RefreshCallback onRefresh;
 
+  /// 自定义bottomWidget,
+  final Widget customBottomWidget;
+
   PullLoadWrapper({
     this.control,
     this.refreshKey,
@@ -27,6 +30,7 @@ class PullLoadWrapper extends StatefulWidget {
     this.itemBuilder,
     this.onLoadMore,
     this.onRefresh,
+    this.customBottomWidget,
   });
 
   @override
@@ -134,12 +138,14 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
             ),
           );
 
-    return Padding(
-      padding: EdgeInsets.all(ScreenUtil().setWidth(40)),
-      child: Center(
-        child: bottomWidget,
-      ),
-    );
+    return widget.customBottomWidget != null
+        ? widget.customBottomWidget
+        : Padding(
+            padding: EdgeInsets.all(ScreenUtil().setWidth(40)),
+            child: Center(
+              child: bottomWidget,
+            ),
+          );
   }
 
   @override
@@ -153,7 +159,9 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
           ? Container()
           : ListView.builder(
               // 保持ListView任何情况都能滚动，解决在RefreshIndicator的兼容问题。
-              physics: AlwaysScrollableScrollPhysics(),
+              physics: ClampingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
               //
               itemBuilder: (context, index) {
                 return _getItem(context, index);

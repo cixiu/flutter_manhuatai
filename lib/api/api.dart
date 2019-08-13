@@ -1073,4 +1073,42 @@ class Api {
 
     return response['status'];
   }
+
+  /// 添加用户对漫画阅读历史记录
+  static Future<bool> addUserRead({
+    String type = 'device',
+    @required String openid,
+    @required String deviceid,
+    @required int myUid,
+    @required String authorization,
+    int comicId,
+    int chapterId,
+    String chapterName,
+    int chapterPage,
+    int autologo = 1,
+  }) async {
+    final String url = 'https://adduserread.321mh.com/app_api/v5/adduserread/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'deviceid': deviceid,
+        'myuid': myUid,
+        'userauth': authorization,
+        'comic_id': comicId,
+        'chapter_id': chapterId,
+        'chapter_name': chapterName,
+        'chapter_page': chapterPage,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+    return response['status'] == 0;
+  }
 }

@@ -83,6 +83,7 @@ class _ComicDetailChapterState extends State<ComicDetailChapter> {
                   ComicReadPage(
                     comicId: widget.comicId,
                     chapterTopicId: chapter.chapterTopicId,
+                    chapterName: chapter.chapterName,
                   ),
                 ),
               );

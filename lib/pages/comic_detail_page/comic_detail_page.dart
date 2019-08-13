@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
+import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -177,6 +178,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     );
 
     store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+    store.dispatch(UpdateUserReadsAction(getUserRecordRes.userRead));
   }
 
   Future<void> onRefresh() async {

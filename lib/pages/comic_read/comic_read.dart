@@ -1,5 +1,12 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_reads.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 // import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -7,6 +14,7 @@ import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/pages/comic_read/components/custom_sliver_child_builder.dart';
+import 'package:redux/redux.dart';
 
 import 'components/comic_read_bottom_bar.dart';
 import 'components/comic_read_drawer.dart';
@@ -15,11 +23,13 @@ import 'components/comic_read_status_bar.dart';
 class ComicReadPage extends StatefulWidget {
   final String comicId;
   final int chapterTopicId;
+  final String chapterName;
 
   ComicReadPage({
     Key key,
     this.comicId,
     this.chapterTopicId,
+    this.chapterName,
   }) : super(key: key);
 
   @override
@@ -56,13 +66,30 @@ class _ComicReadPageState extends State<ComicReadPage>
   @override
   void initState() {
     super.initState();
-    controller = new AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller = new AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this,
+      );
+      // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+      _scrollController.addListener(_scrollListener);
+      _getComicInfoBody();
+    });
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    // TODO:退出时获取正在屏幕中的漫画章节中的第x张
+    // 退出阅读时，也需要加入历史记录
+    if (comicInfoBody == null) {
+      return;
+    }
+    _addUserRead(
+      chapterId: _readerChapter?.chapterTopicId ?? widget.chapterTopicId,
+      chapterName: _readerChapter?.chapterName ?? widget.chapterName,
+      comicInfoBody: comicInfoBody,
     );
-    // SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    _scrollController.addListener(_scrollListener);
-    _getComicInfoBody();
   }
 
   @override
@@ -75,19 +102,76 @@ class _ComicReadPageState extends State<ComicReadPage>
   Future<void> _getComicInfoBody() async {
     var response = await Api.getComicInfoBody(comicId: widget.comicId);
     var _comicInfoBody = ComicInfoBody.fromJson(response);
+
+    if (!this.mounted) {
+      return;
+    }
+
     setState(() {
       comicInfoBody = _comicInfoBody;
     });
+    await _addUserRead(
+      chapterId: widget.chapterTopicId,
+      chapterName: widget.chapterName,
+      comicInfoBody: comicInfoBody,
+    );
     _setComicChapter(widget.chapterTopicId);
+  }
+
+  Future<void> _addUserRead({
+    int chapterId,
+    String chapterName,
+    int chapterPage = 1,
+    ComicInfoBody comicInfoBody,
+  }) async {
+    var user = User(context);
+
+    String deviceid = '';
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceid = androidInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceid = iosInfo.identifierForVendor;
+    }
+    // 进入漫画阅读页时，将要阅读的漫画的章节的第一张添加到用户的阅读历史
+    await Api.addUserRead(
+      type: user.info.type,
+      openid: user.info.openid,
+      deviceid: deviceid,
+      myUid: user.info.uid,
+      authorization: user.info.authData.authcode,
+      comicId: int.tryParse(widget.comicId),
+      chapterId: chapterId,
+      chapterName: chapterName,
+      chapterPage: chapterPage,
+    );
+    Store<AppState> store = StoreProvider.of(context);
+    var userRead = User_read.fromJson({
+      "comic_id": int.tryParse(widget.comicId),
+      "comic_newid": '',
+      "comic_name": comicInfoBody.comicName,
+      "chapter_page": chapterPage,
+      "chapter_name": chapterName,
+      "chapter_newid": '',
+      "read_time": DateTime.now().millisecondsSinceEpoch,
+      "last_chapter_name": comicInfoBody.lastChapterName,
+      "update_time": comicInfoBody.updateTime,
+      "copyright_type": comicInfoBody.copyrightType,
+      "chapter_id": chapterId,
+      "last_chapter_newid": comicInfoBody.lastChapterId,
+    });
+    store.dispatch(AddUserReadAction(userRead));
   }
 
   void _scrollListener() {
     if (_isLoadingMore) {
       return;
     }
+    // var statusHeight = MediaQuery.of(context).padding.top;
     // 判断当前滑动位置是不是到达底部，触发加载更多回调
     var position = _scrollController.position;
-    var statusHeight = MediaQuery.of(context).padding.top;
     double scrollTop = position.pixels;
     double screenWidth = MediaQuery.of(context).size.width;
     int halfScreenHeight = (screenWidth / 2).floor();
@@ -104,7 +188,7 @@ class _ComicReadPageState extends State<ComicReadPage>
       print(readerChapter.chapterName);
       // 将章节对应的漫画图片插入数组
       int len = readerChapter.startNum + readerChapter.endNum;
-      String imgHost = 'https://mhpic.isamanhua.com';
+      String imgHost = 'https://mhpic.manhualang.com';
       List<int> _imageNum = [];
       Map<int, int> imageHashMap = Map();
       int queueLen = 0;
@@ -224,7 +308,7 @@ class _ComicReadPageState extends State<ComicReadPage>
     var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
     // 将章节对应的漫画图片插入数组
     int len = readerChapter.startNum + readerChapter.endNum;
-    String imgHost = 'https://mhpic.isamanhua.com';
+    String imgHost = 'https://mhpic.manhualang.com';
 
     if (this.mounted) {
       int queueLen = 0;
