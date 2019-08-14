@@ -81,7 +81,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
 
     _control.dataListLength = getUserRecordRes.userRead.length;
 
-    // TODO:增加阅读历史
     store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
     store.dispatch(UpdateUserReadsAction(getUserRecordRes.userRead));
 
@@ -94,9 +93,8 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
     });
   }
 
-  Future<void> deleteOneCollect({
-    BuildContext context,
-    User_collect item,
+  Future<void> deleteOneRead({
+    User_read item,
     Store<AppState> store,
   }) async {
     try {
@@ -104,7 +102,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
       var userInfo = store.state.userInfo;
       var guestInfo = store.state.guestInfo;
       var user = userInfo.uid != null ? userInfo : guestInfo;
-      String action = 'dels';
       int _comicId = item.comicId;
 
       String deviceid = '';
@@ -117,35 +114,25 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
         deviceid = iosInfo.identifierForVendor;
       }
 
-      var status = await Api.setUserCollect(
+      var status = await Api.delUserRead(
         type: user.type,
         openid: user.openid,
         deviceid: deviceid,
         myUid: user.uid,
-        action: action,
         comicId: _comicId,
-        comicIdList: [_comicId],
       );
-
-      var getUserRecordRes = await Api.getUserRecord(
-        type: user.type,
-        openid: user.openid,
-        deviceid: deviceid,
-        myUid: user.uid,
-      );
-      getUserRecordRes.userCollect.sort((collectA, collectB) {
-        return collectB.updateTime - collectA.updateTime;
-      });
-
-      store.dispatch(
-        UpdateUserCollectsAction(getUserRecordRes.userCollect),
-      );
-
-      hideLoading(context);
 
       if (status) {
         showToast('已取消对${item.comicName}的订阅');
+        store.state.userReads.removeWhere((comicRead) {
+          return comicRead.comicId == item.comicId;
+        });
+        store.dispatch(
+          UpdateUserReadsAction(store.state.userReads),
+        );
+        hideLoading(context);
       } else {
+        hideLoading(context);
         showToast('操作失败');
       }
     } catch (e) {
@@ -161,6 +148,7 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
     return StoreBuilder<AppState>(
       builder: (context, store) {
         var userReads = store.state.userReads;
+        _control.dataListLength = userReads.length;
 
         return PullLoadWrapper(
           refreshKey: refreshIndicatorKey,
@@ -198,11 +186,10 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
             return CancelDialog(
               title: '是否要删除《${item.comicName}》',
               confirm: () async {
-                // await deleteOneCollect(
-                //   context: context,
-                //   item: item,
-                //   store: store,
-                // );
+                await deleteOneRead(
+                  item: item,
+                  store: store,
+                );
               },
             );
           },

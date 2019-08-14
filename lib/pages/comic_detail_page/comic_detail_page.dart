@@ -154,6 +154,10 @@ class _ComicDetailPageState extends State<ComicDetailPage>
 
   // 获取用户的收藏和阅读记录
   Future<void> _getUserRecord() async {
+    // 防止页面卸载后，导致后面的代码执行出错
+    if (!this.mounted) {
+      return;
+    }
     Store<AppState> store = StoreProvider.of(context);
     if (store.state.userCollects != null) {
       return;

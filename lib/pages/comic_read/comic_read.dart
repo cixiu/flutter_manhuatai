@@ -125,6 +125,7 @@ class _ComicReadPageState extends State<ComicReadPage>
     ComicInfoBody comicInfoBody,
   }) async {
     var user = User(context);
+    Store<AppState> store = StoreProvider.of(context);
 
     String deviceid = '';
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -147,7 +148,7 @@ class _ComicReadPageState extends State<ComicReadPage>
       chapterName: chapterName,
       chapterPage: chapterPage,
     );
-    Store<AppState> store = StoreProvider.of(context);
+
     var userRead = User_read.fromJson({
       "comic_id": int.tryParse(widget.comicId),
       "comic_newid": '',

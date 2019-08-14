@@ -1111,4 +1111,35 @@ class Api {
     );
     return response['status'] == 0;
   }
+
+  /// 删除用户对漫画阅读历史记录
+  static Future<bool> delUserRead({
+    String type = 'device',
+    @required String openid,
+    @required String deviceid,
+    @required int myUid,
+    int comicId,
+    int autologo = 1,
+  }) async {
+    final String url =
+        'https://kanmanapi-main.321mh.com/app_api/v5/deluserread/';
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: {
+        'openid': openid,
+        'type': type,
+        'deviceid': deviceid,
+        'myuid': myUid,
+        'comic_id': comicId,
+        'localtime': DateTime.now().millisecondsSinceEpoch,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+    return response['status'];
+  }
 }

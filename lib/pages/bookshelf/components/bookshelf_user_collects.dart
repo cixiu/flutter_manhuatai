@@ -227,6 +227,22 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
         await Application.router
             .navigateTo(context, '/comic/detail/${item.comicId}');
       },
+      onLongPress: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return CancelDialog(
+              title: '是否取消对《${item.comicName}》的订阅？',
+              confirm: () async {
+                await deleteOneCollect(
+                  item: item,
+                  store: store,
+                );
+              },
+            );
+          },
+        );
+      },
       child: Container(
         padding: EdgeInsets.all(
           ScreenUtil().setWidth(20),
@@ -305,36 +321,36 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
                 ),
               ),
             ),
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return CancelDialog(
-                      title: '是否要取消对${item.comicName}的订阅',
-                      confirm: () async {
-                        await deleteOneCollect(
-                          item: item,
-                          store: store,
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: ScreenUtil().setWidth(30),
-                  bottom: ScreenUtil().setWidth(30),
-                  left: ScreenUtil().setWidth(30),
-                ),
-                child: Icon(
-                  Icons.delete,
-                  color: Colors.grey,
-                ),
-              ),
-            )
+            // GestureDetector(
+            //   behavior: HitTestBehavior.opaque,
+            //   onTap: () {
+            //     showDialog(
+            //       context: context,
+            //       builder: (context) {
+            //         return CancelDialog(
+            //           title: '是否取消对《${item.comicName}》的订阅？',
+            //           confirm: () async {
+            //             await deleteOneCollect(
+            //               item: item,
+            //               store: store,
+            //             );
+            //           },
+            //         );
+            //       },
+            //     );
+            //   },
+            //   child: Container(
+            //     padding: EdgeInsets.only(
+            //       top: ScreenUtil().setWidth(30),
+            //       bottom: ScreenUtil().setWidth(30),
+            //       left: ScreenUtil().setWidth(30),
+            //     ),
+            //     child: Icon(
+            //       Icons.delete,
+            //       color: Colors.grey,
+            //     ),
+            //   ),
+            // )
           ],
         ),
       ),

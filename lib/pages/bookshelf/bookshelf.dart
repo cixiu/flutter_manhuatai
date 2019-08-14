@@ -23,6 +23,12 @@ class _HomeBookshelfState extends State<HomeBookshelf>
   bool get wantKeepAlive => true;
 
   @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 

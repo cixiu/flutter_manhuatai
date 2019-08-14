@@ -15,61 +15,89 @@ class CancelDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: ScreenUtil().setWidth(600),
-        // height: ScreenUtil().setWidth(300),
+        width: ScreenUtil().setWidth(500),
         constraints: BoxConstraints(
-          maxHeight: ScreenUtil().setWidth(250),
+          maxHeight: ScreenUtil().setWidth(475),
         ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Stack(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.symmetric(
-                vertical: ScreenUtil().setWidth(40),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '$title',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: ScreenUtil().setSp(28),
-                  fontWeight: FontWeight.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: ScreenUtil().setWidth(100),
-              ),
-              margin: EdgeInsets.only(
-                bottom: ScreenUtil().setWidth(40),
-              ),
-              child: Row(
+              height: ScreenUtil().setWidth(475),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  _buildActionItem(
-                    text: '取消',
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
+                  Container(
+                    height: ScreenUtil().setWidth(225),
                   ),
-                  _buildActionItem(
-                    text: '确定',
-                    onTap: () {
-                      if (confirm != null) {
-                        Navigator.pop(context);
-                        confirm();
-                      }
-                    },
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(
+                              top: ScreenUtil().setWidth(40),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$title',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: ScreenUtil().setSp(28),
+                                fontWeight: FontWeight.normal,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil().setWidth(60),
+                            ),
+                            margin: EdgeInsets.only(
+                              bottom: ScreenUtil().setWidth(40),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                _buildActionItem(
+                                  text: '取消',
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                _buildActionItem(
+                                  text: '确定',
+                                  onTap: () {
+                                    if (confirm != null) {
+                                      Navigator.pop(context);
+                                      confirm();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-            )
+            ),
+            Positioned(
+              top: ScreenUtil().setWidth(10),
+              left: ScreenUtil().setWidth(10),
+              child: Image.asset(
+                'lib/images/pic_dialog_cartoon3.png',
+                width: ScreenUtil().setWidth(150),
+                height: ScreenUtil().setWidth(225),
+              ),
+            ),
           ],
         ),
       ),
