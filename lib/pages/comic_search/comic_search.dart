@@ -81,11 +81,13 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     });
   }
 
-  void _navigateToSearchResultPage(BuildContext context, String query) {
+  Future<void> _navigateToSearchResultPage(
+      BuildContext context, String query) async {
     String keyword = Uri.encodeComponent(query);
-    Application.router
+    await Application.router
         .navigateTo(context, '${Routes.searchResult}?keyword=$keyword');
-    SpUtils.saveSearchHistory(query);
+    await SpUtils.saveSearchHistory(query);
+    _updateSearchHistoryList();
   }
 
   // 更新搜索历史
