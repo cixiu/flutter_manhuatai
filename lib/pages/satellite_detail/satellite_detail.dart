@@ -121,6 +121,9 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         _fatherCommentList = fatherCommentList;
         _roleInfo = roleInfo;
         _inputKey = GlobalKey<CommentTextInputState>();
+        if (fatherCommentList.length == 0) {
+          _hasMore = false;
+        }
       });
     } catch (e) {
       if (this.mounted) {
@@ -175,6 +178,11 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       page: page,
       ssid: widget.satelliteId,
     );
+
+    if (getSatelliteFatherComments.length == 0) {
+      return [];
+    }
+
     List<int> commentIds =
         getSatelliteFatherComments.map((item) => item.id).toList();
     // 获取帖子的一级评论下需要显示的二级评论
@@ -197,11 +205,14 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       }
     });
 
-    var getCommentUserRes = await Api.getCommentUser(
-      relationId: starId,
-      opreateType: 2,
-      userids: userIds,
-    );
+    var getCommentUserRes = CommentUser.CommentUser.fromJson({});
+    if (userIds.length != 0) {
+      getCommentUserRes = await Api.getCommentUser(
+        relationId: starId,
+        opreateType: 2,
+        userids: userIds,
+      );
+    }
 
     Map<int, CommentUser.Data> commentUserMap = Map();
     if (getCommentUserRes.data != null) {

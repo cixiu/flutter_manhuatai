@@ -49,6 +49,7 @@ class RelatedPosts extends StatelessWidget {
               ),
             );
           }
+
           var item = postList[index - 1];
           return PostItem(
             keyword: keyword,

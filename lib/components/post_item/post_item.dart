@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:extended_text/extended_text.dart';
+import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/components/crop_image/crop_image.dart';
 import 'package:flutter_manhuatai/components/pic_swiper/pic_swiper.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -22,7 +26,7 @@ import 'post_special_text_span_builder.dart';
 
 typedef void CurrentTap(int index);
 
-class PostItem extends StatelessWidget {
+class PostItem extends StatefulWidget {
   final String keyword;
   final GetSatelliteRes.Data postItem;
   final CommentUser.Data postAuthor;
@@ -32,6 +36,18 @@ class PostItem extends StatelessWidget {
     this.postItem,
     this.postAuthor,
   });
+
+  @override
+  _PostItemState createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  GetSatelliteRes.Data _postItem;
+  @override
+  void initState() {
+    super.initState();
+    _postItem = widget.postItem;
+  }
 
   void previewImage({
     BuildContext context,
@@ -63,6 +79,25 @@ class PostItem extends StatelessWidget {
     );
   }
 
+  Future<void> _navigateToSatelliteDetail() async {
+    Satellite _satellite = await Application.router.navigateTo(
+      context,
+      '${Routes.satelliteDetail}?satelliteId=${_postItem.id.toInt()}',
+    );
+    if (_satellite != null) {
+      setState(() {
+        if (_postItem.isSupport != _satellite.issupport.toDouble()) {
+          _postItem.isSupport = _satellite.issupport.toDouble();
+          if (_satellite.issupport == 1) {
+            _postItem.supportNum += 1;
+          } else {
+            _postItem.supportNum -= 1;
+          }
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -73,15 +108,19 @@ class PostItem extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             horizontal: ScreenUtil().setWidth(20),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              _buildPostAuthor(),
-              _buildPostTitle(),
-              _buildPostContent(),
-              _buildPostImages(context),
-              _buildPostStarName(),
-            ],
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _navigateToSatelliteDetail,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildPostAuthor(),
+                _buildPostTitle(),
+                _buildPostContent(),
+                _buildPostImages(context),
+                _buildPostStarName(),
+              ],
+            ),
           ),
         ),
         _buildPostBottomAction(),
@@ -95,7 +134,7 @@ class PostItem extends StatelessWidget {
 
   Widget _buildPostAuthor() {
     var authorImgUrl = Utils.generateImgUrlFromId(
-      id: postAuthor.uid,
+      id: widget.postAuthor.uid,
       aspectRatio: '1:1',
       type: 'head',
     );
@@ -133,7 +172,7 @@ class PostItem extends StatelessWidget {
                     bottom: ScreenUtil().setWidth(10),
                   ),
                   child: Text(
-                    postAuthor.uname,
+                    widget.postAuthor.uname,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.black,
@@ -142,7 +181,7 @@ class PostItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  Utils.formatDate(postItem.createTime),
+                  Utils.formatDate(_postItem.createTime),
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: ScreenUtil().setSp(20),
@@ -162,8 +201,8 @@ class PostItem extends StatelessWidget {
         bottom: ScreenUtil().setWidth(20),
       ),
       child: MatchText(
-        postItem.title,
-        matchText: keyword,
+        _postItem.title,
+        matchText: widget.keyword,
         overflow: TextOverflow.visible,
         matchedStyle: TextStyle(
           color: Colors.blue,
@@ -177,7 +216,7 @@ class PostItem extends StatelessWidget {
     var unescape = HtmlUnescape();
     // 将 html 标签去掉
     var htmlReg = RegExp('<[^>]+>');
-    var content = postItem.content
+    var content = _postItem.content
         .replaceAll(htmlReg, '')
         .replaceAll(' ', '')
         .replaceAll('\n', '');
@@ -203,7 +242,7 @@ class PostItem extends StatelessWidget {
   }
 
   Widget _buildPostImages(BuildContext context) {
-    List<dynamic> images = json.decode(postItem.images);
+    List<dynamic> images = json.decode(_postItem.images);
     if (images.length == 0) {
       return Container();
     }
@@ -316,7 +355,7 @@ class PostItem extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: Text(
-              postItem.starName,
+              _postItem.starName,
               strutStyle: StrutStyle(
                 forceStrutHeight: true,
                 fontSize: ScreenUtil().setWidth(22),
@@ -333,31 +372,37 @@ class PostItem extends StatelessWidget {
   }
 
   Widget _buildPostBottomAction() {
-    return Container(
-      height: ScreenUtil().setWidth(86),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey[350],
-            width: ScreenUtil().setWidth(1),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _navigateToSatelliteDetail,
+      child: Container(
+        height: ScreenUtil().setWidth(86),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey[350],
+              width: ScreenUtil().setWidth(1),
+            ),
           ),
         ),
-      ),
-      child: Row(
-        children: <Widget>[
-          _buildPostBottomActionItem(
-            text: '更多',
-            icon: 'lib/images/icon_newsc_more.png',
-          ),
-          _buildPostBottomActionItem(
-            text: '${postItem.replyNum}',
-            icon: 'lib/images/icon_newsc_comment.png',
-          ),
-          _buildPostBottomActionItem(
-            text: '${postItem.supportNum.toInt()}',
-            icon: 'lib/images/icon_weidianzan_cat.png',
-          ),
-        ],
+        child: Row(
+          children: <Widget>[
+            _buildPostBottomActionItem(
+              text: '更多',
+              icon: 'lib/images/icon_newsc_more.png',
+            ),
+            _buildPostBottomActionItem(
+              text: '${_postItem.replyNum}',
+              icon: 'lib/images/icon_newsc_comment.png',
+            ),
+            _buildPostBottomActionItem(
+              text: '${_postItem.supportNum.toInt()}',
+              icon: 'lib/images/icon_weidianzan_cat.png',
+              activeIcon: 'lib/images/icon_dianzan_cat.png',
+              isActive: _postItem.isSupport.toInt() == 1,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -481,40 +526,38 @@ class PostItem extends StatelessWidget {
   Widget _buildPostBottomActionItem({
     String text,
     String icon,
+    String activeIcon,
+    bool isActive = false,
+    VoidCallback onTap,
   }) {
     return Expanded(
-      child: InkResponse(
-        onTap: () {},
-        containedInkWell: true,
-        highlightShape: BoxShape.rectangle,
-        child: Container(
-          height: ScreenUtil().setWidth(86),
-          constraints: BoxConstraints(
-            maxWidth: ScreenUtil().setWidth(120),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(
-                  right: ScreenUtil().setWidth(10),
-                ),
-                child: Image.asset(
-                  '$icon',
-                  width: ScreenUtil().setWidth(28),
-                  height: ScreenUtil().setWidth(28),
-                  fit: BoxFit.fill,
-                ),
+      child: Container(
+        height: ScreenUtil().setWidth(86),
+        constraints: BoxConstraints(
+          maxWidth: ScreenUtil().setWidth(120),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(
+                right: ScreenUtil().setWidth(10),
               ),
-              Text(
-                '$text',
-                style: TextStyle(
-                  color: Colors.grey[400],
-                  fontSize: ScreenUtil().setSp(24),
-                ),
+              child: Image.asset(
+                '${isActive ? activeIcon : icon}',
+                width: ScreenUtil().setWidth(28),
+                height: ScreenUtil().setWidth(28),
+                fit: BoxFit.fill,
               ),
-            ],
-          ),
+            ),
+            Text(
+              '$text',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: ScreenUtil().setSp(24),
+              ),
+            ),
+          ],
         ),
       ),
     );
