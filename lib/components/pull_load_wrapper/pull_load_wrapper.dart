@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/empty_wrapper/empty_wrapper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// 通用的下拉刷新和上拉加载更多组件
@@ -89,7 +90,10 @@ class _PullLoadWrapperState extends State<PullLoadWrapper> {
     // 如果不需要头部，且数据为0，渲染空页面
     if (!widget.control.needHeader && widget.control.dataListLength == 0) {
       return Container(
-        child: Text('没有发现数据哦~~'),
+        margin: EdgeInsets.only(
+          top: ScreenUtil().setWidth(400),
+        ),
+        child: EmptyWrapper(),
       );
     }
     // 如果需要头部，且数据不为0，当 index 等于实际渲染长度 - 1时，渲染加载更多组件
