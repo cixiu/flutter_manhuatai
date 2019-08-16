@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 final userReadsReducer = combineReducers<List<User_read>>([
   TypedReducer(_updateUserReads),
   TypedReducer(_addUserRead),
+  TypedReducer(_changeUserRead),
 ]);
 
 List<User_read> _updateUserReads(
@@ -33,4 +34,23 @@ class AddUserReadAction {
   final User_read userRead;
 
   AddUserReadAction(this.userRead);
+}
+
+// 修改一条阅读历史
+List<User_read> _changeUserRead(
+  List<User_read> userReads,
+  ChangeUserReadAction action,
+) {
+  return userReads.map((item) {
+    if (item.comicId == action.userRead.comicId) {
+      return action.userRead;
+    }
+    return item;
+  }).toList();
+}
+
+class ChangeUserReadAction {
+  final User_read userRead;
+
+  ChangeUserReadAction(this.userRead);
 }

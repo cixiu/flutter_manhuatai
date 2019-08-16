@@ -149,21 +149,31 @@ class _ComicReadPageState extends State<ComicReadPage>
       chapterPage: chapterPage,
     );
 
-    var userRead = User_read.fromJson({
-      "comic_id": int.tryParse(widget.comicId),
-      "comic_newid": '',
-      "comic_name": comicInfoBody.comicName,
-      "chapter_page": chapterPage,
-      "chapter_name": chapterName,
-      "chapter_newid": '',
-      "read_time": DateTime.now().millisecondsSinceEpoch,
-      "last_chapter_name": comicInfoBody.lastChapterName,
-      "update_time": comicInfoBody.updateTime,
-      "copyright_type": comicInfoBody.copyrightType,
-      "chapter_id": chapterId,
-      "last_chapter_newid": comicInfoBody.lastChapterId,
+    int index = store.state.userReads.indexWhere((comicRead) {
+      return comicRead.comicId == int.tryParse(widget.comicId);
     });
-    store.dispatch(AddUserReadAction(userRead));
+
+    if (index > -1) {
+      var userRead = store.state.userReads[index];
+      userRead.readTime = DateTime.now().millisecondsSinceEpoch;
+      store.dispatch(ChangeUserReadAction(userRead));
+    } else {
+      var userRead = User_read.fromJson({
+        "comic_id": int.tryParse(widget.comicId),
+        "comic_newid": '',
+        "comic_name": comicInfoBody.comicName,
+        "chapter_page": chapterPage,
+        "chapter_name": chapterName,
+        "chapter_newid": '',
+        "read_time": DateTime.now().millisecondsSinceEpoch,
+        "last_chapter_name": comicInfoBody.lastChapterName,
+        "update_time": comicInfoBody.updateTime,
+        "copyright_type": comicInfoBody.copyrightType,
+        "chapter_id": chapterId,
+        "last_chapter_newid": comicInfoBody.lastChapterId,
+      });
+      store.dispatch(AddUserReadAction(userRead));
+    }
   }
 
   void _scrollListener() {
