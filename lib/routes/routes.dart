@@ -12,6 +12,8 @@ class Routes {
   static String searchResult = '/search_result'; // 搜索结果
   static String satelliteDetail =
       '/satellite_detail'; // 帖子详情 eg: /satellite_detail?satelliteId=123456
+  static String bookDetail =
+      '/book_detail'; // 漫画书籍详情页 eg: /book_detail?bookId=123456
 
   static configureRoutes(Router router) {
     router.define(
@@ -53,6 +55,12 @@ class Routes {
     router.define(
       satelliteDetail,
       handler: satelliteDetailHandler,
+      transitionType: TransitionType.inFromRight,
+    );
+
+    router.define(
+      bookDetail,
+      handler: bookDetailHandler,
       transitionType: TransitionType.inFromRight,
     );
   }

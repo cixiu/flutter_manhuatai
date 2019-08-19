@@ -6,6 +6,7 @@ import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/book_list.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/follow_list.dart';
+import 'package:flutter_manhuatai/models/get_book_info_by_id.dart';
 import 'package:flutter_manhuatai/models/get_channels_res.dart';
 import 'package:flutter_manhuatai/models/get_satellite_res.dart';
 import 'package:flutter_manhuatai/models/hot_search.dart';
@@ -1141,5 +1142,26 @@ class Api {
       ),
     );
     return response['status'];
+  }
+
+  /// 通过bookId获取bookList
+  static Future<GetBookInfoById> getBookInfoById({
+    @required int bookId,
+  }) async {
+    final String url =
+        'http://cms-booklist.321mh.com/api/v1/bookList/getbookinfo_sys';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'book_id': bookId,
+        'platformname': 'android',
+        'productname': 'mht'
+      },
+      options: Options(
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+      ),
+    );
+    return GetBookInfoById.fromJson(response);
   }
 }

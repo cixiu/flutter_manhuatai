@@ -1,5 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/pages/book_detail/book_detail.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 
@@ -64,6 +65,17 @@ var satelliteDetailHandler = Handler(
 
     return SatelliteDetailPage(
       satelliteId: int.tryParse(satelliteId),
+    );
+  },
+);
+
+// 漫画书籍详情页
+var bookDetailHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String bookId = params['bookId']?.first;
+
+    return BookDetailPage(
+      bookId: int.tryParse(bookId),
     );
   },
 );

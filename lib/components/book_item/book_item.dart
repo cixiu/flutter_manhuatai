@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import './book_item_display_1.dart';
@@ -143,9 +145,25 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
                 ),
               ),
               widget.book.config.isshowmore == 1
-                  ? Text(
-                      '更多',
-                      style: TextStyle(color: Colors.grey),
+                  ? GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Application.router.navigateTo(
+                          context,
+                          '${Routes.bookDetail}?bookId=${book.bookId}',
+                        );
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: ScreenUtil().setWidth(10),
+                          top: ScreenUtil().setWidth(10),
+                          bottom: ScreenUtil().setWidth(10),
+                        ),
+                        child: Text(
+                          '更多',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
                     )
                   : Text('')
             ],
