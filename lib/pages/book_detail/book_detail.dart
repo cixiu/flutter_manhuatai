@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:transformer_page_view/transformer_page_view.dart';
 import 'package:vector_math/vector_math_64.dart' as v;
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
@@ -29,10 +30,16 @@ class _BookDetailPageState extends State<BookDetailPage>
     with RefreshCommonState, WidgetsBindingObserver {
   bool _isLoading = true;
   GetBookInfoById.Data _bookData;
+  SwiperController _swiperController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _swiperController = SwiperController();
+    _swiperController.addListener(() {
+      print(_swiperController.index);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
@@ -56,16 +63,20 @@ class _BookDetailPageState extends State<BookDetailPage>
         child: _isLoading
             ? Container()
             : Stack(
+                alignment: Alignment.bottomCenter,
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: NetworkImage(
-                          'https://image.mhxk.com/mh/91961.jpg-960x1280.jpg.webp',
+                          Utils.generateImgUrlFromId(
+                            id: _bookData.bookList[_currentIndex].comicId,
+                            aspectRatio: '3:4',
+                          ),
                         ),
                         fit: BoxFit.cover,
                         colorFilter: ColorFilter.mode(
-                          Colors.black54,
+                          Colors.black,
                           BlendMode.overlay,
                         ),
                       ),
@@ -84,126 +95,127 @@ class _BookDetailPageState extends State<BookDetailPage>
                       ),
                     ),
                   ),
-                  Center(
-                    child: SizedBox(
-                      height: ScreenUtil().setWidth(667),
-                      child: Swiper(
-                        loop: false,
-                        viewportFraction: 0.75,
-                        scale: 0.8,
-                        itemCount: _bookData.bookList.length,
-                        itemBuilder: (context, index) {
-                          var item = _bookData.bookList[index];
-                          String imgUrl = Utils.generateImgUrlFromId(
-                              id: item.comicId, aspectRatio: '3:4');
-                          return Transform(
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.01)
-                              ..rotateY(0.04)
-                              ..rotateZ(0.06),
-                            alignment: FractionalOffset.center,
-                            origin: Offset(0.5, 0.5),
-                            child: Container(
-                              // margin: EdgeInsets.symmetric(
-                              //   horizontal: ScreenUtil().setWidth(30),
-                              // ),
-                              padding: EdgeInsets.all(
-                                ScreenUtil().setWidth(6),
-                              ),
-                              color: Colors.white,
-                              width: ScreenUtil().setWidth(500),
-                              height: ScreenUtil().setWidth(667),
-                              child: ImageWrapper(
-                                url: imgUrl,
+                  Container(
+                    child: Swiper(
+                      autoplay: false,
+                      loop: false,
+                      viewportFraction: 0.68,
+                      scale: 0.65,
+                      onIndexChanged: (int index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      itemCount: _bookData.bookList.length,
+                      itemBuilder: (context, index) {
+                        var item = _bookData.bookList[index];
+                        String imgUrl = Utils.generateImgUrlFromId(
+                          id: item.comicId,
+                          aspectRatio: '3:4',
+                        );
+
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Transform(
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.01)
+                                ..rotateY(0.04)
+                                ..rotateZ(0.06),
+                              alignment: FractionalOffset.center,
+                              child: Container(
+                                padding: EdgeInsets.all(
+                                  ScreenUtil().setWidth(6),
+                                ),
+                                color: Colors.white,
                                 width: ScreenUtil().setWidth(500),
                                 height: ScreenUtil().setWidth(667),
+                                child: ImageWrapper(
+                                  url: imgUrl,
+                                  width: ScreenUtil().setWidth(500),
+                                  height: ScreenUtil().setWidth(667),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        // itemWidth: MediaQuery.of(context).size.width,
-                        itemHeight: ScreenUtil().setWidth(667),
-                        // pagination: SwiperPagination(
-                        //   margin: EdgeInsets.only(
-                        //     bottom: ScreenUtil().setWidth(92),
-                        //   ),
-                        // ),
-                        // controller: SwiperController(),
-                        autoplay: false,
-                      ),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  // Container(
-                  //   color: Colors.blue,
-                  //   child: Column(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: <Widget>[
-                  //       Container(
-                  //         height: ScreenUtil().setWidth(700),
-                  //         child: ListView.builder(
-                  //           scrollDirection: Axis.horizontal,
-                  //           itemCount: _bookData.bookList.length,
-                  //           itemBuilder: (BuildContext ctx, int index) {
-                  //             var item = _bookData.bookList[index];
-                  //             String imgUrl = Utils.generateImgUrlFromId(
-                  //                 id: item.comicId, aspectRatio: '3:4');
-
-                  //             return Transform(
-                  //               transform: Matrix4.identity()
-                  //                 ..setEntry(3, 2, 0.01)
-                  //                 ..rotateY(0.04)
-                  //                 ..rotateZ(0.06),
-                  //               alignment: FractionalOffset.center,
-                  //               origin: Offset(0.5, 0.5),
-                  //               child: Container(
-                  //                 margin: EdgeInsets.symmetric(
-                  //                   horizontal: ScreenUtil().setWidth(30),
-                  //                 ),
-                  //                 padding: EdgeInsets.all(
-                  //                   ScreenUtil().setWidth(6),
-                  //                 ),
-                  //                 color: Colors.white,
-                  //                 width: ScreenUtil().setWidth(500),
-                  //                 height: ScreenUtil().setWidth(667),
-                  //                 child: ImageWrapper(
-                  //                   url: imgUrl,
-                  //                   width: ScreenUtil().setWidth(500),
-                  //                   height: ScreenUtil().setWidth(667),
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           },
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // )
-                  // Center(
-                  //   child: Transform(
-                  //     transform: Matrix4.identity()
-                  //       ..setEntry(3, 2, 0.01)
-                  //       ..rotateY(0.04)
-                  //       ..rotateZ(0.06),
-                  //     alignment: FractionalOffset.center,
-                  //     origin: Offset(0.5, 0.5),
-                  //     child: Container(
-                  //       padding: EdgeInsets.all(
-                  //         ScreenUtil().setWidth(6),
-                  //       ),
-                  //       color: Colors.white,
-                  //       width: ScreenUtil().setWidth(500),
-                  //       height: ScreenUtil().setWidth(667),
-                  //       child: ImageWrapper(
-                  //         url:
-                  //             'https://image.mhxk.com/mh/91961.jpg-960x1280.jpg.webp',
-                  //         // width: ScreenUtil().setWidth(500),
-                  //         // height: ScreenUtil().setWidth(667),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // )
+                  _buildAppBar(),
+                  _buildComicInfo(),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        margin: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+        ),
+        height: ScreenUtil().setWidth(88),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: <Widget>[
+            Container(
+              child: Center(
+                child: Text(
+                  '${_bookData.bookName}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: ScreenUtil().setSp(36),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Padding(
+                padding: EdgeInsets.all(
+                  ScreenUtil().setWidth(28),
+                ),
+                child: Image.asset(
+                  'lib/images/ico_return_white.png',
+                  width: ScreenUtil().setWidth(32),
+                  height: ScreenUtil().setWidth(32),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComicInfo() {
+    return Container(
+      margin: EdgeInsets.only(
+        bottom: ScreenUtil().setWidth(80),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            '${_bookData.bookList[_currentIndex].comicName}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: ScreenUtil().setSp(36),
+            ),
+          ),
+          Text(
+            '${_bookData.bookList[_currentIndex].comicFeature}',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: ScreenUtil().setSp(28),
+            ),
+          ),
+        ],
       ),
     );
   }
