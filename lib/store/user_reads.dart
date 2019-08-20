@@ -1,4 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
+import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:redux/redux.dart';
 
 // 用户收藏和阅读历史记录
@@ -53,4 +60,44 @@ class ChangeUserReadAction {
   final User_read userRead;
 
   ChangeUserReadAction(this.userRead);
+}
+
+// 异步更新redux
+// 获取用户的收藏和阅读记录
+Future<void> getUserRecordAsyncAction(Store<AppState> store) async {
+  if (store.state.userCollects != null) {
+    return;
+  }
+
+  var guestInfo = store.state.guestInfo;
+  var userInfo = store.state.userInfo;
+  var user = userInfo.uid != null ? userInfo : guestInfo;
+
+  String deviceid = '';
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  if (Platform.isAndroid) {
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    deviceid = androidInfo.androidId;
+  } else if (Platform.isIOS) {
+    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    deviceid = iosInfo.identifierForVendor;
+  }
+
+  var getUserRecordRes = await Api.getUserRecord(
+    type: user.type,
+    openid: user.openid,
+    deviceid: deviceid,
+    myUid: user.uid,
+  );
+  var userCollect = getUserRecordRes?.userCollect ?? [];
+  var userRead = getUserRecordRes?.userRead ?? [];
+
+  if (userCollect.length >= 2) {
+    userCollect.sort((collectA, collectB) {
+      return collectB.updateTime - collectA.updateTime;
+    });
+  }
+
+  store.dispatch(UpdateUserCollectsAction(userCollect));
+  store.dispatch(UpdateUserReadsAction(userRead));
 }

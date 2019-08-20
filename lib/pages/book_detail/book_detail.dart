@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -55,6 +56,12 @@ class _BookDetailPageState extends State<BookDetailPage>
 
   Future<void> _handleRefresh() async {
     var getBookInfoByIdRes = await Api.getBookInfoById(bookId: widget.bookId);
+    // 获取用户的收藏列表
+    Store<AppState> store = StoreProvider.of(context);
+    await getUserRecordAsyncAction(store);
+    if (!this.mounted) {
+      return;
+    }
     setState(() {
       _isLoading = false;
       _bookData = getBookInfoByIdRes.data;

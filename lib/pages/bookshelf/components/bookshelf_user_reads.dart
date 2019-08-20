@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:device_info/device_info.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:redux/redux.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/components/cancel_dialog/cancel_dialog.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
@@ -13,13 +17,8 @@ import 'package:flutter_manhuatai/components/request_loading/request_loading.dar
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:oktoast/oktoast.dart';
-import 'package:redux/redux.dart';
 
 class BookshelfUserReads extends StatefulWidget {
   @override
@@ -57,37 +56,13 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
       return;
     }
 
-    var user = User(context);
-
-    String deviceid = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceid = androidInfo.androidId;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceid = iosInfo.identifierForVendor;
-    }
-
-    var getUserRecordRes = await Api.getUserRecord(
-      type: user.info.type,
-      openid: user.info.openid,
-      deviceid: deviceid,
-      myUid: user.info.uid,
-    );
-    getUserRecordRes.userCollect.sort((collectA, collectB) {
-      return collectB.updateTime - collectA.updateTime;
-    });
-
-    _control.dataListLength = getUserRecordRes.userRead.length;
-
-    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
-    store.dispatch(UpdateUserReadsAction(getUserRecordRes.userRead));
+    await getUserRecordAsyncAction(store);
 
     if (!this.mounted) {
       return;
     }
 
+    _control.dataListLength = store.state.userReads.length;
     setState(() {
       _isLoading = false;
     });

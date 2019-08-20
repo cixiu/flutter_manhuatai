@@ -13,7 +13,10 @@ import 'package:flutter_manhuatai/pages/launch/launch_page.dart';
 
 main() async {
   var initialState = await initState();
-  final store = Store<AppState>(rootReducer, initialState: initialState);
+  final store = Store<AppState>(
+    rootReducer,
+    initialState: initialState,
+  );
   // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
   // await FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
 

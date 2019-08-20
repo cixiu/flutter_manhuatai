@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart' hide NestedScrollView;
 import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:redux/redux.dart';
@@ -22,9 +20,7 @@ import 'package:flutter_manhuatai/models/comic_info_influence.dart';
 import 'package:flutter_manhuatai/models/comic_comment_count.dart';
 import 'package:flutter_manhuatai/models/comic_info_role.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
 
 /// 漫画详情
 class ComicDetailPage extends StatefulWidget {
@@ -159,30 +155,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
       return;
     }
     Store<AppState> store = StoreProvider.of(context);
-    if (store.state.userCollects != null) {
-      return;
-    }
-
-    var user = User(context);
-    String deviceid = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceid = androidInfo.androidId;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceid = iosInfo.identifierForVendor;
-    }
-
-    var getUserRecordRes = await Api.getUserRecord(
-      type: user.info.type,
-      openid: user.info.openid,
-      deviceid: deviceid,
-      myUid: user.info.uid,
-    );
-
-    store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
-    store.dispatch(UpdateUserReadsAction(getUserRecordRes.userRead));
+    await getUserRecordAsyncAction(store);
   }
 
   Future<void> onRefresh() async {
