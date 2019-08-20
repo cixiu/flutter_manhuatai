@@ -1,18 +1,26 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:io';
 import 'dart:ui';
 
-import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:transformer_page_view/transformer_page_view.dart';
-import 'package:vector_math/vector_math_64.dart' as v;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:device_info/device_info.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/get_book_info_by_id.dart'
     as GetBookInfoById;
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_manhuatai/common/const/app_const.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_collects.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
 
 class BookDetailPage extends StatefulWidget {
   final int bookId;
@@ -43,7 +51,6 @@ class _BookDetailPageState extends State<BookDetailPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
-    // _scrollController.addListener(_listScroll);
   }
 
   Future<void> _handleRefresh() async {
@@ -52,6 +59,65 @@ class _BookDetailPageState extends State<BookDetailPage>
       _isLoading = false;
       _bookData = getBookInfoByIdRes.data;
     });
+  }
+
+  // 收藏或者取消收藏
+  Future<void> _setUserCollect({
+    Store<AppState> store,
+    int comicId,
+    bool hasCollected,
+  }) async {
+    try {
+      showLoading(context);
+      var guestInfo = store.state.guestInfo;
+      var userInfo = store.state.userInfo;
+      var user = userInfo.uid != null ? userInfo : guestInfo;
+      String action = hasCollected ? 'dels' : 'add';
+
+      String deviceid = '';
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceid = androidInfo.androidId;
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceid = iosInfo.identifierForVendor;
+      }
+
+      var status = await Api.setUserCollect(
+        type: user.type,
+        openid: user.openid,
+        deviceid: deviceid,
+        myUid: user.uid,
+        action: action,
+        comicId: comicId,
+        comicIdList: [comicId],
+      );
+
+      var getUserRecordRes = await Api.getUserRecord(
+        type: user.type,
+        openid: user.openid,
+        deviceid: deviceid,
+        myUid: user.uid,
+      );
+
+      getUserRecordRes.userCollect.sort((collectA, collectB) {
+        return collectB.updateTime - collectA.updateTime;
+      });
+
+      store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+      hideLoading(context);
+
+      String message = hasCollected ? '已取消收藏' : '收藏成功~~';
+      if (status) {
+        showToast(message);
+      } else {
+        showToast('操作失败');
+      }
+    } catch (e) {
+      hideLoading(context);
+      showToast('操作失败');
+    }
   }
 
   @override
@@ -95,52 +161,107 @@ class _BookDetailPageState extends State<BookDetailPage>
                       ),
                     ),
                   ),
-                  Container(
-                    child: Swiper(
-                      autoplay: false,
-                      loop: false,
-                      viewportFraction: 0.68,
-                      scale: 0.65,
-                      onIndexChanged: (int index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      itemCount: _bookData.bookList.length,
-                      itemBuilder: (context, index) {
-                        var item = _bookData.bookList[index];
-                        String imgUrl = Utils.generateImgUrlFromId(
-                          id: item.comicId,
-                          aspectRatio: '3:4',
-                        );
+                  StoreConnector<AppState, Store<AppState>>(
+                    converter: (store) => store,
+                    builder: (ctx, store) {
+                      return Container(
+                        child: Swiper(
+                          autoplay: false,
+                          loop: false,
+                          viewportFraction: 0.68,
+                          scale: 0.65,
+                          onIndexChanged: (int index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          itemCount: _bookData.bookList.length,
+                          itemBuilder: (context, index) {
+                            var item = _bookData.bookList[index];
+                            String imgUrl = item.imgUrl.isEmpty
+                                ? Utils.generateImgUrlFromId(
+                                    id: item.comicId,
+                                    aspectRatio: '3:4',
+                                  )
+                                : '${AppConst.img_host}/${item.imgUrl}';
+                            int collectIndex =
+                                store.state.userCollects.indexWhere((collect) {
+                              return collect.comicId == item.comicId;
+                            });
+                            // 是否已经收藏过漫画了
+                            bool hasCollected = collectIndex > -1;
 
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Transform(
-                              transform: Matrix4.identity()
-                                ..setEntry(3, 2, 0.01)
-                                ..rotateY(0.04)
-                                ..rotateZ(0.06),
-                              alignment: FractionalOffset.center,
-                              child: Container(
-                                padding: EdgeInsets.all(
-                                  ScreenUtil().setWidth(6),
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () {
+                                    Application.router.navigateTo(
+                                      context,
+                                      '/comic/detail/${item.comicId}',
+                                    );
+                                  },
+                                  child: Transform(
+                                    transform: Matrix4.identity()
+                                      ..setEntry(3, 2, 0.01)
+                                      ..rotateY(0.04)
+                                      ..rotateZ(0.06),
+                                    alignment: FractionalOffset.center,
+                                    child: Container(
+                                      padding: EdgeInsets.all(
+                                        ScreenUtil().setWidth(6),
+                                      ),
+                                      color: Colors.white,
+                                      width: ScreenUtil().setWidth(500),
+                                      height: ScreenUtil().setWidth(667),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          ImageWrapper(
+                                            url: imgUrl,
+                                            width: ScreenUtil().setWidth(500),
+                                            height: ScreenUtil().setWidth(667),
+                                          ),
+                                          Container(
+                                            color: Colors.black12,
+                                          ),
+                                          Positioned(
+                                            top: ScreenUtil().setWidth(20),
+                                            right: ScreenUtil().setWidth(20),
+                                            child: GestureDetector(
+                                              behavior: HitTestBehavior.opaque,
+                                              onTap: () {
+                                                _setUserCollect(
+                                                  store: store,
+                                                  comicId: item.comicId,
+                                                  hasCollected: hasCollected,
+                                                );
+                                              },
+                                              child: Image.asset(
+                                                hasCollected
+                                                    ? 'lib/images/icon_heart_dianzan.png'
+                                                    : 'lib/images/icon_heart_notdianzan.png',
+                                                width:
+                                                    ScreenUtil().setWidth(72),
+                                                height:
+                                                    ScreenUtil().setWidth(72),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: ScreenUtil().setWidth(30),
+                                            child: _buildComicTypes(item),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                color: Colors.white,
-                                width: ScreenUtil().setWidth(500),
-                                height: ScreenUtil().setWidth(667),
-                                child: ImageWrapper(
-                                  url: imgUrl,
-                                  width: ScreenUtil().setWidth(500),
-                                  height: ScreenUtil().setWidth(667),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                              ],
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                   _buildAppBar(),
                   _buildComicInfo(),
@@ -173,6 +294,7 @@ class _BookDetailPageState extends State<BookDetailPage>
               ),
             ),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 Navigator.of(context).pop();
               },
@@ -217,6 +339,37 @@ class _BookDetailPageState extends State<BookDetailPage>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildComicTypes(GetBookInfoById.Book_list item) {
+    return Row(
+      children: item.comicType.map((typeName) {
+        return Container(
+          margin: EdgeInsets.only(
+            left: ScreenUtil().setWidth(20),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: ScreenUtil().setWidth(20),
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white,
+              width: ScreenUtil().setWidth(2),
+            ),
+            borderRadius: BorderRadius.circular(
+              ScreenUtil().setWidth(50),
+            ),
+          ),
+          child: Text(
+            typeName,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: ScreenUtil().setSp(28),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
