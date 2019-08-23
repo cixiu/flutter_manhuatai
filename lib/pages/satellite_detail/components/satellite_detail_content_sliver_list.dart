@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
@@ -114,7 +115,7 @@ class SatelliteDetailContentSliverList extends StatelessWidget {
                 ),
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '阅读 ${satellite.viewCount}',
+                  '阅读 ${Utils.formatNumber(satellite.viewCount.toString())}',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: ScreenUtil().setSp(24),
