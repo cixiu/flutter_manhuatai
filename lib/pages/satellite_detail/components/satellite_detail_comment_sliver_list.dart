@@ -1,5 +1,6 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
@@ -15,11 +16,13 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
   final List<CommonSatelliteComment> fatherCommentList;
   final bool hasMore;
   final SupportComment supportComment;
+  final GlobalKey<CommentTextInputState> inputKey;
 
   SatelliteDetailCommentSliverList({
     this.fatherCommentList,
     this.hasMore,
     this.supportComment,
+    this.inputKey,
   });
 
   String _formatSupportCount(int count) {
@@ -27,6 +30,12 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
       return '${(count / 10000).toStringAsFixed(1)}万';
     }
     return count.toString();
+  }
+
+  // 设置要回复的评论的一些信息
+  void _setReplyComment(CommonSatelliteComment item) {
+    inputKey.currentState.focus(hintText: '回复：${item.fatherComment.uname}');
+    inputKey.currentState.replyComment(comment: item.fatherComment);
   }
 
   @override
@@ -65,7 +74,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
               _buildFatherCommentContent(
                 context: context,
                 margin: margin,
-                content: item.fatherComment.content,
+                item: item,
               ),
               item.childrenCommentList.length != 0
                   ? _buildChildrenComments(
@@ -77,7 +86,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
               _buildBottomActionIcons(
                 context: context,
                 margin: margin,
-                comment: item.fatherComment,
+                item: item,
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
@@ -99,17 +108,23 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
   Widget _buildFatherCommentContent({
     BuildContext context,
     EdgeInsetsGeometry margin,
-    String content,
+    CommonSatelliteComment item,
   }) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      margin: margin,
-      child: ExtendedText(
-        content,
-        specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
-        style: TextStyle(
-          color: Colors.grey[800],
-          fontSize: ScreenUtil().setSp(26),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        _setReplyComment(item);
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        margin: margin,
+        child: ExtendedText(
+          item.fatherComment.content,
+          specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: ScreenUtil().setSp(26),
+          ),
         ),
       ),
     );
@@ -216,28 +231,36 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
   Widget _buildBottomActionIcons({
     BuildContext context,
     EdgeInsetsGeometry margin,
-    SatelliteComment comment,
+    CommonSatelliteComment item,
   }) {
+    int supportcount = item.fatherComment.supportcount;
+
     return Container(
       margin: margin,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: ScreenUtil().setWidth(30),
-            ),
-            child: Image.asset(
-              'lib/images/icon_pinglun_pinglun_m.png',
-              width: ScreenUtil().setWidth(40),
-              height: ScreenUtil().setWidth(40),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              _setReplyComment(item);
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: ScreenUtil().setWidth(30),
+              ),
+              child: Image.asset(
+                'lib/images/icon_pinglun_pinglun_m.png',
+                width: ScreenUtil().setWidth(40),
+                height: ScreenUtil().setWidth(40),
+              ),
             ),
           ),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
               if (supportComment != null) {
-                supportComment(comment);
+                supportComment(item.fatherComment);
               }
             },
             child: Container(
@@ -248,14 +271,14 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   Image.asset(
-                    comment.status == 1
+                    item.fatherComment.status == 1
                         ? 'lib/images/icon_pinglun_weidianzan_m.png'
                         : 'lib/images/icon_pinglun_yidianzan_m.png',
                     width: ScreenUtil().setWidth(40),
                     height: ScreenUtil().setWidth(40),
                   ),
                   Text(
-                    '${comment.supportcount == 0 ? ' ' : _formatSupportCount(comment.supportcount)}',
+                    '${supportcount == 0 ? ' ' : _formatSupportCount(supportcount)}',
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: ScreenUtil().setSp(24),

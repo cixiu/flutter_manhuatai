@@ -954,6 +954,9 @@ class Api {
 
     Map<String, dynamic> response = await HttpRequest.post(
       url,
+      params: {
+        'FatherId': fatherId,
+      },
       data: {
         "appId": "$appId",
         "auth_token": authorization,

@@ -319,7 +319,11 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   }
 
   // 发表评论
-  Future<void> _submitComment(String value) async {
+  Future<void> _submitComment({
+    String value,
+    bool isReply,
+    SatelliteComment comment,
+  }) async {
     if (value.trim().isEmpty) {
       showToast('还是写点什么吧');
       return;
@@ -343,8 +347,8 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       userIdentifier: user.info.uid,
       userName: user.info.uname,
       ssid: _satellite.id,
-      fatherId: 0,
-      satelliteUserId: _satellite.ulevel,
+      fatherId: isReply ? comment.id : 0,
+      satelliteUserId: isReply ? 0 : _satellite.useridentifier,
       starId: _satellite.starid,
       content: value,
       title: _satellite.title,
@@ -466,6 +470,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                     fatherCommentList: _fatherCommentList,
                                     hasMore: _hasMore,
                                     supportComment: _supportComment,
+                                    inputKey: _inputKey,
                                   ),
                                 ],
                               ),

@@ -3,11 +3,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/components/post_item/emoji_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+typedef Future<void> SubmitCallback({
+  String value,
+  bool isReply,
+  SatelliteComment comment,
+});
+
 class CommentTextInput extends StatefulWidget {
-  final Future<void> Function(String) submit;
+  final SubmitCallback submit;
   final double keyboardHeight;
 
   CommentTextInput({
@@ -23,9 +30,13 @@ class CommentTextInput extends StatefulWidget {
 class CommentTextInputState extends State<CommentTextInput> {
   String _value = '';
   TextEditingController _textEditingController = TextEditingController();
+  String _hintText = '神评机会近在眼前~';
   FocusNode _focusNode = FocusNode();
   double _keyboardHeight = 267.0;
   bool activeEmojiGird = false;
+  bool _isReply = false;
+  SatelliteComment _replyComment;
+
   bool get showCustomKeyBoard => activeEmojiGird;
 
   void _insertText(String text) {
@@ -76,6 +87,32 @@ class CommentTextInputState extends State<CommentTextInput> {
 
   void blurKeyBoard() {
     FocusScope.of(context).unfocus();
+    hideEmoji();
+    Future.delayed(Duration(milliseconds: 100), () {
+      setState(() {
+        _hintText = '神评机会近在眼前~';
+        _isReply = false;
+        _replyComment = null;
+      });
+    });
+  }
+
+  // 主动控制输入框聚焦
+  void focus({String hintText}) {
+    FocusScope.of(context).requestFocus(_focusNode);
+    if (hintText != null) {
+      setState(() {
+        _hintText = hintText;
+      });
+    }
+  }
+
+  // 设置要回复的评论变量
+  void replyComment({SatelliteComment comment}) {
+    setState(() {
+      _isReply = true;
+      _replyComment = comment;
+    });
   }
 
   void hideEmoji() {
@@ -155,7 +192,7 @@ class CommentTextInputState extends State<CommentTextInput> {
                       fontSize: ScreenUtil().setSp(28),
                     ),
                     decoration: InputDecoration(
-                      hintText: '神评机会近在眼前~',
+                      hintText: _hintText,
                       border: InputBorder.none,
                       hintStyle: TextStyle(
                         fontSize: ScreenUtil().setSp(28),
@@ -192,13 +229,20 @@ class CommentTextInputState extends State<CommentTextInput> {
               GestureDetector(
                 onTap: () async {
                   if (widget.submit != null) {
-                    await widget.submit(_value);
+                    await widget.submit(
+                      value: _value,
+                      isReply: _isReply,
+                      comment: _replyComment,
+                    );
                     setState(() {
                       _value = '';
                       _textEditingController.value = TextEditingValue(
                         text: _value,
                       );
                       activeEmojiGird = false;
+                      _hintText = '神评机会近在眼前~';
+                      _isReply = false;
+                      _replyComment = null;
                     });
                     FocusScope.of(context).unfocus();
                   }
