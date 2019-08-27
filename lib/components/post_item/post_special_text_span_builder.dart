@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_manhuatai/components/post_item/image_text.dart';
 import 'package:flutter_manhuatai/components/post_item/satellite_link_text.dart';
+import 'package:flutter_manhuatai/components/post_item/web_view_link_text.dart';
 import 'emoji_text.dart';
 import 'reply_text.dart';
 import 'self_text.dart';
@@ -94,6 +95,19 @@ class PostSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
         textStyle,
         onTap,
         start: index - (SatelliteLinkText.flag.length - 1),
+        showAtBackground: showAtBackground,
+        type: type,
+        linkStyle: linkStyle,
+        context: context,
+      );
+    } else if (isStart(flag, WebViewLinkText.flag)) {
+      /// 解析帖子中的webView链接
+      /// 将格式如：'<a href="(https?:\/\/.*?)" target=".*" [^>]+>(.*)<\/a>'
+      /// 转成[webViewLink:{"$webViewUrl":"$webViewTitle"}]再进行解析
+      return WebViewLinkText(
+        textStyle,
+        onTap,
+        start: index - (WebViewLinkText.flag.length - 1),
         showAtBackground: showAtBackground,
         type: type,
         linkStyle: linkStyle,

@@ -14,6 +14,7 @@ class Routes {
       '/satellite_detail'; // 帖子详情 eg: /satellite_detail?satelliteId=123456
   static String bookDetail =
       '/book_detail'; // 漫画书籍详情页 eg: /book_detail?bookId=123456
+  static String webView = '/web_view'; // webView
 
   static configureRoutes(Router router) {
     router.define(
@@ -61,6 +62,12 @@ class Routes {
     router.define(
       bookDetail,
       handler: bookDetailHandler,
+      transitionType: TransitionType.inFromRight,
+    );
+
+    router.define(
+      webView,
+      handler: webViewHandler,
       transitionType: TransitionType.inFromRight,
     );
   }

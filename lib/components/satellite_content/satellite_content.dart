@@ -183,6 +183,9 @@ class SatelliteContent extends StatelessWidget {
       // 帖子链接reg, 用于解析帖子中的有关的其他帖子的链接
       RegExp satelliteLinkTagReg = RegExp(
           r'<a href=".*&satellite_id=(\d+)" target=".*" [^>]+>(.*)<\/a>');
+      // webView的链接reg, 用于解析外链url
+      RegExp webViewLinkTagReg =
+          RegExp(r'<a href="(https?:\/\/.*?)" target=".*" [^>]+>(.*)<\/a>');
       content = unescape.convert(content);
 
       content = content.replaceAllMapped(
@@ -205,6 +208,14 @@ class SatelliteContent extends StatelessWidget {
           String satelliteTitle = matches[2];
           // 对于匹配到的satelliteLink，返回被解析的格式
           return '[satelliteLink:{"$satelliteId":"$satelliteTitle"}]';
+        },
+      ).replaceAllMapped(
+        webViewLinkTagReg,
+        (matches) {
+          String webViewUrl = matches[1];
+          String webViewTitle = matches[2];
+          // 对于匹配到的webViewLinkTag，返回被解析webView的格式
+          return '[webViewLink:{"$webViewUrl":"$webViewTitle"}]';
         },
       );
       List<String> contentList = content.split('\${insert}\$');

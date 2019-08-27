@@ -9,6 +9,7 @@ import 'package:flutter_manhuatai/pages/satellite_detail/satellite_detail.dart';
 import 'package:flutter_manhuatai/pages/search_result/search_result.dart';
 import 'package:flutter_manhuatai/pages/user_center/user_center.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/comic_detail_page.dart';
+import 'package:flutter_manhuatai/pages/web_view/web_view.dart';
 
 // 登录
 var loginHandler = Handler(
@@ -76,6 +77,17 @@ var bookDetailHandler = Handler(
 
     return BookDetailPage(
       bookId: int.tryParse(bookId),
+    );
+  },
+);
+
+// webView
+var webViewHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String url = params['url']?.first;
+
+    return WebViewPage(
+      url: url,
     );
   },
 );
