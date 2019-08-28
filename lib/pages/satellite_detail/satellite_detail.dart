@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
+import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -466,10 +468,12 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                       ),
                                     ),
                                   ),
-                                  SatelliteDetailCommentSliverList(
+                                  CommentSliverList(
+                                    isReplyDetail: false,
                                     fatherCommentList: _fatherCommentList,
                                     hasMore: _hasMore,
                                     supportComment: _supportComment,
+                                    relationId: _satellite.starid,
                                     inputKey: _inputKey,
                                   ),
                                 ],

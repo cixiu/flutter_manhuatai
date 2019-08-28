@@ -4,8 +4,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
+class CommentUserHeaderType {
+  final int uid;
+  final int ulevel;
+  final String uname;
+  final String floorDesc;
+  final int createtime;
+  final String deviceTail;
+
+  CommentUserHeaderType({
+    @required this.uid,
+    @required this.ulevel,
+    @required this.uname,
+    this.floorDesc,
+    @required this.createtime,
+    this.deviceTail,
+  });
+}
+
 class CommentUserHeader extends StatelessWidget {
-  final SatelliteComment item;
+  final CommentUserHeaderType item;
 
   CommentUserHeader({
     this.item,
@@ -81,7 +99,7 @@ class CommentUserHeader extends StatelessWidget {
                     margin: EdgeInsets.only(
                       right: ScreenUtil().setWidth(10),
                     ),
-                    height:  ScreenUtil().setSp(42),
+                    height: ScreenUtil().setSp(42),
                     child: Text(
                       item.uname,
                       style: TextStyle(
@@ -92,22 +110,24 @@ class CommentUserHeader extends StatelessWidget {
                   ),
                   Row(
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(
-                          right: ScreenUtil().setWidth(30),
-                        ),
-                        child: Text(
-                          '${item.floorDesc}',
-                          strutStyle: StrutStyle(
-                            forceStrutHeight: true,
-                            fontSize: ScreenUtil().setSp(20),
-                          ),
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: ScreenUtil().setSp(20),
-                          ),
-                        ),
-                      ),
+                      item.floorDesc != null
+                          ? Container(
+                              margin: EdgeInsets.only(
+                                right: ScreenUtil().setWidth(30),
+                              ),
+                              child: Text(
+                                '${item.floorDesc}',
+                                strutStyle: StrutStyle(
+                                  forceStrutHeight: true,
+                                  fontSize: ScreenUtil().setSp(20),
+                                ),
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: ScreenUtil().setSp(20),
+                                ),
+                              ),
+                            )
+                          : Container(),
                       Container(
                         margin: EdgeInsets.only(
                           right: ScreenUtil().setWidth(30),
@@ -124,13 +144,15 @@ class CommentUserHeader extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        '${item.deviceTail}',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: ScreenUtil().setSp(20),
-                        ),
-                      ),
+                      item.deviceTail != null
+                          ? Text(
+                              '${item.deviceTail}',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: ScreenUtil().setSp(20),
+                              ),
+                            )
+                          : Container(),
                     ],
                   )
                 ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/comment_content.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/book_list.dart';
@@ -1166,5 +1167,38 @@ class Api {
       ),
     );
     return GetBookInfoById.fromJson(response);
+  }
+
+  /// 通过commentId获取评论的信息
+  static Future<CommentContent> getCommentContent({
+    @required int commentId,
+    @required int userIdentifier,
+    @required int level,
+    int siteId = 8,
+  }) async {
+    final String url = 'http://community.321mh.com/comment/getcontent/';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'appId': 2,
+        'commentId': commentId,
+        'userIdentifier': userIdentifier,
+        'level': level,
+        'userloglevel': 1,
+        'siteId': siteId,
+        'opreateTime': DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+
+    if (response['status'] == 1 && response['data'] is List) {
+      var data = response['data'] as List<dynamic>;
+      var commentMap = data.first;
+      if (commentMap != null) {
+        return CommentContent.fromJson(commentMap);
+      }
+    }
+
+    return CommentContent.fromJson({});
   }
 }

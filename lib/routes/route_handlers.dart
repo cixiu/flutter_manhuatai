@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/pages/book_detail/book_detail.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
+import 'package:flutter_manhuatai/pages/comment_reply/comment_reply.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
 import 'package:flutter_manhuatai/pages/satellite_detail/satellite_detail.dart';
@@ -88,6 +89,34 @@ var webViewHandler = Handler(
 
     return WebViewPage(
       url: url,
+    );
+  },
+);
+
+// 评论的回复详情页
+var commentReplyHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String commentId = params['commentId']?.first;
+    String ssid = params['ssid']?.first;
+    String relationId = params['relationId']?.first;
+    String floorNum = params['floorNum']?.first;
+    String commentUserid = params['commentUserid']?.first;
+    String commentUsername = params['commentUsername']?.first;
+    String commentUserlevel = params['commentUserlevel']?.first;
+    String commentUserdeviceTail = params['commentUserdeviceTail']?.first;
+    print('-------------------------------');
+    print(commentUsername);
+    print('-------------------------------');
+
+    return CommentReplyPage(
+      commentId: int.tryParse(commentId),
+      ssid: int.tryParse(ssid),
+      relationId: int.tryParse(relationId),
+      floorNum: int.tryParse(floorNum),
+      commentUserid: int.tryParse(commentUserid),
+      commentUsername: commentUsername,
+      commentUserlevel: int.tryParse(commentUserlevel),
+      commentUserdeviceTail: commentUserdeviceTail,
     );
   },
 );

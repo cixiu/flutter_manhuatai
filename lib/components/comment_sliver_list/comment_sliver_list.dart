@@ -15,14 +15,16 @@ import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
 typedef void SupportComment(SatelliteComment comment);
 
-class SatelliteDetailCommentSliverList extends StatelessWidget {
+class CommentSliverList extends StatelessWidget {
+  final bool isReplyDetail;
   final List<CommonSatelliteComment> fatherCommentList;
   final bool hasMore;
   final SupportComment supportComment;
   final int relationId;
   final GlobalKey<CommentTextInputState> inputKey;
 
-  SatelliteDetailCommentSliverList({
+  CommentSliverList({
+    this.isReplyDetail = false,
     this.fatherCommentList,
     this.hasMore,
     this.supportComment,
@@ -73,7 +75,14 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
                   bottom: ScreenUtil().setWidth(20),
                 ),
                 child: CommentUserHeader(
-                  // item: item.fatherComment,
+                  item: CommentUserHeaderType(
+                    uid: item.fatherComment.uid,
+                    uname: item.fatherComment.uname,
+                    ulevel: item.fatherComment.ulevel,
+                    floorDesc: item.fatherComment.floorDesc,
+                    createtime: item.fatherComment.createtime,
+                    deviceTail: item.fatherComment.deviceTail,
+                  ),
                 ),
               ),
               _buildFatherCommentContent(
@@ -81,7 +90,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
                 margin: margin,
                 item: item,
               ),
-              item.childrenCommentList.length != 0
+              !isReplyDetail && item.childrenCommentList.length != 0
                   ? _buildChildrenComments(
                       context: context,
                       margin: margin,
@@ -136,17 +145,23 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        _setReplyComment(item);
+        if (!isReplyDetail) {
+          _setReplyComment(item);
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
         margin: margin,
         child: ExtendedText(
           content,
-          specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
+          specialTextSpanBuilder: PostSpecialTextSpanBuilder(
+            replyTap: () {
+              print('${replyCommentUser.uname}: ${replyCommentUser.uid}');
+            },
+          ),
           style: TextStyle(
             color: Colors.grey[800],
-            fontSize: ScreenUtil().setSp(26),
+            fontSize: ScreenUtil().setSp(!isReplyDetail ? 26 : 28),
           ),
         ),
       ),
@@ -159,11 +174,12 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
     EdgeInsetsGeometry margin,
     CommonSatelliteComment item,
   }) {
+    var fatherComment = item.fatherComment;
     return GestureDetector(
       onTap: () {
         Application.router.navigateTo(
           context,
-          '${Routes.commentReply}?commentId=${item.fatherComment.id}&ssid=${item.fatherComment.ssid}&relationId=$relationId&floorNum=${item.fatherComment.floorNum}',
+          '${Routes.commentReply}?commentId=${fatherComment.id}&ssid=${fatherComment.ssid}&relationId=$relationId&floorNum=${fatherComment.floorNum}&commentUserid=${fatherComment.uid}&commentUsername=${Uri.encodeComponent(fatherComment.uname)}&commentUserlevel=${fatherComment.ulevel}&commentUserdeviceTail=${fatherComment.deviceTail}',
         );
       },
       child: Container(
@@ -245,7 +261,7 @@ class SatelliteDetailCommentSliverList extends StatelessWidget {
             ),
             Container(
               child: Text(
-                '共${item.fatherComment.revertcount}条回复>',
+                '共${fatherComment.revertcount}条回复>',
                 style: TextStyle(
                   color: Colors.blue,
                   fontSize: ScreenUtil().setWidth(22),

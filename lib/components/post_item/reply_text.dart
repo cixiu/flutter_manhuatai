@@ -1,6 +1,7 @@
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'post_special_text_span_builder.dart';
 
@@ -27,8 +28,10 @@ class ReplyText extends SpecialText {
 
   @override
   TextSpan finishText() {
-    TextStyle textStyle =
-        this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
+    TextStyle textStyle = this.textStyle?.copyWith(
+          color: Colors.blue,
+          fontSize: ScreenUtil().setSp(28),
+        );
 
     final String atText = toString();
     final String content = getContent();
