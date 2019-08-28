@@ -104,9 +104,6 @@ var commentReplyHandler = Handler(
     String commentUsername = params['commentUsername']?.first;
     String commentUserlevel = params['commentUserlevel']?.first;
     String commentUserdeviceTail = params['commentUserdeviceTail']?.first;
-    print('-------------------------------');
-    print(commentUsername);
-    print('-------------------------------');
 
     return CommentReplyPage(
       commentId: int.tryParse(commentId),

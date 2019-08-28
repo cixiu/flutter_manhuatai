@@ -412,6 +412,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                         children: <Widget>[
                           Expanded(
                             child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 _inputKey.currentState.blurKeyBoard();
                               },

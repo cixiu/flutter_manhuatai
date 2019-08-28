@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:device_info/device_info.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
@@ -10,11 +12,13 @@ import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_content_item/comment_content_item.dart';
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
+import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
 
 class CommentReplyPage extends StatefulWidget {
   final int commentId;
@@ -51,10 +55,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
 
   ScrollController _scrollController = ScrollController();
 
-  CommentContent _fatherComment;
+  SatelliteComment _fatherComment;
   List<CommonSatelliteComment> _commentList;
 
-  // GlobalKey<CommentTextInputState> _inputKey;
+  GlobalKey<CommentTextInputState> _inputKey;
 
   @override
   void initState() {
@@ -88,6 +92,14 @@ class _CommentReplyPageState extends State<CommentReplyPage>
         level: user.info.ulevel,
       );
 
+      var fatherCommentUserRes = await Api.getCommentUser(
+        relationId: 0,
+        opreateType: 0,
+        userids: [fatherComment.useridentifier.toInt()],
+      );
+
+      var fatherCommentUser = fatherCommentUserRes.data.first;
+
       var commentList = await _getCommentListInfo(
         type: type,
         openid: openid,
@@ -101,9 +113,38 @@ class _CommentReplyPageState extends State<CommentReplyPage>
 
       setState(() {
         _isLoading = false;
-        _fatherComment = fatherComment;
+        // 构建回复评论页的原始评论
+        _fatherComment = SatelliteComment.fromJson({
+          "id": widget.commentId,
+          "content": fatherComment.content,
+          "fatherid": fatherComment.fatherid.toInt(),
+          "images": fatherComment.images,
+          "ssid": fatherComment.ssid.toInt(),
+          "title": fatherComment.title,
+          "url": fatherComment.url,
+          "ip": null,
+          "place": '',
+          "supportcount": fatherComment.supportcount.toInt(),
+          "iselite": fatherComment.iselite,
+          "istop": fatherComment.istop,
+          "status": 1,
+          "revertcount": fatherComment.revertcount.toInt(),
+          "useridentifier": fatherComment.useridentifier.toInt(),
+          "appid": null,
+          "createtime": fatherComment.createtime,
+          "updatetime": fatherComment.updatetime,
+          "ssidtype": fatherComment.ssidtype,
+          "relateid": fatherComment.relateId,
+          'uid': fatherCommentUser.uid,
+          'uname': fatherCommentUser.uname,
+          'ulevel': fatherCommentUser.ulevel,
+          'floor_num': widget.floorNum,
+          'floor_desc': '${widget.floorNum}楼',
+          'createtime': fatherComment.createtime,
+          'device_tail': widget.commentUserdeviceTail,
+        });
         _commentList = commentList;
-        // _inputKey = GlobalKey<CommentTextInputState>();
+        _inputKey = GlobalKey<CommentTextInputState>();
         if (commentList.length == 0) {
           _hasMore = false;
         }
@@ -269,8 +310,94 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     }).toList();
   }
 
+  // 点赞或者取消点赞
+  Future<void> _supportComment(SatelliteComment comment) async {
+    var user = User(context);
+    if (!user.hasLogin) {
+      showToast('点赞失败，请先登录');
+      return;
+    }
+
+    var success = await Api.supportComment(
+      type: user.info.type,
+      openid: user.info.openid,
+      authorization: user.info.authData.authcode,
+      userIdentifier: user.info.uid,
+      userLevel: user.info.ulevel,
+      status: comment.status,
+      ssid: widget.ssid,
+      commentId: comment.id,
+    );
+
+    if (success) {
+      setState(() {
+        if (comment.status == 1) {
+          comment.status = 0;
+          comment.supportcount += 1;
+        } else {
+          comment.status = 1;
+          comment.supportcount -= 1;
+        }
+      });
+    } else {
+      showToast('点赞失败，请稍后再试。');
+    }
+  }
+
+  // 回复评论 TODO:带完善
+  Future<void> _submitComment({
+    String value,
+    bool isReply,
+    SatelliteComment comment,
+  }) async {
+    if (value.trim().isEmpty) {
+      showToast('还是写点什么吧');
+      return;
+    }
+    var user = User(context);
+    String deviceTail = '';
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceTail = androidInfo.device;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceTail = iosInfo.name;
+    }
+
+    if (isReply) {
+      value = '{reply:“${comment.uid}”}$value';
+    }
+    print(value);
+
+    var response = await Api.addComment(
+      type: user.info.type,
+      openid: user.info.openid,
+      authorization: user.info.authData.authcode,
+      userLevel: user.info.ulevel,
+      userIdentifier: user.info.uid,
+      userName: user.info.uname,
+      replyName: isReply ? comment.uname : null,
+      ssid: widget.ssid,
+      fatherId: isReply ? comment.id : widget.commentId,
+      satelliteUserId: isReply ? comment.uid : 0,
+      starId: 0,
+      content: value,
+      title: _fatherComment.title,
+      images: [],
+      deviceTail: deviceTail,
+    );
+    if (response['status'] == 1) {
+      showToast('正在快马加鞭审核中');
+    } else {
+      showToast('${response['msg']}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       body: _isLoadingError
           ? Center(
@@ -306,8 +433,9 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                       children: <Widget>[
                         Expanded(
                           child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
-                              // _inputKey.currentState.blurKeyBoard();
+                              _inputKey.currentState.blurKeyBoard();
                             },
                             child: CustomScrollView(
                               physics: ClampingScrollPhysics(
@@ -321,13 +449,18 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                                   title: Text('${widget.floorNum}楼的回复'),
                                   pinned: true,
                                 ),
-                                // CommentContentItem(
-                                //   isReplyDetail: true,
-                                //   item: CommonSatelliteComment(
-                                //     fatherComment: SatelliteComment()
-                                //   ),
-                                // ),
-                                _buildSliverFatherComment(),
+                                SliverToBoxAdapter(
+                                  child: CommentContentItem(
+                                    isReplyDetail: true,
+                                    item: CommonSatelliteComment(
+                                      fatherComment: _fatherComment,
+                                      childrenCommentList: [],
+                                      replyUserMap: Map(),
+                                    ),
+                                    inputKey: _inputKey,
+                                    supportComment: _supportComment,
+                                  ),
+                                ),
                                 SliverPersistentHeader(
                                   pinned: true,
                                   delegate:
@@ -368,80 +501,22 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                                   isReplyDetail: true,
                                   fatherCommentList: _commentList,
                                   hasMore: _hasMore,
-                                  // supportComment: _supportComment,
+                                  supportComment: _supportComment,
                                   relationId: widget.relationId,
-                                  // inputKey: _inputKey,
+                                  inputKey: _inputKey,
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        // CommentTextInput(
-                        //   key: _inputKey,
-                        //   submit: _submitComment,
-                        //   keyboardHeight: keyboardHeight,
-                        // ),
+                        CommentTextInput(
+                          key: _inputKey,
+                          submit: _submitComment,
+                          keyboardHeight: keyboardHeight,
+                        ),
                       ],
                     ),
             ),
-    );
-  }
-
-  Widget _buildSliverFatherComment() {
-    return SliverToBoxAdapter(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: ScreenUtil().setWidth(30),
-            ),
-            margin: EdgeInsets.only(
-              top: ScreenUtil().setWidth(20),
-              bottom: ScreenUtil().setWidth(20),
-            ),
-            child: CommentUserHeader(
-              item: CommentUserHeaderType(
-                uid: widget.commentUserid,
-                uname: widget.commentUsername,
-                ulevel: widget.commentUserlevel,
-                floorDesc: '${widget.floorNum}楼',
-                createtime: _fatherComment.createtime,
-                deviceTail: widget.commentUserdeviceTail,
-              ),
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.only(
-              left: ScreenUtil().setWidth(130),
-              right: ScreenUtil().setWidth(30),
-              bottom: ScreenUtil().setWidth(20),
-            ),
-            child: ExtendedText(
-              _fatherComment.content,
-              specialTextSpanBuilder: PostSpecialTextSpanBuilder(),
-              style: TextStyle(
-                color: Colors.grey[800],
-                fontSize: ScreenUtil().setSp(28),
-              ),
-            ),
-          ),
-          // _buildBottomActionIcons(
-          //   context: context,
-          //   margin: margin,
-          //   item: item,
-          // ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: ScreenUtil().setWidth(1),
-            margin: EdgeInsets.symmetric(
-              horizontal: ScreenUtil().setWidth(30),
-            ),
-            color: Colors.grey[350],
-          )
-        ],
-      ),
     );
   }
 }

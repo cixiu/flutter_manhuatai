@@ -940,6 +940,7 @@ class Api {
     @required int userIdentifier,
     @required String userName,
     @required int ssid,
+    String replyName,
     int fatherId = 0,
     int siteId = 8,
     @required int satelliteUserId,
@@ -953,35 +954,42 @@ class Api {
   }) async {
     final String url = 'http://community-new.321mh.com/v1/comment/add/';
 
+    var data = {
+      "appId": "$appId",
+      "auth_token": authorization,
+      "authorization": "Bearer $authorization",
+      "content": content,
+      "device_tail": deviceTail,
+      "fatherId": fatherId,
+      "images": images == null ? images.toString() : "[]",
+      "level": "$userLevel",
+      "openid": "$openid",
+      "opreateId": satelliteUserId,
+      "relateId": relateId,
+      "satelliteId": ssid,
+      "selfName": userName,
+      "siteId": siteId,
+      "ssid": ssid,
+      "ssidType": ssidType,
+      "starId": starId,
+      "title": title,
+      "type": type,
+      "url": "",
+      "userIdentifier": "$userIdentifier",
+      "userloglevel": 1
+    };
+
+    // 要回复的用户，在评论的回复页面中需要使用
+    if (replyName != null) {
+      data['replyName'] = replyName;
+    }
+
     Map<String, dynamic> response = await HttpRequest.post(
       url,
       params: {
         'FatherId': fatherId,
       },
-      data: {
-        "appId": "$appId",
-        "auth_token": authorization,
-        "authorization": "Bearer $authorization",
-        "content": content,
-        "device_tail": deviceTail,
-        "fatherId": fatherId,
-        "images": images == null ? images.toString() : "[]",
-        "level": "$userLevel",
-        "openid": "$openid",
-        "opreateId": satelliteUserId,
-        "relateId": relateId,
-        "satelliteId": ssid,
-        "selfName": userName,
-        "siteId": siteId,
-        "ssid": ssid,
-        "ssidType": ssidType,
-        "starId": starId,
-        "title": title,
-        "type": type,
-        "url": "",
-        "userIdentifier": "$userIdentifier",
-        "userloglevel": 1
-      },
+      data: data,
       options: Options(
         headers: {
           'Authorization': 'Bearer $authorization',
