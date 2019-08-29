@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -37,6 +39,9 @@ class _CommentReplyPageState extends State<CommentReplyPage>
   bool _isLoadingMore = false;
   bool _isLoadingError = false;
   int page = 1;
+  int pageSize = 20;
+  double _maxFirstScrollTop; // 加装第一页的评论后的最大滚动距离，用于切换评论列表的类型后，需要将页面滚动至初始位置的基准距离
+  WhyFarther _commentType = WhyFarther.hot; // 评论的类型（最新，最热）
 
   ScrollController _scrollController = ScrollController();
 
@@ -63,6 +68,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
   void _listenenScroll() {
     bool isBottom = _scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent;
+    // 设置页面需要滚动至初始位置的基准距离
+    if (page == 1 && _maxFirstScrollTop == null) {
+      _maxFirstScrollTop = _scrollController.position.maxScrollExtent;
+    }
     // 判断当前滑动位置是不是到达底部，触发加载更多回调
     if (isBottom) {
       loadMore();
@@ -73,6 +82,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     try {
       page = 1;
       _hasMore = true;
+      _maxFirstScrollTop = null;
       var user = User(context);
       var type = user.info.type;
       var openid = user.info.openid;
@@ -137,7 +147,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
         });
         _commentList = commentList;
         _inputKey = GlobalKey<CommentTextInputState>();
-        if (commentList.length == 0) {
+        if (commentList.length < pageSize) {
           _hasMore = false;
         }
       });
@@ -183,6 +193,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     print('加载更多');
   }
 
+  // 获取评论列表的相关信息
   Future<List<CommonSatelliteComment>> _getCommentListInfo({
     String type,
     String openid,
@@ -194,6 +205,8 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       page: page,
       ssid: widget.fatherComment.ssid,
       fatherid: widget.fatherComment.id,
+      type: _commentType == WhyFarther.hot ? 'hot' : 'new', // 用来判断获取哪种类型的评论
+      iswater: null,
     );
 
     List<int> userIds = [];
@@ -336,7 +349,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     }
   }
 
-  // 回复评论 TODO:带完善
+  // 回复评论
   Future<void> _submitComment({
     String value,
     bool isReply,
@@ -383,6 +396,44 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       showToast('正在快马加鞭审核中');
     } else {
       showToast('${response['msg']}');
+    }
+  }
+
+  // 切换显示的评论列表的类型
+  Future<void> _switchCommentType(WhyFarther result) async {
+    try {
+      int _page = page;
+      showLoading(context);
+      setState(() {
+        _commentType = result;
+      });
+      _hasMore = true;
+      page = 1;
+      var user = User(context);
+
+      var fatherCommentList = await _getCommentListInfo(
+        type: user.info.type,
+        openid: user.info.openid,
+        authorization: user.info.authData.authcode,
+        relationId: relationId,
+      );
+
+      // 如果已经加装到了下一个page, 则切换评论列表的类型后，需要将页面滚动至初始位置
+      var scrollTop = _scrollController.position.pixels;
+      if (_page > 1 && scrollTop > _maxFirstScrollTop) {
+        _scrollController.jumpTo(1.0);
+      }
+
+      setState(() {
+        if (fatherCommentList.length == 0) {
+          _hasMore = false;
+        }
+        _commentList = fatherCommentList;
+        _maxFirstScrollTop = null;
+      });
+      hideLoading(context);
+    } catch (e) {
+      hideLoading(context);
     }
   }
 
@@ -458,34 +509,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                                   delegate:
                                       CommonSliverPersistentHeaderDelegate(
                                     height: ScreenUtil().setWidth(80),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: ScreenUtil().setWidth(30),
-                                      ),
-                                      color: Colors.white,
-                                      height: ScreenUtil().setWidth(80),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            '评论 （${_fatherComment.revertcount.toInt()}）',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize:
-                                                  ScreenUtil().setWidth(32),
-                                            ),
-                                          ),
-                                          Text(
-                                            '最热',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize:
-                                                  ScreenUtil().setWidth(24),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    child: CommentTypeHeader(
+                                      count: _fatherComment.revertcount,
+                                      commentType: _commentType,
+                                      onSelected: _switchCommentType,
                                     ),
                                   ),
                                 ),

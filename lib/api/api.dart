@@ -795,6 +795,7 @@ class Api {
     int page = 1,
     int size = 20,
     int contenttype = 3,
+    int iswater = 0,
     int fatherid = 0,
     int relateid = 0,
     String type = 'hot',
@@ -803,18 +804,30 @@ class Api {
         ? 'http://community-new.321mh.com/v1/comment/gethotscomment'
         : 'http://community-new.321mh.com/v1/comment/newgetsv2';
 
+    var params = {
+      'appid': 2,
+      'ssid': ssid,
+      'ssidtype': ssidtype,
+      'page': page,
+      // 'size': size,
+      // 'contenttype': contenttype,
+      'fatherid': fatherid,
+      'relateid': relateid
+    };
+
+    if (type == 'hot') {
+      params['size'] = size;
+      params['contenttype'] = contenttype;
+    } else {
+      params['pagesize'] = size;
+      if (iswater != null) {
+        params['iswater'] = iswater;
+      }
+    }
+
     Map<String, dynamic> response = await HttpRequest.get(
       url,
-      params: {
-        'appid': 2,
-        'ssid': ssid,
-        'ssidtype': ssidtype,
-        'page': page,
-        'size': size,
-        'contenttype': contenttype,
-        'fatherid': fatherid,
-        'relateid': relateid
-      },
+      params: params,
       options: Options(
         headers: {
           'auth_token': '$authorization',
