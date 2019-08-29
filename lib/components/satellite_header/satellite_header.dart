@@ -129,7 +129,9 @@ class SatelliteHeader extends StatelessWidget {
               ),
             ),
           ),
-          showFollowBtn
+          // isfollow == 0 表示还未关注用户，所以需要显示关注按钮
+          // isfollow == 1 表示已关注
+          showFollowBtn && item.isfollow == 0
               ? Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
