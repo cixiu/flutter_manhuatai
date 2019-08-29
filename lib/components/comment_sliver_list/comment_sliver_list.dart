@@ -13,16 +13,12 @@ class CommentSliverList extends StatelessWidget {
   final bool isReplyDetail;
   final List<CommonSatelliteComment> fatherCommentList;
   final bool hasMore;
-  final SupportComment supportComment;
-  final int relationId;
   final GlobalKey<CommentTextInputState> inputKey;
 
   CommentSliverList({
     this.isReplyDetail = false,
     this.fatherCommentList,
     this.hasMore,
-    this.supportComment,
-    this.relationId,
     this.inputKey,
   });
 
@@ -41,9 +37,7 @@ class CommentSliverList extends StatelessWidget {
           return CommentContentItem(
             isReplyDetail: isReplyDetail,
             item: item,
-            relationId: relationId,
             inputKey: inputKey,
-            supportComment: supportComment,
           );
         },
         childCount: fatherCommentList.length + 1,

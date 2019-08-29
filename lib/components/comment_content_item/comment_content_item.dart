@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
@@ -11,26 +15,28 @@ import 'package:flutter_manhuatai/components/post_item/post_special_text_span_bu
 
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
+import 'package:oktoast/oktoast.dart';
 
-typedef void SupportComment(SatelliteComment comment);
+// typedef void SupportComment(SatelliteComment comment);
 
-class CommentContentItem extends StatelessWidget {
+class CommentContentItem extends StatefulWidget {
   final bool isReplyDetail; // 是否是回复的详情页
   final bool needReplyed; // 是否需要带上{reply:'xxx'}的内容，也就是是否是直接回复，还是评论
   final CommonSatelliteComment item;
-  final SupportComment supportComment;
-  final int relationId;
   final GlobalKey<CommentTextInputState> inputKey;
 
   CommentContentItem({
     this.isReplyDetail = false,
     this.needReplyed = true,
     this.item,
-    this.supportComment,
-    this.relationId,
     this.inputKey,
   });
 
+  @override
+  _CommentContentItemState createState() => _CommentContentItemState();
+}
+
+class _CommentContentItemState extends State<CommentContentItem> {
   String _formatSupportCount(int count) {
     if (count > 10000) {
       return '${(count / 10000).toStringAsFixed(1)}万';
@@ -38,13 +44,56 @@ class CommentContentItem extends StatelessWidget {
     return count.toString();
   }
 
-  // 设置要回复的评论的一些信息
   void _setReplyComment(CommonSatelliteComment item) {
-    inputKey.currentState.focus(hintText: '回复：${item.fatherComment.uname}');
-    inputKey.currentState.replyComment(
-      isReply: needReplyed,
+    widget.inputKey.currentState
+        .focus(hintText: '回复：${item.fatherComment.uname}');
+    widget.inputKey.currentState.replyComment(
+      isReply: widget.needReplyed,
       comment: item.fatherComment,
     );
+  }
+
+  Future<void> _supportComment({
+    BuildContext context,
+    SatelliteComment comment,
+  }) async {
+    var user = User(context);
+    if (!user.hasLogin) {
+      showToast('点赞失败，请先登录');
+      return;
+    }
+
+    var success = await Api.supportComment(
+      type: user.info.type,
+      openid: user.info.openid,
+      authorization: user.info.authData.authcode,
+      userIdentifier: user.info.uid,
+      userLevel: user.info.ulevel,
+      status: comment.status == 1 ? 0 : 1,
+      ssid: comment.ssid,
+      commentId: comment.id,
+    );
+
+    if (success) {
+      setState(() {
+        if (comment.status == 1) {
+          comment.status = 0;
+          comment.supportcount += 1;
+        } else {
+          comment.status = 1;
+          comment.supportcount -= 1;
+        }
+      });
+    } else {
+      // showToast('点赞失败，请稍后再试。');
+      setState(() {
+        if (comment.status == 1) {
+          comment.status = 0;
+        } else {
+          comment.status = 1;
+        }
+      });
+    }
   }
 
   @override
@@ -68,31 +117,31 @@ class CommentContentItem extends StatelessWidget {
           ),
           child: CommentUserHeader(
             item: CommentUserHeaderType(
-              uid: item.fatherComment.uid,
-              uname: item.fatherComment.uname,
-              ulevel: item.fatherComment.ulevel,
-              floorDesc: item.fatherComment.floorDesc,
-              createtime: item.fatherComment.createtime,
-              deviceTail: item.fatherComment.deviceTail,
+              uid: widget.item.fatherComment.uid,
+              uname: widget.item.fatherComment.uname,
+              ulevel: widget.item.fatherComment.ulevel,
+              floorDesc: widget.item.fatherComment.floorDesc,
+              createtime: widget.item.fatherComment.createtime,
+              deviceTail: widget.item.fatherComment.deviceTail,
             ),
           ),
         ),
         _buildFatherCommentContent(
           context: context,
           margin: margin,
-          item: item,
+          item: widget.item,
         ),
-        !isReplyDetail && item.childrenCommentList.length != 0
+        !widget.isReplyDetail && widget.item.childrenCommentList.length != 0
             ? _buildChildrenComments(
                 context: context,
                 margin: margin,
-                item: item,
+                item: widget.item,
               )
             : Container(),
         _buildBottomActionIcons(
           context: context,
           margin: margin,
-          item: item,
+          item: widget.item,
         ),
         Container(
           width: MediaQuery.of(context).size.width,
@@ -106,7 +155,6 @@ class CommentContentItem extends StatelessWidget {
     );
   }
 
-  // 一级评论的内容
   Widget _buildFatherCommentContent({
     BuildContext context,
     EdgeInsetsGeometry margin,
@@ -133,7 +181,7 @@ class CommentContentItem extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (!isReplyDetail) {
+        if (!widget.isReplyDetail) {
           _setReplyComment(item);
         }
       },
@@ -149,14 +197,13 @@ class CommentContentItem extends StatelessWidget {
           ),
           style: TextStyle(
             color: Colors.grey[800],
-            fontSize: ScreenUtil().setSp(!isReplyDetail ? 26 : 28),
+            fontSize: ScreenUtil().setSp(!widget.isReplyDetail ? 26 : 28),
           ),
         ),
       ),
     );
   }
 
-  // 二级评论
   Widget _buildChildrenComments({
     BuildContext context,
     EdgeInsetsGeometry margin,
@@ -268,7 +315,6 @@ class CommentContentItem extends StatelessWidget {
     );
   }
 
-  // 评论和点赞的操作区
   Widget _buildBottomActionIcons({
     BuildContext context,
     EdgeInsetsGeometry margin,
@@ -281,6 +327,9 @@ class CommentContentItem extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
+          // TODO:与relationId相关的信息，比如漫画评论的relationId是comicChapterId，这里需要显示漫画的章节信息
+          //
+          //
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
@@ -300,9 +349,13 @@ class CommentContentItem extends StatelessWidget {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
-              if (supportComment != null) {
-                supportComment(item.fatherComment);
-              }
+              _supportComment(
+                comment: item.fatherComment,
+                context: context,
+              );
+              // if (supportComment != null) {
+              //   supportComment(item.fatherComment);
+              // }
             },
             child: Container(
               width: ScreenUtil().setWidth(100),

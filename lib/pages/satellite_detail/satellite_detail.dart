@@ -141,7 +141,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         setState(() {
           _isLoadingError = true;
         });
-        print(e);
       }
     }
   }
@@ -169,7 +168,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     }
 
     setState(() {
-      if (fatherCommentList.length == 0) {
+      if (fatherCommentList.length < pageSize) {
         _hasMore = false;
       }
       _fatherCommentList.addAll(fatherCommentList);
@@ -289,40 +288,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         } else {
           _satellite.issupport = 1;
           _satellite.supportnum += 1;
-        }
-      });
-    } else {
-      showToast('点赞失败，请稍后再试。');
-    }
-  }
-
-  // 点赞或者取消点赞
-  Future<void> _supportComment(SatelliteComment comment) async {
-    var user = User(context);
-    if (!user.hasLogin) {
-      showToast('点赞失败，请先登录');
-      return;
-    }
-
-    var success = await Api.supportComment(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
-      userIdentifier: user.info.uid,
-      userLevel: user.info.ulevel,
-      status: comment.status == 1 ? 0 : 1,
-      ssid: _satellite.id,
-      commentId: comment.id,
-    );
-
-    if (success) {
-      setState(() {
-        if (comment.status == 1) {
-          comment.status = 0;
-          comment.supportcount += 1;
-        } else {
-          comment.status = 1;
-          comment.supportcount -= 1;
         }
       });
     } else {
@@ -494,8 +459,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
                                     isReplyDetail: false,
                                     fatherCommentList: _fatherCommentList,
                                     hasMore: _hasMore,
-                                    supportComment: _supportComment,
-                                    relationId: _satellite.starid,
                                     inputKey: _inputKey,
                                   ),
                                 ],
