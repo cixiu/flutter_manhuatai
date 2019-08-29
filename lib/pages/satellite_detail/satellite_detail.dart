@@ -72,6 +72,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
   Future<void> _handleRefresh() async {
     try {
       page = 1;
+      _hasMore = true;
       var user = User(context);
       var type = user.info.type;
       var openid = user.info.openid;

@@ -16,11 +16,13 @@ typedef Future<void> SubmitCallback({
 class CommentTextInput extends StatefulWidget {
   final SubmitCallback submit;
   final double keyboardHeight;
+  final String hintText;
 
   CommentTextInput({
     Key key,
     @required this.keyboardHeight,
     this.submit,
+    this.hintText = '神评机会近在眼前~',
   }) : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class CommentTextInput extends StatefulWidget {
 class CommentTextInputState extends State<CommentTextInput> {
   String _value = '';
   TextEditingController _textEditingController = TextEditingController();
-  String _hintText = '神评机会近在眼前~';
+  String _hintText = '';
   FocusNode _focusNode = FocusNode();
   double _keyboardHeight = 267.0;
   bool activeEmojiGird = false;
@@ -38,6 +40,12 @@ class CommentTextInputState extends State<CommentTextInput> {
   SatelliteComment _replyComment;
 
   bool get showCustomKeyBoard => activeEmojiGird;
+
+  @override
+  void initState() {
+    super.initState();
+    _hintText = widget.hintText;
+  }
 
   void _insertText(String text) {
     bool isBack = text == '[/返回]';
@@ -90,7 +98,7 @@ class CommentTextInputState extends State<CommentTextInput> {
     hideEmoji();
     Future.delayed(Duration(milliseconds: 100), () {
       setState(() {
-        _hintText = '神评机会近在眼前~';
+        _hintText = widget.hintText;
         _isReply = false;
         _replyComment = null;
       });
@@ -108,9 +116,12 @@ class CommentTextInputState extends State<CommentTextInput> {
   }
 
   // 设置要回复的评论变量
-  void replyComment({SatelliteComment comment}) {
+  void replyComment({
+    bool isReply = true,
+    SatelliteComment comment,
+  }) {
     setState(() {
-      _isReply = true;
+      _isReply = isReply;
       _replyComment = comment;
     });
   }
@@ -240,7 +251,7 @@ class CommentTextInputState extends State<CommentTextInput> {
                         text: _value,
                       );
                       activeEmojiGird = false;
-                      _hintText = '神评机会近在眼前~';
+                      _hintText = widget.hintText;
                       _isReply = false;
                       _replyComment = null;
                     });

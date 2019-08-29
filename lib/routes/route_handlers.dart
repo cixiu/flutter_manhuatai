@@ -92,28 +92,3 @@ var webViewHandler = Handler(
     );
   },
 );
-
-// 评论的回复详情页
-var commentReplyHandler = Handler(
-  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    String commentId = params['commentId']?.first;
-    String ssid = params['ssid']?.first;
-    String relationId = params['relationId']?.first;
-    String floorNum = params['floorNum']?.first;
-    String commentUserid = params['commentUserid']?.first;
-    String commentUsername = params['commentUsername']?.first;
-    String commentUserlevel = params['commentUserlevel']?.first;
-    String commentUserdeviceTail = params['commentUserdeviceTail']?.first;
-
-    return CommentReplyPage(
-      commentId: int.tryParse(commentId),
-      ssid: int.tryParse(ssid),
-      relationId: int.tryParse(relationId),
-      floorNum: int.tryParse(floorNum),
-      commentUserid: int.tryParse(commentUserid),
-      commentUsername: commentUsername,
-      commentUserlevel: int.tryParse(commentUserlevel),
-      commentUserdeviceTail: commentUserdeviceTail,
-    );
-  },
-);

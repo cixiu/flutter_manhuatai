@@ -15,8 +15,7 @@ class Routes {
   static String bookDetail =
       '/book_detail'; // 漫画书籍详情页 eg: /book_detail?bookId=123456
   static String webView = '/web_view'; // webView
-  static String commentReply =
-      '/comment_reply'; // 评论的回复详情页 /comment_reply?commentId=xxx
+  static String commentReply = '/comment_reply'; // 评论的回复详情页使用CustomRouter进行跳转传参
 
   static configureRoutes(Router router) {
     router.define(
@@ -70,12 +69,6 @@ class Routes {
     router.define(
       webView,
       handler: webViewHandler,
-      transitionType: TransitionType.inFromRight,
-    );
-
-    router.define(
-      commentReply,
-      handler: commentReplyHandler,
       transitionType: TransitionType.inFromRight,
     );
   }

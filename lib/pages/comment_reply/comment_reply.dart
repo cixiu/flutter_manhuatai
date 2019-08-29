@@ -1,44 +1,29 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:device_info/device_info.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/common/model/comment_content.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_content_item/comment_content_item.dart';
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
-import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
-import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:oktoast/oktoast.dart';
 
 class CommentReplyPage extends StatefulWidget {
-  final int commentId;
-  final int ssid;
-  final int relationId;
-  final int floorNum;
-  final int commentUserid;
-  final String commentUsername;
-  final int commentUserlevel;
-  final String commentUserdeviceTail;
+  final SatelliteComment fatherComment;
+  final String title;
 
   CommentReplyPage({
-    @required this.commentId,
-    @required this.ssid,
-    @required this.relationId,
-    @required this.floorNum,
-    @required this.commentUserid,
-    @required this.commentUsername,
-    @required this.commentUserlevel,
-    this.commentUserdeviceTail,
+    this.fatherComment,
+    this.title = '评论回复',
   });
 
   @override
@@ -60,10 +45,16 @@ class _CommentReplyPageState extends State<CommentReplyPage>
 
   GlobalKey<CommentTextInputState> _inputKey;
 
+  // 如果是漫画的章节评论，则relationId为comicChapterId, 否则为空
+  int get relationId => widget.fatherComment.relateid.isEmpty
+      ? 0
+      : int.tryParse(widget.fatherComment.relateid);
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_listenenScroll);
+    _fatherComment = widget.fatherComment;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
@@ -81,13 +72,14 @@ class _CommentReplyPageState extends State<CommentReplyPage>
   Future<void> _handleRefresh() async {
     try {
       page = 1;
+      _hasMore = true;
       var user = User(context);
       var type = user.info.type;
       var openid = user.info.openid;
       var authorization = user.info.authData.authcode;
 
       var fatherComment = await Api.getCommentContent(
-        commentId: widget.commentId,
+        commentId: widget.fatherComment.id,
         userIdentifier: user.info.uid,
         level: user.info.ulevel,
       );
@@ -104,7 +96,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
         type: type,
         openid: openid,
         authorization: authorization,
-        relationId: widget.relationId,
+        relationId: relationId,
       );
 
       if (!this.mounted) {
@@ -115,22 +107,22 @@ class _CommentReplyPageState extends State<CommentReplyPage>
         _isLoading = false;
         // 构建回复评论页的原始评论
         _fatherComment = SatelliteComment.fromJson({
-          "id": widget.commentId,
+          "id": widget.fatherComment.id,
           "content": fatherComment.content,
           "fatherid": fatherComment.fatherid.toInt(),
           "images": fatherComment.images,
           "ssid": fatherComment.ssid.toInt(),
           "title": fatherComment.title,
           "url": fatherComment.url,
-          "ip": null,
-          "place": '',
+          "ip": widget.fatherComment.ip,
+          "place": widget.fatherComment.place,
           "supportcount": fatherComment.supportcount.toInt(),
           "iselite": fatherComment.iselite,
           "istop": fatherComment.istop,
-          "status": 1,
+          "status": fatherComment.issupport,
           "revertcount": fatherComment.revertcount.toInt(),
           "useridentifier": fatherComment.useridentifier.toInt(),
-          "appid": null,
+          "appid": widget.fatherComment.appid,
           "createtime": fatherComment.createtime,
           "updatetime": fatherComment.updatetime,
           "ssidtype": fatherComment.ssidtype,
@@ -138,10 +130,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
           'uid': fatherCommentUser.uid,
           'uname': fatherCommentUser.uname,
           'ulevel': fatherCommentUser.ulevel,
-          'floor_num': widget.floorNum,
-          'floor_desc': '${widget.floorNum}楼',
+          'floor_num': widget.fatherComment.floorNum,
+          'floor_desc': widget.fatherComment.floorDesc,
           'createtime': fatherComment.createtime,
-          'device_tail': widget.commentUserdeviceTail,
+          'device_tail': widget.fatherComment.deviceTail,
         });
         _commentList = commentList;
         _inputKey = GlobalKey<CommentTextInputState>();
@@ -173,7 +165,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       type: user.info.type,
       openid: user.info.openid,
       authorization: user.info.authData.authcode,
-      relationId: widget.relationId,
+      relationId: relationId,
     );
     _isLoadingMore = false;
 
@@ -200,8 +192,8 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     var getSatelliteFatherComments = await Api.getSatelliteFatherComments(
       authorization: authorization,
       page: page,
-      ssid: widget.ssid,
-      fatherid: widget.commentId,
+      ssid: widget.fatherComment.ssid,
+      fatherid: widget.fatherComment.id,
     );
 
     List<int> userIds = [];
@@ -325,7 +317,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       userIdentifier: user.info.uid,
       userLevel: user.info.ulevel,
       status: comment.status,
-      ssid: widget.ssid,
+      ssid: widget.fatherComment.ssid,
       commentId: comment.id,
     );
 
@@ -378,8 +370,8 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       userIdentifier: user.info.uid,
       userName: user.info.uname,
       replyName: isReply ? comment.uname : null,
-      ssid: widget.ssid,
-      fatherId: isReply ? comment.id : widget.commentId,
+      ssid: widget.fatherComment.ssid,
+      fatherId: widget.fatherComment.id,
       satelliteUserId: isReply ? comment.uid : 0,
       starId: 0,
       content: value,
@@ -399,6 +391,11 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        centerTitle: true,
+        title: Text('${widget.title}'),
+      ),
       body: _isLoadingError
           ? Center(
               child: Container(
@@ -443,14 +440,9 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                               ),
                               controller: _scrollController,
                               slivers: <Widget>[
-                                SliverAppBar(
-                                  elevation: 0.0,
-                                  centerTitle: true,
-                                  title: Text('${widget.floorNum}楼的回复'),
-                                  pinned: true,
-                                ),
                                 SliverToBoxAdapter(
                                   child: CommentContentItem(
+                                    needReplyed: false,
                                     isReplyDetail: true,
                                     item: CommonSatelliteComment(
                                       fatherComment: _fatherComment,
@@ -502,7 +494,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                                   fatherCommentList: _commentList,
                                   hasMore: _hasMore,
                                   supportComment: _supportComment,
-                                  relationId: widget.relationId,
+                                  relationId: relationId,
                                   inputKey: _inputKey,
                                 ),
                               ],
@@ -511,6 +503,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
                         ),
                         CommentTextInput(
                           key: _inputKey,
+                          hintText: '回复：${_fatherComment.uname}',
                           submit: _submitComment,
                           keyboardHeight: keyboardHeight,
                         ),

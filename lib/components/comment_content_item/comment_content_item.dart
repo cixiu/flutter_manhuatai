@@ -2,12 +2,11 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
-import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
+import 'package:flutter_manhuatai/pages/comment_reply/comment_reply.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
-import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
@@ -16,17 +15,17 @@ import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 typedef void SupportComment(SatelliteComment comment);
 
 class CommentContentItem extends StatelessWidget {
-  final bool isReplyDetail;
+  final bool isReplyDetail; // 是否是回复的详情页
+  final bool needReplyed; // 是否需要带上{reply:'xxx'}的内容，也就是是否是直接回复，还是评论
   final CommonSatelliteComment item;
-  final bool hasMore;
   final SupportComment supportComment;
   final int relationId;
   final GlobalKey<CommentTextInputState> inputKey;
 
   CommentContentItem({
     this.isReplyDetail = false,
+    this.needReplyed = true,
     this.item,
-    this.hasMore,
     this.supportComment,
     this.relationId,
     this.inputKey,
@@ -42,7 +41,10 @@ class CommentContentItem extends StatelessWidget {
   // 设置要回复的评论的一些信息
   void _setReplyComment(CommonSatelliteComment item) {
     inputKey.currentState.focus(hintText: '回复：${item.fatherComment.uname}');
-    inputKey.currentState.replyComment(comment: item.fatherComment);
+    inputKey.currentState.replyComment(
+      isReply: needReplyed,
+      comment: item.fatherComment,
+    );
   }
 
   @override
@@ -163,9 +165,15 @@ class CommentContentItem extends StatelessWidget {
     var fatherComment = item.fatherComment;
     return GestureDetector(
       onTap: () {
-        Application.router.navigateTo(
-          context,
-          '${Routes.commentReply}?commentId=${fatherComment.id}&ssid=${fatherComment.ssid}&relationId=$relationId&floorNum=${fatherComment.floorNum}&commentUserid=${fatherComment.uid}&commentUsername=${Uri.encodeComponent(fatherComment.uname)}&commentUserlevel=${fatherComment.ulevel}&commentUserdeviceTail=${fatherComment.deviceTail}',
+        Navigator.of(context).push(
+          CustomRouter(
+            CommentReplyPage(
+              fatherComment: item.fatherComment,
+              title: item.fatherComment.relateid.isEmpty
+                  ? '${item.fatherComment.floorDesc}的回复'
+                  : '吐槽详情',
+            ),
+          ),
         );
       },
       child: Container(
