@@ -82,7 +82,7 @@ class _PicSwiperState extends State<PicSwiper>
                   item,
                   fit: BoxFit.contain,
                   enableSlideOutPage: true,
-                  mode: ExtendedImageMode.Gesture,
+                  mode: ExtendedImageMode.gesture,
                   loadStateChanged: (state) {
                     if (state.extendedImageLoadState == LoadState.loading) {
                       return Center(
@@ -131,6 +131,7 @@ class _PicSwiperState extends State<PicSwiper>
                         ),
                       );
                     }
+                    // return Container();
                   },
                   initGestureConfigHandler: (state) {
                     double initialScale = 1.0;

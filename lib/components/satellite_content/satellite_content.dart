@@ -173,7 +173,7 @@ class SatelliteContent extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.grey[800],
                   fontSize: ScreenUtil().setSp(28),
-                  height: 1.2,
+                  // height: 1.2,
                 ),
               ),
             );
@@ -271,14 +271,14 @@ class SatelliteContent extends StatelessWidget {
                               linkStyle: TextStyle(
                                 color: Colors.blue,
                                 fontSize: ScreenUtil().setSp(28),
-                                height: 1.2,
+                                // height: 1.2,
                               ),
                             ),
                             maxLines: isDetail ? null : 3,
                             style: TextStyle(
                               color: Colors.grey[800],
                               fontSize: ScreenUtil().setSp(28),
-                              height: 1.2,
+                              // height: 1.2,
                             ),
                           );
                   } else {
