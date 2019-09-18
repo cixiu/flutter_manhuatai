@@ -104,7 +104,11 @@ class Utils {
     String imgUrl;
 
     if (type == 'head') {
-      imgHost = '$imgHost/file/kanmanhua_images/head';
+      imgHost = AppConst.userHeadImgHost;
+      imgHost = '$imgHost/kmh_user_head';
+      size = 'head';
+      suffix = AppConst.imageSizeSuffixMap[size];
+
       const int Len = 9;
 
       // 将id补0至9位数  123456 => 000123456

@@ -88,6 +88,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       var openid = user.info.openid;
       var authorization = user.info.authData.authcode;
 
+      // 获取父级评论的详细内容
       var fatherComment = await Api.getCommentContent(
         commentId: widget.fatherComment.id,
         userIdentifier: user.info.uid,
@@ -97,7 +98,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       var fatherCommentUserRes = await Api.getCommentUser(
         relationId: 0,
         opreateType: 0,
-        userids: [fatherComment.useridentifier.toInt()],
+        userids: [widget.fatherComment.useridentifier.toInt()],
       );
 
       var fatherCommentUser = fatherCommentUserRes.data.first;
@@ -116,35 +117,39 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       setState(() {
         _isLoading = false;
         // 构建回复评论页的原始评论
-        _fatherComment = SatelliteComment.fromJson({
-          "id": widget.fatherComment.id,
-          "content": fatherComment.content,
-          "fatherid": fatherComment.fatherid.toInt(),
-          "images": fatherComment.images,
-          "ssid": fatherComment.ssid.toInt(),
-          "title": fatherComment.title,
-          "url": fatherComment.url,
-          "ip": widget.fatherComment.ip,
-          "place": widget.fatherComment.place,
-          "supportcount": fatherComment.supportcount.toInt(),
-          "iselite": fatherComment.iselite,
-          "istop": fatherComment.istop,
-          "status": fatherComment.issupport,
-          "revertcount": fatherComment.revertcount.toInt(),
-          "useridentifier": fatherComment.useridentifier.toInt(),
-          "appid": widget.fatherComment.appid,
-          "createtime": fatherComment.createtime,
-          "updatetime": fatherComment.updatetime,
-          "ssidtype": fatherComment.ssidtype,
-          "relateid": fatherComment.relateId,
-          'uid': fatherCommentUser.uid,
-          'uname': fatherCommentUser.uname,
-          'ulevel': fatherCommentUser.ulevel,
-          'floor_num': widget.fatherComment.floorNum,
-          'floor_desc': widget.fatherComment.floorDesc,
-          'createtime': fatherComment.createtime,
-          'device_tail': widget.fatherComment.deviceTail,
-        });
+        if (fatherComment.fatherid == null) {
+          _fatherComment = widget.fatherComment;
+        } else {
+          _fatherComment = SatelliteComment.fromJson({
+            "id": widget.fatherComment.id,
+            "content": fatherComment.content,
+            "fatherid": fatherComment.fatherid.toInt(),
+            "images": fatherComment.images,
+            "ssid": fatherComment.ssid.toInt(),
+            "title": fatherComment.title,
+            "url": fatherComment.url,
+            "ip": widget.fatherComment.ip,
+            "place": widget.fatherComment.place,
+            "supportcount": fatherComment.supportcount.toInt(),
+            "iselite": fatherComment.iselite,
+            "istop": fatherComment.istop,
+            "status": fatherComment.issupport,
+            "revertcount": fatherComment.revertcount.toInt(),
+            "useridentifier": fatherComment.useridentifier.toInt(),
+            "appid": widget.fatherComment.appid,
+            "createtime": fatherComment.createtime,
+            "updatetime": fatherComment.updatetime,
+            "ssidtype": fatherComment.ssidtype,
+            "relateid": fatherComment.relateId,
+            'uid': fatherCommentUser.uid,
+            'uname': fatherCommentUser.uname,
+            'ulevel': fatherCommentUser.ulevel,
+            'floor_num': widget.fatherComment.floorNum,
+            'floor_desc': widget.fatherComment.floorDesc,
+            'createtime': fatherComment.createtime,
+            'device_tail': widget.fatherComment.deviceTail,
+          });
+        }
         _commentList = commentList;
         _inputKey = GlobalKey<CommentTextInputState>();
         if (commentList.length < pageSize) {

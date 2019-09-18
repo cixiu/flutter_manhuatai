@@ -1214,9 +1214,8 @@ class Api {
 
     if (response['status'] == 1 && response['data'] is List) {
       var data = response['data'] as List<dynamic>;
-      var commentMap = data.first;
-      if (commentMap != null) {
-        return CommentContent.fromJson(commentMap);
+      if (data.length != 0) {
+        return CommentContent.fromJson(data.first);
       }
     }
 

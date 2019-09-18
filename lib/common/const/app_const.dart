@@ -2,6 +2,7 @@ import 'dart:io';
 
 class AppConst {
   static const img_host = 'https://image.mhxk.com';
+  static const userHeadImgHost = 'http://head.samanlehua.com';
   static const commentImgHost = 'https://comment.yyhao.com';
 
   // ios使用jpg格式图片 android使用webp格式图片
@@ -27,7 +28,7 @@ class AppConst {
     "h16x9": Platform.isIOS ? "-800x450.jpg" : "-800x450.jpg.webp",
     "m16x9": Platform.isIOS ? "-640x360.jpg" : "-640x360.jpg.webp",
     "l16x9": Platform.isIOS ? "-400x225.jpg" : "-400x225.jpg.webp",
-    "head": Platform.isIOS ? "-100x100.jpg" : "-100x100.jpg.webp",
+    "head": Platform.isIOS ? "-100x100" : "-100x100.webp",
     "default": Platform.isIOS ? "-noresize" : "-noresize.webp",
   };
 
