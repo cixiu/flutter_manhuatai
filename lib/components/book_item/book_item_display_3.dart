@@ -7,6 +7,8 @@ import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
+import 'book_item_content.dart';
+
 /// displayType == 3 的 BookItem需要呈现的布局
 class BookItemDisplay3 extends StatelessWidget {
   final RecommendList.Book book;
@@ -36,7 +38,7 @@ class BookItemDisplay3 extends StatelessWidget {
     return Wrap(
       runSpacing: ScreenUtil().setWidth(20),
       spacing: spacing,
-      children: book.comicInfo.take(this.count).map((item) {
+      children: book.comicInfo.take(count).map((item) {
         return GestureDetector(
           onTap: () {
             Application.router.navigateTo(
@@ -44,33 +46,11 @@ class BookItemDisplay3 extends StatelessWidget {
               '/comic/detail/${item.comicId}',
             );
           },
-          child: Container(
+          child: BookItemContent(
             width: width,
-            child: Column(
-              children: <Widget>[
-                ImageWrapper(
-                  url: Utils.formatBookImgUrl(
-                    comicInfo: item,
-                    config: book.config,
-                  ),
-                  width: width,
-                  height: width / horizonratio,
-                  fit: BoxFit.fill,
-                ),
-                Container(
-                  width: width,
-                  child: Padding(
-                    padding: EdgeInsets.all(
-                      ScreenUtil().setWidth(16),
-                    ),
-                    child: Text(
-                      item.comicName,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
-              ],
-            ),
+            horizonratio: horizonratio,
+            item: item,
+            config: book.config,
           ),
         );
       }).toList(),

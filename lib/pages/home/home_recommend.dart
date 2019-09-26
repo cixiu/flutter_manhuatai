@@ -53,15 +53,20 @@ class _HomeRecommendState extends State<HomeRecommend>
     Map<String, dynamic> data = await Api.getRecommentList();
     RecommendList.BookList recommendList =
         RecommendList.BookList.fromJson(data);
-    // bookId == 7414 代表bannerList
-    List<RecommendList.Comic_info> bannerList =
-        recommendList.data.book[0].title.contains('安卓')
-            ? recommendList.data.book[0].comicInfo.take(6).toList()
-            : [];
+    // bookId == 267551 漫画台安卓男样式 低版本
+    // bookId == 276350 漫画台安卓男样式
+    List<RecommendList.Comic_info> bannerList = [];
+    recommendList.data.book.forEach((book) {
+      if (book.bookId == 267551 || book.bookId == 276350) {
+        bannerList = book.comicInfo.take(6).toList();
+      }
+    });
 
     recommendList.data.book.removeWhere((item) {
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
-      return item.bookId == 5035 ||
+      return item.bookId == 267551 ||
+          item.bookId == 276350 ||
+          item.bookId == 5035 ||
           item.bookId == 4938 ||
           item.bookId == 6669 ||
           item.bookId == 5072 ||
@@ -70,10 +75,9 @@ class _HomeRecommendState extends State<HomeRecommend>
           item.bookId == 8833;
     });
 
-    int start = bannerList.length != 0 ? 1 : 0;
-    int length = recommendList.data.book.length;
-    var bookList =
-        recommendList.data.book.getRange(start, length).where((book) {
+    // int start = bannerList.length != 0 ? 1 : 0;
+    // int length = recommendList.data.book.length;
+    var bookList = recommendList.data.book.where((book) {
       return book.config.displayType != 20;
     }).toList();
 

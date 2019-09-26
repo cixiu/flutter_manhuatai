@@ -7,6 +7,8 @@ import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
+import 'book_item_content.dart';
+
 /// displayType == 1 的 BookItem需要呈现的布局
 class BookItemDisplay1 extends StatelessWidget {
   final RecommendList.Book book;
@@ -42,35 +44,12 @@ class BookItemDisplay1 extends StatelessWidget {
               '/comic/detail/${item.comicId}',
             );
           },
-          child: Container(
-              width: width,
-              child: Stack(
-                alignment: Alignment.bottomLeft,
-                children: <Widget>[
-                  ImageWrapper(
-                    url: Utils.formatBookImgUrl(
-                      comicInfo: item,
-                      config: book.config,
-                    ),
-                    width: width,
-                    height: width / horizonratio,
-                    fit: BoxFit.fill,
-                  ),
-                  Container(
-                    width: width,
-                    color: Color.fromRGBO(255, 255, 255, 0.8),
-                    child: Padding(
-                      padding: EdgeInsets.all(
-                        ScreenUtil().setWidth(16),
-                      ),
-                      child: Text(
-                        item.comicName,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  )
-                ],
-              )),
+          child: BookItemContent(
+            width: width,
+            horizonratio: horizonratio,
+            item: item,
+            config: book.config,
+          ),
         );
       }).toList(),
     );

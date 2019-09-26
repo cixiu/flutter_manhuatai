@@ -74,20 +74,14 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
         book: book,
         horizontalPadding: totalHorizontalPadding,
       );
-    } else if (book.config.displayType == 0) {
+    } else if (book.config.displayType == 3 ||
+        book.config.displayType == 0 ||
+        book.config.displayType == 11) {
+      // 展示的数量
+      int count = (book.config.displayType == 11) ? 6 : 4;
       return BookItemDisplay3(
         book: book,
-        horizontalPadding: totalHorizontalPadding,
-      );
-    } else if (book.config.displayType == 3) {
-      return BookItemDisplay3(
-        book: book,
-        horizontalPadding: totalHorizontalPadding,
-      );
-    } else if (book.config.displayType == 11) {
-      return BookItemDisplay3(
-        book: book,
-        count: 6,
+        count: count,
         horizontalPadding: totalHorizontalPadding,
       );
     } else if (book.config.displayType == 61) {
