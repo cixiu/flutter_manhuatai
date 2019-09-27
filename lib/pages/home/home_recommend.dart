@@ -53,19 +53,19 @@ class _HomeRecommendState extends State<HomeRecommend>
     Map<String, dynamic> data = await Api.getRecommentList();
     RecommendList.BookList recommendList =
         RecommendList.BookList.fromJson(data);
-    // bookId == 267551 漫画台安卓男样式 低版本
-    // bookId == 276350 漫画台安卓男样式
+    // 漫画台安卓男样式
     List<RecommendList.Comic_info> bannerList = [];
+    List<int> bannerBookIdList = [];
     recommendList.data.book.forEach((book) {
-      if (book.bookId == 267551 || book.bookId == 276350) {
+      if (book.title.contains('样式')) {
         bannerList = book.comicInfo.take(6).toList();
+        bannerBookIdList.add(book.bookId);
       }
     });
 
     recommendList.data.book.removeWhere((item) {
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
-      return item.bookId == 267551 ||
-          item.bookId == 276350 ||
+      return bannerBookIdList.contains(item.bookId) ||
           item.bookId == 5035 ||
           item.bookId == 4938 ||
           item.bookId == 6669 ||
