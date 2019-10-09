@@ -788,7 +788,7 @@ class Api {
   /// type = 'hot' 表示热门评论
   ///
   /// type = 'new' 表示最新评论
-  static Future<List<SatelliteComment>> getSatelliteFatherComments({
+  static Future<List<SatelliteComment>> getFatherComments({
     String authorization,
     int ssid,
     int ssidtype = 1,
@@ -842,7 +842,7 @@ class Api {
   }
 
   /// 根据帖子的一级comment的fatherid来获取childrenComments
-  static Future<List<SatelliteComment>> getSatelliteChildrenComments({
+  static Future<List<SatelliteComment>> getChildrenComments({
     String type = 'device',
     String openid,
     String authorization,

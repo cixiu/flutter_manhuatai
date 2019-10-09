@@ -204,7 +204,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     String authorization,
     int relationId,
   }) async {
-    var getSatelliteFatherComments = await Api.getSatelliteFatherComments(
+    var getSatelliteFatherComments = await Api.getFatherComments(
       authorization: authorization,
       page: page,
       ssid: widget.fatherComment.ssid,
@@ -233,7 +233,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
         getSatelliteFatherComments.map((item) => item.id).toList();
     // 获取帖子的一级评论下需要显示的二级评论
     var getSatelliteChildrenCommentsRes =
-        await Api.getSatelliteChildrenComments(
+        await Api.getChildrenComments(
       type: type,
       openid: openid,
       authorization: authorization,

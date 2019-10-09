@@ -183,7 +183,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     String authorization,
     int starId,
   }) async {
-    var getSatelliteFatherComments = await Api.getSatelliteFatherComments(
+    var getSatelliteFatherComments = await Api.getFatherComments(
       authorization: authorization,
       page: page,
       ssid: widget.satelliteId,
@@ -198,7 +198,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         getSatelliteFatherComments.map((item) => item.id).toList();
     // 获取帖子的一级评论下需要显示的二级评论
     var getSatelliteChildrenCommentsRes =
-        await Api.getSatelliteChildrenComments(
+        await Api.getChildrenComments(
       type: type,
       openid: openid,
       authorization: authorization,
