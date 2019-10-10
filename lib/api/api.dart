@@ -878,7 +878,7 @@ class Api {
   }
 
   /// 获取帖子的评论总数
-  static Future<int> getSatelliteCommentCount({
+  static Future<int> getCommentCount({
     int ssid,
     int appId = 2,
     int ssidType = 1,

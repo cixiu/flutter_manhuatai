@@ -7,6 +7,8 @@ import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -380,26 +382,34 @@ class ComicDetailHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: ScreenUtil().setWidth(200),
-                height: ScreenUtil().setWidth(64),
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    Image.asset(
-                      'lib/images/icon_detail_comt.png',
-                      width: ScreenUtil().setWidth(200),
-                      height: ScreenUtil().setWidth(64),
-                    ),
-                    Positioned(
-                      bottom: ScreenUtil().setWidth(6),
-                      child: _buildTabText(
-                        text: '吐槽',
-                        subText:
-                            '${Utils.formatNumber(comicCommentCount.toString())}',
+              GestureDetector(
+                onTap: () {
+                  Application.router.navigateTo(
+                    context,
+                    '${Routes.comicComment}?comicId=$comicId',
+                  );
+                },
+                child: Container(
+                  width: ScreenUtil().setWidth(200),
+                  height: ScreenUtil().setWidth(64),
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      Image.asset(
+                        'lib/images/icon_detail_comt.png',
+                        width: ScreenUtil().setWidth(200),
+                        height: ScreenUtil().setWidth(64),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: ScreenUtil().setWidth(6),
+                        child: _buildTabText(
+                          text: '吐槽',
+                          subText:
+                              '${Utils.formatNumber(comicCommentCount.toString())}',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

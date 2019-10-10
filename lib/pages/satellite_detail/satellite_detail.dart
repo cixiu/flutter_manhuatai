@@ -93,7 +93,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
           authorization: authorization,
           satelliteId: widget.satelliteId,
         ))
-        ..add(Api.getSatelliteCommentCount(
+        ..add(Api.getCommentCount(
           ssid: widget.satelliteId,
         ));
       var result = await Future.wait(futures);

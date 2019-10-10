@@ -330,6 +330,9 @@ class _CommentContentItemState extends State<CommentContentItem> {
           // TODO:与relationId相关的信息，比如漫画评论的relationId是comicChapterId，这里需要显示漫画的章节信息
           //
           //
+          item.fatherComment.relateid.isNotEmpty
+              ? Text(item.fatherComment.relateid)
+              : Container(),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {

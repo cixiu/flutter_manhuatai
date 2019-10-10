@@ -7,6 +7,8 @@ class Routes {
   static String login = '/login'; // 登录
   static String userCenter = '/user_center'; // 用户中心
   static String comicDetail = '/comic/detail/:comicId'; // 漫画详情
+  static String comicComment =
+      '/comic/comment'; // 漫画的评论吐槽 eg: /comic/comment?comicId=12345
   static String comicRank = '/comic_rank'; // 漫画排行榜
   static String comicSearch = '/comic_search'; // 搜索
   static String searchResult = '/search_result'; // 搜索结果
@@ -33,6 +35,12 @@ class Routes {
     router.define(
       comicDetail,
       handler: comicDetailHandler,
+      transitionType: TransitionType.inFromRight,
+    );
+
+    router.define(
+      comicComment,
+      handler: comicCommentlHandler,
       transitionType: TransitionType.inFromRight,
     );
 

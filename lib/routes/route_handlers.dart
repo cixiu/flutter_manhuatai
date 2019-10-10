@@ -1,6 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/pages/book_detail/book_detail.dart';
+import 'package:flutter_manhuatai/pages/comic_comment/comic_comment.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 import 'package:flutter_manhuatai/pages/comment_reply/comment_reply.dart';
@@ -31,6 +32,14 @@ var comicDetailHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     String comicId = params['comicId']?.first;
     return ComicDetailPage(comicId: comicId);
+  },
+);
+
+// 漫画的吐槽评论
+var comicCommentlHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    String comicId = params['comicId']?.first;
+    return ComicCommentPage(comicId: comicId);
   },
 );
 
