@@ -1,11 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:device_info/device_info.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
+import 'package:oktoast/oktoast.dart';
 
 Future<List<CommonSatelliteComment>> getCommentListInfo({
   String type,
@@ -153,4 +158,65 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
       relationInfo: relationInfo,
     );
   }).toList();
+}
+
+// 发表评论
+Future<void> addComment({
+  String value,
+  bool isReplyDetail = false,
+  bool isReply,
+  SatelliteComment comment,
+  BuildContext context,
+  int fatherId,
+  int ssid,
+  int satelliteId,
+  int ssidType,
+  String title,
+  int starId = 0,
+  int opreateId = 0,
+}) async {
+  if (value.trim().isEmpty) {
+    showToast('还是写点什么吧');
+    return;
+  }
+  var user = User(context);
+  String deviceTail = '';
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  if (Platform.isAndroid) {
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    deviceTail = androidInfo.device;
+  } else if (Platform.isIOS) {
+    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    deviceTail = iosInfo.name;
+  }
+
+  if (isReply && isReplyDetail) {
+    value = '{reply:“${comment.uid}”}$value';
+  }
+  print(value);
+
+  var response = await Api.addComment(
+    type: user.info.type,
+    openid: user.info.openid,
+    authorization: user.info.authData.authcode,
+    userLevel: user.info.ulevel,
+    userIdentifier: user.info.uid,
+    userName: user.info.uname,
+    replyName: isReply && isReplyDetail ? comment.uname : null,
+    ssid: ssid,
+    satelliteId: satelliteId,
+    ssidType: ssidType,
+    fatherId: fatherId != null ? fatherId : isReply ? comment.id : 0,
+    satelliteUserId: opreateId,
+    starId: starId,
+    content: value,
+    title: title,
+    images: [],
+    deviceTail: deviceTail,
+  );
+  if (response['status'] == 1) {
+    showToast('正在快马加鞭审核中');
+  } else {
+    showToast('${response['msg']}');
+  }
 }

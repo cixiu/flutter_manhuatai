@@ -6,6 +6,7 @@ import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/dao/comment.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
+import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
@@ -151,6 +152,26 @@ class _ComicCommentPageState extends State<ComicCommentPage>
     print('加载更多');
   }
 
+  // 发表评论
+  Future<void> _submitComment({
+    String value,
+    bool isReply,
+    SatelliteComment comment,
+  }) async {
+    await addComment(
+      context: context,
+      value: value,
+      isReplyDetail: false,
+      isReply: isReply,
+      comment: comment,
+      ssid: int.tryParse(widget.comicId),
+      satelliteId: 0,
+      ssidType: 0,
+      title: widget.comicName,
+      opreateId: isReply ? comment.useridentifier : 0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -168,35 +189,41 @@ class _ComicCommentPageState extends State<ComicCommentPage>
             : Column(
                 children: <Widget>[
                   Expanded(
-                    child: CustomScrollView(
-                      physics: ClampingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
-                      controller: _scrollController,
-                      slivers: <Widget>[
-                        SliverPersistentHeader(
-                          pinned: true,
-                          delegate: CommonSliverPersistentHeaderDelegate(
-                            height: ScreenUtil().setWidth(80),
-                            child: CommentTypeHeader(
-                              count: _commentCount,
-                              commentType: _commentType,
-                              // onSelected: _switchCommentType,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        _inputKey.currentState.blurKeyBoard();
+                      },
+                      child: CustomScrollView(
+                        physics: ClampingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        controller: _scrollController,
+                        slivers: <Widget>[
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: CommonSliverPersistentHeaderDelegate(
+                              height: ScreenUtil().setWidth(80),
+                              child: CommentTypeHeader(
+                                count: _commentCount,
+                                commentType: _commentType,
+                                // onSelected: _switchCommentType,
+                              ),
                             ),
                           ),
-                        ),
-                        CommentSliverList(
-                          isReplyDetail: false,
-                          fatherCommentList: _fatherCommentList,
-                          hasMore: _hasMore,
-                          // inputKey: _inputKey,
-                        ),
-                      ],
+                          CommentSliverList(
+                            isReplyDetail: false,
+                            fatherCommentList: _fatherCommentList,
+                            hasMore: _hasMore,
+                            inputKey: _inputKey,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   CommentTextInput(
                     key: _inputKey,
-                    // submit: _submitComment,
+                    submit: _submitComment,
                     keyboardHeight: keyboardHeight,
                   ),
                 ],

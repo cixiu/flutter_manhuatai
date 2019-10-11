@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/common/dao/comment.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
@@ -197,8 +198,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     List<int> commentIds =
         getSatelliteFatherComments.map((item) => item.id).toList();
     // 获取帖子的一级评论下需要显示的二级评论
-    var getSatelliteChildrenCommentsRes =
-        await Api.getChildrenComments(
+    var getSatelliteChildrenCommentsRes = await Api.getChildrenComments(
       type: type,
       openid: openid,
       authorization: authorization,
@@ -301,42 +301,54 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     bool isReply,
     SatelliteComment comment,
   }) async {
-    if (value.trim().isEmpty) {
-      showToast('还是写点什么吧');
-      return;
-    }
-    var user = User(context);
-    String deviceTail = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceTail = androidInfo.device;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceTail = iosInfo.name;
-    }
-
-    var response = await Api.addComment(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
-      userLevel: user.info.ulevel,
-      userIdentifier: user.info.uid,
-      userName: user.info.uname,
+    await addComment(
+      context: context,
+      value: value,
+      isReplyDetail: false,
+      isReply: isReply,
+      comment: comment,
       ssid: _satellite.id,
-      fatherId: isReply ? comment.id : 0,
-      satelliteUserId: isReply ? 0 : _satellite.useridentifier,
-      starId: _satellite.starid,
-      content: value,
+      ssidType: 1,
       title: _satellite.title,
-      images: [],
-      deviceTail: deviceTail,
+      opreateId: isReply ? comment.useridentifier : 0,
+      starId: _satellite.starid,
     );
-    if (response['status'] == 1) {
-      showToast('正在快马加鞭审核中');
-    } else {
-      showToast('${response['msg']}');
-    }
+    // if (value.trim().isEmpty) {
+    //   showToast('还是写点什么吧');
+    //   return;
+    // }
+    // var user = User(context);
+    // String deviceTail = '';
+    // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    // if (Platform.isAndroid) {
+    //   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    //   deviceTail = androidInfo.device;
+    // } else if (Platform.isIOS) {
+    //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    //   deviceTail = iosInfo.name;
+    // }
+
+    // var response = await Api.addComment(
+    //   type: user.info.type,
+    //   openid: user.info.openid,
+    //   authorization: user.info.authData.authcode,
+    //   userLevel: user.info.ulevel,
+    //   userIdentifier: user.info.uid,
+    //   userName: user.info.uname,
+    //   ssid: _satellite.id,
+    //   fatherId: isReply ? comment.id : 0,
+    //   satelliteUserId: isReply ? 0 : _satellite.useridentifier,
+    //   starId: _satellite.starid,
+    //   content: value,
+    //   title: _satellite.title,
+    //   images: [],
+    //   deviceTail: deviceTail,
+    // );
+    // if (response['status'] == 1) {
+    //   showToast('正在快马加鞭审核中');
+    // } else {
+    //   showToast('${response['msg']}');
+    // }
   }
 
   // 切换显示的评论列表的类型
