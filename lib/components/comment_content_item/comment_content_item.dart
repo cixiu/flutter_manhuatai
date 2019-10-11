@@ -22,12 +22,14 @@ import 'package:oktoast/oktoast.dart';
 class CommentContentItem extends StatefulWidget {
   final bool isReplyDetail; // 是否是回复的详情页
   final bool needReplyed; // 是否需要带上{reply:'xxx'}的内容，也就是是否是直接回复，还是评论
+  final bool isComicComment;
   final CommonSatelliteComment item;
   final GlobalKey<CommentTextInputState> inputKey;
 
   CommentContentItem({
     this.isReplyDetail = false,
     this.needReplyed = true,
+    this.isComicComment = false,
     this.item,
     this.inputKey,
   });
@@ -172,10 +174,12 @@ class _CommentContentItemState extends State<CommentContentItem> {
       content = content.replaceAllMapped(
         replyReg,
         (matches) {
-          return '{reply:${replyCommentUser.uname}：}';
+          return replyCommentUser != null
+              ? '{reply:${replyCommentUser.uname}：}'
+              : '';
         },
       );
-      content = '回复$content';
+      content = replyCommentUser != null ? '回复$content' : content;
     }
 
     return GestureDetector(
@@ -219,6 +223,7 @@ class _CommentContentItemState extends State<CommentContentItem> {
               title: item.fatherComment.relateid.isEmpty
                   ? '${item.fatherComment.floorDesc}的回复'
                   : '吐槽详情',
+              isComicComment: widget.isComicComment,
             ),
           ),
         );

@@ -11,6 +11,7 @@ import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ComicCommentPage extends StatefulWidget {
@@ -172,6 +173,49 @@ class _ComicCommentPageState extends State<ComicCommentPage>
     );
   }
 
+  // 切换显示的评论列表的类型
+  Future<void> _switchCommentType(WhyFarther result) async {
+    try {
+      int _page = page;
+      showLoading(context);
+      setState(() {
+        _commentType = result;
+      });
+      _hasMore = true;
+      page = 1;
+      var user = User(context);
+      var userType = user.info.type;
+      var openid = user.info.openid;
+      var authorization = user.info.authData.authcode;
+      var ssid = int.tryParse(widget.comicId);
+
+      var fatherCommentList = await getCommentListInfo(
+        type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+        userType: userType,
+        openid: openid,
+        authorization: authorization,
+        ssid: ssid,
+        ssidtype: 0,
+        isComicComment: true,
+        page: page,
+      );
+      var scrollTop = _scrollController.position.pixels;
+      if (_page > 1 && scrollTop > _maxFirstScrollTop) {
+        _scrollController.jumpTo(1.0);
+      }
+      setState(() {
+        if (fatherCommentList.length == 0) {
+          _hasMore = false;
+        }
+        _fatherCommentList = fatherCommentList;
+        _maxFirstScrollTop = null;
+      });
+      hideLoading(context);
+    } catch (e) {
+      hideLoading(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -181,54 +225,81 @@ class _ComicCommentPageState extends State<ComicCommentPage>
         title: Text(widget.comicName),
         centerTitle: false,
       ),
-      body: RefreshIndicator(
-        key: refreshIndicatorKey,
-        onRefresh: _handleRefresh,
-        child: _isLoading
-            ? Container()
-            : Column(
-                children: <Widget>[
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        _inputKey.currentState.blurKeyBoard();
-                      },
-                      child: CustomScrollView(
-                        physics: ClampingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        controller: _scrollController,
-                        slivers: <Widget>[
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: CommonSliverPersistentHeaderDelegate(
-                              height: ScreenUtil().setWidth(80),
-                              child: CommentTypeHeader(
-                                count: _commentCount,
-                                commentType: _commentType,
-                                // onSelected: _switchCommentType,
+      body: _isLoadingError
+          ? Center(
+              child: Container(
+                width: 200,
+                child: FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      _isLoadingError = false;
+                    });
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showRefreshLoading();
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        '加载失败，点击重试',
+                      ),
+                      Icon(Icons.refresh),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          : RefreshIndicator(
+              key: refreshIndicatorKey,
+              onRefresh: _handleRefresh,
+              child: _isLoading
+                  ? Container()
+                  : Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              _inputKey.currentState.blurKeyBoard();
+                            },
+                            child: CustomScrollView(
+                              physics: ClampingScrollPhysics(
+                                parent: AlwaysScrollableScrollPhysics(),
                               ),
+                              controller: _scrollController,
+                              slivers: <Widget>[
+                                SliverPersistentHeader(
+                                  pinned: true,
+                                  delegate:
+                                      CommonSliverPersistentHeaderDelegate(
+                                    height: ScreenUtil().setWidth(80),
+                                    child: CommentTypeHeader(
+                                      count: _commentCount,
+                                      commentType: _commentType,
+                                      onSelected: _switchCommentType,
+                                    ),
+                                  ),
+                                ),
+                                CommentSliverList(
+                                  isReplyDetail: false,
+                                  isComicComment: true,
+                                  fatherCommentList: _fatherCommentList,
+                                  hasMore: _hasMore,
+                                  inputKey: _inputKey,
+                                ),
+                              ],
                             ),
                           ),
-                          CommentSliverList(
-                            isReplyDetail: false,
-                            fatherCommentList: _fatherCommentList,
-                            hasMore: _hasMore,
-                            inputKey: _inputKey,
-                          ),
-                        ],
-                      ),
+                        ),
+                        CommentTextInput(
+                          key: _inputKey,
+                          submit: _submitComment,
+                          keyboardHeight: keyboardHeight,
+                        ),
+                      ],
                     ),
-                  ),
-                  CommentTextInput(
-                    key: _inputKey,
-                    submit: _submitComment,
-                    keyboardHeight: keyboardHeight,
-                  ),
-                ],
-              ),
-      ),
+            ),
     );
   }
 }

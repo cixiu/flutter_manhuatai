@@ -109,7 +109,7 @@ class CommentUserHeader extends StatelessWidget {
                   ),
                   Row(
                     children: <Widget>[
-                      item.floorDesc != null
+                      item.floorDesc != null && item.floorDesc.isNotEmpty
                           ? Container(
                               margin: EdgeInsets.only(
                                 right: ScreenUtil().setWidth(30),

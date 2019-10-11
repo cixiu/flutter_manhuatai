@@ -32,7 +32,7 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
     fatherid: fatherid,
     type: type, // 用来判断获取哪种类型的评论
     // type: _commentType == WhyFarther.hot ? 'hot' : 'new', // 用来判断获取哪种类型的评论
-    iswater: null,
+    // iswater: null,
   );
 
   List<int> userIds = [];
@@ -57,7 +57,7 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
   }
 
   List<ChapterInfo> chapterInfoList = [];
-  if (isComicComment) {
+  if (isComicComment && chapterIds.length != 0) {
     chapterInfoList = await Api.getChapterInfoByChapterId(
       chapterIds: chapterIds,
     );

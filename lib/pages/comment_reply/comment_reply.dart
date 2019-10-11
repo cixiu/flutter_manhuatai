@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter_manhuatai/common/dao/comment.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
@@ -18,15 +15,16 @@ import 'package:flutter_manhuatai/components/comment_content_item/comment_conten
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
-import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 
 class CommentReplyPage extends StatefulWidget {
   final SatelliteComment fatherComment;
   final String title;
+  final bool isComicComment;
 
   CommentReplyPage({
     this.fatherComment,
     this.title = '评论回复',
+    this.isComicComment = false,
   });
 
   @override
@@ -85,7 +83,7 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       _hasMore = true;
       _maxFirstScrollTop = null;
       var user = User(context);
-      var type = user.info.type;
+      var userType = user.info.type;
       var openid = user.info.openid;
       var authorization = user.info.authData.authcode;
 
@@ -104,11 +102,16 @@ class _CommentReplyPageState extends State<CommentReplyPage>
 
       var fatherCommentUser = fatherCommentUserRes.data.first;
 
-      var commentList = await _getCommentListInfo(
-        type: type,
+      var commentList = await getCommentListInfo(
+        type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+        userType: userType,
         openid: openid,
         authorization: authorization,
-        relationId: relationId,
+        ssid: widget.fatherComment.ssid,
+        ssidtype: widget.isComicComment ? 0 : 1,
+        fatherid: widget.fatherComment.id,
+        isComicComment: widget.isComicComment,
+        page: page,
       );
 
       if (!this.mounted) {
@@ -175,12 +178,20 @@ class _CommentReplyPageState extends State<CommentReplyPage>
 
     page++;
     var user = User(context);
+    var userType = user.info.type;
+    var openid = user.info.openid;
+    var authorization = user.info.authData.authcode;
 
-    var commentList = await _getCommentListInfo(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
-      relationId: relationId,
+    var commentList = await getCommentListInfo(
+      type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+      userType: userType,
+      openid: openid,
+      authorization: authorization,
+      ssid: widget.fatherComment.ssid,
+      ssidtype: widget.isComicComment ? 0 : 1,
+      fatherid: widget.fatherComment.id,
+      isComicComment: widget.isComicComment,
+      page: page,
     );
     _isLoadingMore = false;
 
@@ -198,127 +209,6 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     print('加载更多');
   }
 
-  // 获取评论列表的相关信息
-  Future<List<CommonSatelliteComment>> _getCommentListInfo({
-    String type,
-    String openid,
-    String authorization,
-    int relationId,
-  }) async {
-    var getSatelliteFatherComments = await Api.getFatherComments(
-      authorization: authorization,
-      page: page,
-      ssid: widget.fatherComment.ssid,
-      fatherid: widget.fatherComment.id,
-      type: _commentType == WhyFarther.hot ? 'hot' : 'new', // 用来判断获取哪种类型的评论
-      iswater: null,
-    );
-
-    List<int> userIds = [];
-    if (getSatelliteFatherComments.length == 0) {
-      return [];
-    } else {
-      getSatelliteFatherComments.forEach((comment) {
-        var match =
-            RegExp(r'{reply:“(\d+)”}').firstMatch(comment.content.trim());
-        if (match != null) {
-          userIds.add(int.tryParse(match.group(1)));
-        }
-        if (!userIds.contains(comment.useridentifier)) {
-          userIds.add(comment.useridentifier);
-        }
-      });
-    }
-
-    List<int> commentIds =
-        getSatelliteFatherComments.map((item) => item.id).toList();
-    // 获取帖子的一级评论下需要显示的二级评论
-    var getSatelliteChildrenCommentsRes = await Api.getChildrenComments(
-      type: type,
-      openid: openid,
-      authorization: authorization,
-      commentIds: commentIds,
-    );
-
-    if (getSatelliteChildrenCommentsRes.length != 0) {
-      getSatelliteChildrenCommentsRes.forEach((comment) {
-        var match =
-            RegExp(r'{reply:“(\d+)”}').firstMatch(comment.content.trim());
-        if (match != null) {
-          userIds.add(int.tryParse(match.group(1)));
-        }
-        if (!userIds.contains(comment.useridentifier)) {
-          userIds.add(comment.useridentifier);
-        }
-      });
-    }
-
-    var getCommentUserRes = CommentUser.CommentUser.fromJson({});
-    if (userIds.length != 0) {
-      getCommentUserRes = await Api.getCommentUser(
-        relationId: relationId,
-        opreateType: 2,
-        userids: userIds,
-      );
-    }
-
-    Map<int, CommentUser.Data> commentUserMap = Map();
-    if (getCommentUserRes.data != null) {
-      getCommentUserRes.data.forEach((item) {
-        if (commentUserMap[item.uid] == null) {
-          commentUserMap[item.uid] = item;
-        }
-      });
-    }
-
-    if (getSatelliteChildrenCommentsRes.length != 0) {
-      getSatelliteChildrenCommentsRes =
-          getSatelliteChildrenCommentsRes.map((child) {
-        if (commentUserMap[child.useridentifier] != null) {
-          var commentUser = commentUserMap[child.useridentifier];
-          child.uid = commentUser.uid;
-          child.uname = commentUser.uname;
-        }
-        return child;
-      }).toList();
-    }
-
-    return getSatelliteFatherComments.map((item) {
-      List<SatelliteComment> childrenCommentList = [];
-      Map<int, CommentUser.Data> replyUserMap = {};
-
-      // 将reply格式所匹配到的用户加入Map中
-      var fatherMatch =
-          RegExp(r'{reply:“(\d+)”}').firstMatch(item.content.trim());
-      if (fatherMatch != null) {
-        int replyCommentUserId = int.tryParse(fatherMatch.group(1));
-        replyUserMap[replyCommentUserId] = commentUserMap[replyCommentUserId];
-      }
-
-      if (getSatelliteChildrenCommentsRes.length != 0) {
-        getSatelliteChildrenCommentsRes.forEach((child) {
-          if (child.fatherid == item.id) {
-            childrenCommentList.add(child);
-          }
-
-          var match =
-              RegExp(r'{reply:“(\d+)”}').firstMatch(child.content.trim());
-          if (match != null) {
-            int replyCommentUserId = int.tryParse(match.group(1));
-            replyUserMap[replyCommentUserId] =
-                commentUserMap[replyCommentUserId];
-          }
-        });
-      }
-
-      return CommonSatelliteComment(
-        fatherComment: item,
-        childrenCommentList: childrenCommentList,
-        replyUserMap: replyUserMap,
-      );
-    }).toList();
-  }
-
   // 回复评论
   Future<void> _submitComment({
     String value,
@@ -333,53 +223,11 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       comment: comment,
       fatherId: widget.fatherComment.id,
       ssid: widget.fatherComment.ssid,
-      ssidType: 1,
+      ssidType: widget.isComicComment ? 0 : 1,
       title: _fatherComment.title,
       opreateId: isReply ? comment.useridentifier : 0,
       starId: 0,
     );
-    // if (value.trim().isEmpty) {
-    //   showToast('还是写点什么吧');
-    //   return;
-    // }
-    // var user = User(context);
-    // String deviceTail = '';
-    // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    // if (Platform.isAndroid) {
-    //   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    //   deviceTail = androidInfo.device;
-    // } else if (Platform.isIOS) {
-    //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    //   deviceTail = iosInfo.name;
-    // }
-
-    // if (isReply) {
-    //   value = '{reply:“${comment.uid}”}$value';
-    // }
-    // print(value);
-
-    // var response = await Api.addComment(
-    //   type: user.info.type,
-    //   openid: user.info.openid,
-    //   authorization: user.info.authData.authcode,
-    //   userLevel: user.info.ulevel,
-    //   userIdentifier: user.info.uid,
-    //   userName: user.info.uname,
-    //   replyName: isReply ? comment.uname : null,
-    //   ssid: widget.fatherComment.ssid,
-    //   fatherId: widget.fatherComment.id,
-    //   satelliteUserId: isReply ? comment.uid : 0,
-    //   starId: 0,
-    //   content: value,
-    //   title: _fatherComment.title,
-    //   images: [],
-    //   deviceTail: deviceTail,
-    // );
-    // if (response['status'] == 1) {
-    //   showToast('正在快马加鞭审核中');
-    // } else {
-    //   showToast('${response['msg']}');
-    // }
   }
 
   // 切换显示的评论列表的类型
@@ -393,12 +241,20 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       _hasMore = true;
       page = 1;
       var user = User(context);
+      var userType = user.info.type;
+      var openid = user.info.openid;
+      var authorization = user.info.authData.authcode;
 
-      var fatherCommentList = await _getCommentListInfo(
-        type: user.info.type,
-        openid: user.info.openid,
-        authorization: user.info.authData.authcode,
-        relationId: relationId,
+      var fatherCommentList = await getCommentListInfo(
+        type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+        userType: userType,
+        openid: openid,
+        authorization: authorization,
+        ssid: widget.fatherComment.ssid,
+        ssidtype: widget.isComicComment ? 0 : 1,
+        fatherid: widget.fatherComment.id,
+        isComicComment: widget.isComicComment,
+        page: page,
       );
 
       // 如果已经加装到了下一个page, 则切换评论列表的类型后，需要将页面滚动至初始位置

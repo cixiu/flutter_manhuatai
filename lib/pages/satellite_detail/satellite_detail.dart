@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/dao/comment.dart';
@@ -16,7 +14,6 @@ import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
-import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 
@@ -83,13 +80,13 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       _hasMore = true;
       _maxFirstScrollTop = null;
       var user = User(context);
-      var type = user.info.type;
+      var userType = user.info.type;
       var openid = user.info.openid;
       var authorization = user.info.authData.authcode;
 
       List<Future<dynamic>> futures = List()
         ..add(Api.getSatelliteDetail(
-          type: type,
+          type: userType,
           openid: openid,
           authorization: authorization,
           satelliteId: widget.satelliteId,
@@ -115,11 +112,14 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
         orElse: () => null,
       );
 
-      var fatherCommentList = await _getCommentListInfo(
-        type: type,
+      var fatherCommentList = await getCommentListInfo(
+        type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+        userType: userType,
         openid: openid,
         authorization: authorization,
-        starId: getSatelliteDetail.starid,
+        ssid: widget.satelliteId,
+        ssidtype: 1,
+        page: page,
       );
 
       if (!this.mounted) {
@@ -155,12 +155,18 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
     page++;
     var user = User(context);
+    var userType = user.info.type;
+    var openid = user.info.openid;
+    var authorization = user.info.authData.authcode;
 
-    var fatherCommentList = await _getCommentListInfo(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
-      starId: _satellite.starid,
+    var fatherCommentList = await getCommentListInfo(
+      type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+      userType: userType,
+      openid: openid,
+      authorization: authorization,
+      ssid: widget.satelliteId,
+      ssidtype: 1,
+      page: page,
     );
     _isLoadingMore = false;
 
@@ -176,96 +182,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     });
 
     print('加载更多');
-  }
-
-  Future<List<CommonSatelliteComment>> _getCommentListInfo({
-    String type,
-    String openid,
-    String authorization,
-    int starId,
-  }) async {
-    var getSatelliteFatherComments = await Api.getFatherComments(
-      authorization: authorization,
-      page: page,
-      ssid: widget.satelliteId,
-      type: _commentType == WhyFarther.hot ? 'hot' : 'new',
-    );
-
-    if (getSatelliteFatherComments.length == 0) {
-      return [];
-    }
-
-    List<int> commentIds =
-        getSatelliteFatherComments.map((item) => item.id).toList();
-    // 获取帖子的一级评论下需要显示的二级评论
-    var getSatelliteChildrenCommentsRes = await Api.getChildrenComments(
-      type: type,
-      openid: openid,
-      authorization: authorization,
-      commentIds: commentIds,
-    );
-
-    List<int> userIds = [];
-    getSatelliteChildrenCommentsRes.forEach((comment) {
-      var match = RegExp(r'{reply:“(\d+)”}').firstMatch(comment.content.trim());
-      if (match != null) {
-        userIds.add(int.tryParse(match.group(1)));
-      }
-      if (!userIds.contains(comment.useridentifier)) {
-        userIds.add(comment.useridentifier);
-      }
-    });
-
-    var getCommentUserRes = CommentUser.CommentUser.fromJson({});
-    if (userIds.length != 0) {
-      getCommentUserRes = await Api.getCommentUser(
-        relationId: starId,
-        opreateType: 2,
-        userids: userIds,
-      );
-    }
-
-    Map<int, CommentUser.Data> commentUserMap = Map();
-    if (getCommentUserRes.data != null) {
-      getCommentUserRes.data.forEach((item) {
-        if (commentUserMap[item.uid] == null) {
-          commentUserMap[item.uid] = item;
-        }
-      });
-    }
-
-    getSatelliteChildrenCommentsRes =
-        getSatelliteChildrenCommentsRes.map((child) {
-      if (commentUserMap[child.useridentifier] != null) {
-        var commentUser = commentUserMap[child.useridentifier];
-        child.uid = commentUser.uid;
-        child.uname = commentUser.uname;
-      }
-      return child;
-    }).toList();
-
-    return getSatelliteFatherComments.map((item) {
-      List<SatelliteComment> childrenCommentList = [];
-      Map<int, CommentUser.Data> replyUserMap = {};
-
-      getSatelliteChildrenCommentsRes.forEach((child) {
-        if (child.fatherid == item.id) {
-          childrenCommentList.add(child);
-        }
-
-        var match = RegExp(r'{reply:“(\d+)”}').firstMatch(child.content.trim());
-        if (match != null) {
-          int replyCommentUserId = int.tryParse(match.group(1));
-          replyUserMap[replyCommentUserId] = commentUserMap[replyCommentUserId];
-        }
-      });
-
-      return CommonSatelliteComment(
-        fatherComment: item,
-        childrenCommentList: childrenCommentList,
-        replyUserMap: replyUserMap,
-      );
-    }).toList();
   }
 
   // 点赞帖子
@@ -313,42 +229,6 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       opreateId: isReply ? comment.useridentifier : 0,
       starId: _satellite.starid,
     );
-    // if (value.trim().isEmpty) {
-    //   showToast('还是写点什么吧');
-    //   return;
-    // }
-    // var user = User(context);
-    // String deviceTail = '';
-    // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    // if (Platform.isAndroid) {
-    //   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    //   deviceTail = androidInfo.device;
-    // } else if (Platform.isIOS) {
-    //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    //   deviceTail = iosInfo.name;
-    // }
-
-    // var response = await Api.addComment(
-    //   type: user.info.type,
-    //   openid: user.info.openid,
-    //   authorization: user.info.authData.authcode,
-    //   userLevel: user.info.ulevel,
-    //   userIdentifier: user.info.uid,
-    //   userName: user.info.uname,
-    //   ssid: _satellite.id,
-    //   fatherId: isReply ? comment.id : 0,
-    //   satelliteUserId: isReply ? 0 : _satellite.useridentifier,
-    //   starId: _satellite.starid,
-    //   content: value,
-    //   title: _satellite.title,
-    //   images: [],
-    //   deviceTail: deviceTail,
-    // );
-    // if (response['status'] == 1) {
-    //   showToast('正在快马加鞭审核中');
-    // } else {
-    //   showToast('${response['msg']}');
-    // }
   }
 
   // 切换显示的评论列表的类型
@@ -362,13 +242,20 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       _hasMore = true;
       page = 1;
       var user = User(context);
+      var userType = user.info.type;
+      var openid = user.info.openid;
+      var authorization = user.info.authData.authcode;
 
-      var fatherCommentList = await _getCommentListInfo(
-        type: user.info.type,
-        openid: user.info.openid,
-        authorization: user.info.authData.authcode,
-        starId: _satellite.starid,
+      var fatherCommentList = await getCommentListInfo(
+        type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+        userType: userType,
+        openid: openid,
+        authorization: authorization,
+        ssid: widget.satelliteId,
+        ssidtype: 1,
+        page: page,
       );
+
       var scrollTop = _scrollController.position.pixels;
       if (_page > 1 && scrollTop > _maxFirstScrollTop) {
         _scrollController.jumpTo(1.0);
