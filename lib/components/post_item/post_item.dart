@@ -19,7 +19,6 @@ import 'package:flutter_manhuatai/models/get_satellite_res.dart'
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
 import 'package:flutter_manhuatai/utils/utils.dart';
 
-import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/match_text/match_text.dart';
 
 import 'post_special_text_span_builder.dart';
@@ -264,7 +263,7 @@ class _PostItemState extends State<PostItem> {
         },
       );
 
-      url = 'https://comment.yyhao.com/${imgUrl}';
+      url = 'https://comment.yyhao.com/$imgUrl';
       imageViewList.add(ImageItem(
         url: url,
         width: width,

@@ -30,7 +30,7 @@ class SelfText extends SpecialText {
     TextStyle textStyle =
         this.textStyle?.copyWith(color: Colors.blue, fontSize: 16.0);
 
-    final String atText = toString();
+    // final String atText = toString();
     final String content = getContent();
 
     return showAtBackground

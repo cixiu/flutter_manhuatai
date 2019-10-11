@@ -4,8 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
-import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
 import 'package:flutter_manhuatai/components/match_text/match_text.dart';

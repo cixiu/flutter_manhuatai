@@ -4,7 +4,6 @@ import 'package:flutter_manhuatai/pages/book_detail/book_detail.dart';
 import 'package:flutter_manhuatai/pages/comic_comment/comic_comment.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
-import 'package:flutter_manhuatai/pages/comment_reply/comment_reply.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
 import 'package:flutter_manhuatai/pages/satellite_detail/satellite_detail.dart';

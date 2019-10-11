@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'dart:math';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:oktoast/oktoast.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -65,7 +64,6 @@ class _PicSwiperState extends State<PicSwiper>
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     Widget result = Material(
 
         /// if you use ExtendedImageSlidePage and slideType =SlideType.onlyImage,

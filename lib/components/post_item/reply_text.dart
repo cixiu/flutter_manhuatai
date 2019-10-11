@@ -33,7 +33,7 @@ class ReplyText extends SpecialText {
           fontSize: ScreenUtil().setSp(28),
         );
 
-    final String atText = toString();
+    // final String atText = toString();
     final String content = getContent();
 
     return showAtBackground

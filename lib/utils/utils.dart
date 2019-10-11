@@ -177,7 +177,7 @@ class Utils {
     var weekDiff = (targetThursday.difference(firstThursday).inDays) / 7;
     var week = 1 + weekDiff.floor();
 
-    return '${date.year}年第${week}周';
+    return '${date.year}年第$week周';
   }
 
   static String fromNow(int timestamp, [pattern = 'yyyy-MM-dd']) {

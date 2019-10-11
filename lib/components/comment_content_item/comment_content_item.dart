@@ -336,9 +336,7 @@ class _CommentContentItemState extends State<CommentContentItem> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          // TODO:与relationId相关的信息，比如漫画评论的relationId是comicChapterId，这里需要显示漫画的章节信息
-          //
-          //
+          // 与relationId相关的信息，比如漫画评论的relationId是comicChapterId，这里需要显示漫画的章节信息
           item.relationInfo != null
               ? Expanded(
                   child: Text(

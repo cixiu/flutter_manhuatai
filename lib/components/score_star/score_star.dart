@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
