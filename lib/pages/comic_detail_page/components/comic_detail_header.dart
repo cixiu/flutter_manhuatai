@@ -386,7 +386,7 @@ class ComicDetailHeader extends StatelessWidget {
                 onTap: () {
                   Application.router.navigateTo(
                     context,
-                    '${Routes.comicComment}?comicId=$comicId',
+                    '${Routes.comicComment}?comicId=$comicId&comicName=${Uri.encodeComponent(comicInfoBody.comicName)}',
                   );
                 },
                 child: Container(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_manhuatai/api/api.dart';
+import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
@@ -16,6 +17,7 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
   int ssidtype,
   int fatherid = 0,
   int relationId,
+  bool isComicComment = false,
 }) async {
   var getSatelliteFatherComments = await Api.getFatherComments(
     authorization: authorization,
@@ -29,10 +31,13 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
   );
 
   List<int> userIds = [];
+  List<int> commentIds = [];
+  List<int> chapterIds = [];
   if (getSatelliteFatherComments.length == 0) {
     return [];
   } else {
     getSatelliteFatherComments.forEach((comment) {
+      commentIds.add(comment.id);
       var match = RegExp(r'{reply:“(\d+)”}').firstMatch(comment.content.trim());
       if (match != null) {
         userIds.add(int.tryParse(match.group(1)));
@@ -40,11 +45,21 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
       if (!userIds.contains(comment.useridentifier)) {
         userIds.add(comment.useridentifier);
       }
+      if (isComicComment && comment.relateid.isNotEmpty) {
+        chapterIds.add(int.tryParse(comment.relateid));
+      }
     });
   }
 
-  List<int> commentIds =
-      getSatelliteFatherComments.map((item) => item.id).toList();
+  List<ChapterInfo> chapterInfoList = [];
+  if (isComicComment) {
+    chapterInfoList = await Api.getChapterInfoByChapterId(
+      chapterIds: chapterIds,
+    );
+  }
+
+  // List<int> commentIds =
+  //     getSatelliteFatherComments.map((item) => item.id).toList();
   // 获取帖子的一级评论下需要显示的二级评论
   var getSatelliteChildrenCommentsRes = await Api.getChildrenComments(
     type: userType,
@@ -96,9 +111,9 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
   }
 
   return getSatelliteFatherComments.map((item) {
-    item.relateid = '评论的relationid';
     List<SatelliteComment> childrenCommentList = [];
     Map<int, Data> replyUserMap = {};
+    ChapterInfo relationInfo;
 
     // 将reply格式所匹配到的用户加入Map中
     var fatherMatch =
@@ -122,10 +137,20 @@ Future<List<CommonSatelliteComment>> getCommentListInfo({
       });
     }
 
+    // 如果是漫画的评论
+    if (isComicComment && chapterInfoList.length != 0) {
+      chapterInfoList.forEach((chapterInfo) {
+        if (int.tryParse(item.relateid) == chapterInfo.chapterTopicId) {
+          relationInfo = chapterInfo;
+        }
+      });
+    }
+
     return CommonSatelliteComment(
       fatherComment: item,
       childrenCommentList: childrenCommentList,
       replyUserMap: replyUserMap,
+      relationInfo: relationInfo,
     );
   }).toList();
 }

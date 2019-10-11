@@ -34,6 +34,7 @@ class CommentSliverList extends StatelessWidget {
           }
 
           var item = fatherCommentList[index];
+          // return Text(item.fatherComment.uname);
           return CommentContentItem(
             isReplyDetail: isReplyDetail,
             item: item,

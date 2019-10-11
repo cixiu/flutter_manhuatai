@@ -7,15 +7,18 @@ import 'package:flutter_manhuatai/common/dao/comment.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
+import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ComicCommentPage extends StatefulWidget {
   final String comicId;
+  final String comicName;
 
   ComicCommentPage({
     this.comicId,
+    this.comicName,
   });
 
   @override
@@ -34,6 +37,8 @@ class _ComicCommentPageState extends State<ComicCommentPage>
   WhyFarther _commentType = WhyFarther.hot; // 评论的类型（最新，最热）
 
   ScrollController _scrollController = ScrollController();
+  GlobalKey<CommentTextInputState> _inputKey;
+
   int _commentCount = 0;
   List<CommonSatelliteComment> _fatherCommentList;
 
@@ -54,7 +59,7 @@ class _ComicCommentPageState extends State<ComicCommentPage>
     }
     // 判断当前滑动位置是不是到达底部，触发加载更多回调
     if (isBottom) {
-      // loadMore();
+      loadMore();
     }
   }
 
@@ -81,6 +86,7 @@ class _ComicCommentPageState extends State<ComicCommentPage>
         authorization: authorization,
         ssid: ssid,
         ssidtype: 0,
+        isComicComment: true,
       );
 
       if (!this.mounted) {
@@ -91,7 +97,7 @@ class _ComicCommentPageState extends State<ComicCommentPage>
         _isLoading = false;
         _commentCount = commentCount;
         _fatherCommentList = fatherCommentList;
-        // _inputKey = GlobalKey<CommentTextInputState>();
+        _inputKey = GlobalKey<CommentTextInputState>();
         if (fatherCommentList.length < pageSize) {
           _hasMore = false;
         }
@@ -105,11 +111,53 @@ class _ComicCommentPageState extends State<ComicCommentPage>
     }
   }
 
+  // 上拉加载更多
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) {
+      return;
+    }
+    _isLoadingMore = true;
+
+    page++;
+    var user = User(context);
+    var userType = user.info.type;
+    var openid = user.info.openid;
+    var authorization = user.info.authData.authcode;
+    var ssid = int.tryParse(widget.comicId);
+
+    var fatherCommentList = await getCommentListInfo(
+      type: _commentType == WhyFarther.hot ? 'hot' : 'new',
+      userType: userType,
+      openid: openid,
+      authorization: authorization,
+      ssid: ssid,
+      ssidtype: 0,
+      isComicComment: true,
+      page: page,
+    );
+    _isLoadingMore = false;
+
+    if (!this.mounted) {
+      return;
+    }
+
+    setState(() {
+      if (fatherCommentList.length < pageSize) {
+        _hasMore = false;
+      }
+      _fatherCommentList.addAll(fatherCommentList);
+    });
+
+    print('加载更多');
+  }
+
   @override
   Widget build(BuildContext context) {
+    var keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('漫画名称'),
+        title: Text(widget.comicName),
         centerTitle: false,
       ),
       body: RefreshIndicator(
@@ -145,6 +193,11 @@ class _ComicCommentPageState extends State<ComicCommentPage>
                         ),
                       ],
                     ),
+                  ),
+                  CommentTextInput(
+                    key: _inputKey,
+                    // submit: _submitComment,
+                    keyboardHeight: keyboardHeight,
                   ),
                 ],
               ),

@@ -258,20 +258,24 @@ class _CommentContentItemState extends State<CommentContentItem> {
                     content = comment.content.replaceAllMapped(
                       replyReg,
                       (matches) {
-                        return '{reply:${replyCommentUser.uname}：}';
+                        return replyCommentUser != null
+                            ? '{reply:${replyCommentUser.uname}：}'
+                            : '';
                       },
                     );
-                    content = '@${comment.uname}： 回复 $content';
+                    content = replyCommentUser != null
+                        ? '@${comment.uname}： 回复 $content'
+                        : '@${comment.uname}：：$content';
                   } else {
                     content = '@${comment.uname}：：${comment.content}';
                   }
-
                   return Container(
                     margin: EdgeInsets.only(
                       bottom: ScreenUtil().setWidth(10),
                     ),
                     child: ExtendedText(
                       '$content',
+                      maxLines: 3,
                       specialTextSpanBuilder: PostSpecialTextSpanBuilder(
                         selfStyle: TextStyle(
                           color: Colors.black,
@@ -330,8 +334,16 @@ class _CommentContentItemState extends State<CommentContentItem> {
           // TODO:与relationId相关的信息，比如漫画评论的relationId是comicChapterId，这里需要显示漫画的章节信息
           //
           //
-          item.fatherComment.relateid.isNotEmpty
-              ? Text(item.fatherComment.relateid)
+          item.relationInfo != null
+              ? Expanded(
+                  child: Text(
+                    item.relationInfo.chapterName,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: ScreenUtil().setSp(24),
+                    ),
+                  ),
+                )
               : Container(),
           GestureDetector(
             behavior: HitTestBehavior.opaque,

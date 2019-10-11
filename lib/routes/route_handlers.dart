@@ -39,7 +39,11 @@ var comicDetailHandler = Handler(
 var comicCommentlHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     String comicId = params['comicId']?.first;
-    return ComicCommentPage(comicId: comicId);
+    String comicName = params['comicName']?.first;
+    return ComicCommentPage(
+      comicId: comicId,
+      comicName: comicName,
+    );
   },
 );
 

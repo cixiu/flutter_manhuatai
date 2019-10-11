@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum WhyFarther { hot, newest }
@@ -26,7 +27,7 @@ class CommentTypeHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Text(
-            '评论 （$count）',
+            '评论 （${Utils.formatNumber(count.toString())}）',
             style: TextStyle(
               color: Colors.black,
               fontSize: ScreenUtil().setWidth(32),

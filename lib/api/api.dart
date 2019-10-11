@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 import 'package:flutter_manhuatai/common/model/comment_content.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
@@ -1220,5 +1221,38 @@ class Api {
     }
 
     return CommentContent.fromJson({});
+  }
+
+  /// 通过chapterId获取漫画的章节信息
+  static Future<List<ChapterInfo>> getChapterInfoByChapterId({
+    @required List<int> chapterIds,
+  }) async {
+    String url =
+        'http://kanmanapi-main.321mh.com/v1/comic/getchapterinfobychapterid';
+    String chapterIdString = '';
+
+    // if (chapterIds.length != 0) {
+    chapterIds.forEach((chpaterId) {
+      chapterIdString += '&chapterid=$chpaterId';
+    });
+
+    url += '?' + chapterIdString.substring(1);
+    // }
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {'platformname': 'android', 'productname': 'mht'},
+    );
+
+    if (response['status'] == 0 && response['data'] is List) {
+      var data = response['data'] as List<dynamic>;
+      if (data.length != 0) {
+        return data.map((item) {
+          return ChapterInfo.fromJson(item);
+        }).toList();
+      }
+    }
+
+    return [];
   }
 }
