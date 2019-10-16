@@ -1,20 +1,19 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:device_info/device_info.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_reads.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-// import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/pages/comic_read/components/custom_sliver_child_builder.dart';
-import 'package:redux/redux.dart';
 
 import 'components/comic_read_bottom_bar.dart';
 import 'components/comic_read_drawer.dart';
@@ -126,16 +125,8 @@ class _ComicReadPageState extends State<ComicReadPage>
   }) async {
     var user = User(context);
     Store<AppState> store = StoreProvider.of(context);
+    var deviceid = await Utils.getDeviceId();
 
-    String deviceid = '';
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceid = androidInfo.androidId;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceid = iosInfo.identifierForVendor;
-    }
     // 进入漫画阅读页时，将要阅读的漫画的章节的第一张添加到用户的阅读历史
     await Api.addUserRead(
       type: user.info.type,
@@ -156,6 +147,8 @@ class _ComicReadPageState extends State<ComicReadPage>
     if (index > -1) {
       var userRead = store.state.userReads[index];
       userRead.readTime = DateTime.now().millisecondsSinceEpoch;
+      userRead.chapterId = chapterId;
+      userRead.chapterName = chapterName;
       store.dispatch(ChangeUserReadAction(userRead));
     } else {
       var userRead = User_read.fromJson({
@@ -176,7 +169,7 @@ class _ComicReadPageState extends State<ComicReadPage>
     }
   }
 
-  void _scrollListener() {
+  void _scrollListener() async {
     if (_isLoadingMore) {
       return;
     }
@@ -196,6 +189,11 @@ class _ComicReadPageState extends State<ComicReadPage>
 
       _readerChapterIndex--;
       var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
+      await _addUserRead(
+        chapterId: readerChapter.chapterTopicId,
+        chapterName: readerChapter.chapterName,
+        comicInfoBody: comicInfoBody,
+      );
       print(readerChapter.chapterName);
       // 将章节对应的漫画图片插入数组
       int len = readerChapter.startNum + readerChapter.endNum;

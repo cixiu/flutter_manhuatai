@@ -48,7 +48,7 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
 
   Future<void> _handleRefresh() async {
     Store<AppState> store = StoreProvider.of(context);
-    await getUserRecordAsyncAction(store);
+    await getUserRecordAsyncAction(store, !_isLoading);
     if (!this.mounted) {
       return;
     }

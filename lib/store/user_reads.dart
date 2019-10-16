@@ -63,11 +63,11 @@ class ChangeUserReadAction {
 
 // 异步更新redux
 // 获取用户的收藏和阅读记录
-Future<void> getUserRecordAsyncAction(Store<AppState> store) async {
-  if (store.state.userCollects != null) {
+Future<void> getUserRecordAsyncAction(Store<AppState> store,
+    [bool isRefresh = false]) async {
+  if (store.state.userCollects != null && !isRefresh) {
     return;
   }
-
   var guestInfo = store.state.guestInfo;
   var userInfo = store.state.userInfo;
   var user = userInfo.uid != null ? userInfo : guestInfo;

@@ -54,7 +54,7 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
       return;
     }
 
-    await getUserRecordAsyncAction(store);
+    await getUserRecordAsyncAction(store, !_isLoading);
 
     if (!this.mounted) {
       return;
