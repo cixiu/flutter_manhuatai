@@ -890,7 +890,7 @@ class Api {
     Map<String, dynamic> response = await HttpRequest.get(
       url,
       params: {
-        'appid': appId,
+        'appId': appId,
         'ssid': ssid,
         'ssidType': ssidType,
         'commentType': commentType,

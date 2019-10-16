@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_collects.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:redux/redux.dart';
 
 // 用户收藏和阅读历史记录
@@ -73,15 +72,7 @@ Future<void> getUserRecordAsyncAction(Store<AppState> store) async {
   var userInfo = store.state.userInfo;
   var user = userInfo.uid != null ? userInfo : guestInfo;
 
-  String deviceid = '';
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  if (Platform.isAndroid) {
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    deviceid = androidInfo.androidId;
-  } else if (Platform.isIOS) {
-    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    deviceid = iosInfo.identifierForVendor;
-  }
+  var deviceid = await Utils.getDeviceId();
 
   var getUserRecordRes = await Api.getUserRecord(
     type: user.type,

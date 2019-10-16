@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/pages/comic_read/comic_read.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/store/index.dart';
@@ -43,16 +43,7 @@ class ComicDetailHeader extends StatelessWidget {
       var user = User(context);
       String action = hasCollected ? 'dels' : 'add';
       int _comicId = int.parse(comicId);
-
-      String deviceid = '';
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceid = androidInfo.androidId;
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceid = iosInfo.identifierForVendor;
-      }
+      var deviceid = await Utils.getDeviceId();
 
       var status = await Api.setUserCollect(
         type: user.info.type,
@@ -360,27 +351,71 @@ class ComicDetailHeader extends StatelessWidget {
                   );
                 },
               ),
-              Container(
-                width: ScreenUtil().setWidth(248),
-                height: ScreenUtil().setWidth(102),
-                child: Stack(
-                  overflow: Overflow.visible,
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    Positioned(
-                      top: ScreenUtil().setWidth(-10),
-                      child: Image.asset(
-                        'lib/images/icon_detail_reed.png',
-                        width: ScreenUtil().setWidth(248),
-                        height: ScreenUtil().setWidth(102),
+              StoreConnector<AppState, List<User_read>>(
+                converter: (store) => store.state.userReads,
+                builder: (context, userReads) {
+                  // 阅读历史的漫画章节
+                  User_read hasReadedComic;
+                  userReads.forEach((readComic) {
+                    if (readComic.comicId == int.parse(comicId)) {
+                      hasReadedComic = readComic;
+                    }
+                  });
+                  // 开始阅读的章节，默认是漫画的第一章
+                  Comic_chapter needStartComicChapter =
+                      comicInfoBody.comicChapter.last;
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CustomRouter(
+                          ComicReadPage(
+                            comicId: comicId,
+                            chapterTopicId: hasReadedComic != null
+                                ? hasReadedComic.chapterId
+                                : needStartComicChapter.chapterTopicId,
+                            chapterName: hasReadedComic != null
+                                ? hasReadedComic.chapterName
+                                : needStartComicChapter.chapterName,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: ScreenUtil().setWidth(248),
+                      height: ScreenUtil().setWidth(102),
+                      child: Stack(
+                        overflow: Overflow.visible,
+                        alignment: Alignment.bottomCenter,
+                        children: <Widget>[
+                          Positioned(
+                            top: ScreenUtil().setWidth(-10),
+                            child: Image.asset(
+                              'lib/images/icon_detail_reed.png',
+                              width: ScreenUtil().setWidth(248),
+                              height: ScreenUtil().setWidth(102),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: ScreenUtil().setWidth(20),
+                            child: hasReadedComic != null
+                                ? Container(
+                                    width: ScreenUtil().setWidth(210),
+                                    child: Center(
+                                      child: Text(
+                                        '续看 ${hasReadedComic.chapterName}',
+                                        overflow: TextOverflow.clip,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  )
+                                : Text('开始阅读'),
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      bottom: ScreenUtil().setWidth(20),
-                      child: Text('开始阅读'),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
               GestureDetector(
                 onTap: () {

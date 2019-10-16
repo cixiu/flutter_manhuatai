@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
@@ -72,16 +70,7 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
       var user = userInfo.uid != null ? userInfo : guestInfo;
       String action = 'dels';
       int _comicId = item.comicId;
-
-      String deviceid = '';
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceid = androidInfo.androidId;
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceid = iosInfo.identifierForVendor;
-      }
+      var deviceid = await Utils.getDeviceId();
 
       var status = await Api.setUserCollect(
         type: user.type,

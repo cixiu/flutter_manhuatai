@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
@@ -210,5 +214,20 @@ class Utils {
     }
 
     return formatDate(timestamp, pattern);
+  }
+
+  /// 获取deviceId
+  static Future<String> getDeviceId() async {
+    String deviceid = '';
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceid = androidInfo.androidId;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceid = iosInfo.identifierForVendor;
+    }
+
+    return deviceid;
   }
 }
