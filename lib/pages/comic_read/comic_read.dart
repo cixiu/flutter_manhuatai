@@ -317,7 +317,7 @@ class _ComicReadPageState extends State<ComicReadPage>
     var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
     // 将章节对应的漫画图片插入数组
     int len = readerChapter.startNum + readerChapter.endNum;
-    String imgHost = 'https://mhpic.manhualang.com';
+    String imgHost = 'https://mhpic.isamanhua.com';
 
     if (this.mounted) {
       int queueLen = 0;
