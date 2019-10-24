@@ -186,7 +186,7 @@ class Api {
     @required String comicId,
   }) async {
     final String url =
-        'https://comic.321mh.com/app_api/v5/getcomicinfo_influence/';
+        'http://comic.321mh.com/app_api/v5/getcomicinfo_influence/';
 
     Map<String, dynamic> response = await HttpRequest.get(url, params: {
       'comic_id': comicId,
@@ -202,7 +202,7 @@ class Api {
   static Future<Map<String, dynamic>> getComicCommentCount({
     @required String comicId,
   }) async {
-    final String url = 'https://community-hots.321mh.com/comment/count/';
+    final String url = 'http://community-hots.321mh.com/comment/count/';
 
     Map<String, dynamic> response = await HttpRequest.get(url, params: {
       'appId': 2,
@@ -220,7 +220,7 @@ class Api {
     @required String comicId,
   }) async {
     final String url =
-        'https://cms-booklist.321mh.com/api/v1/bookList/getBookByComicidNew';
+        'http://cms-booklist.321mh.com/api/v1/bookList/getBookByComicidNew';
 
     Map<String, dynamic> response = await HttpRequest.post(url, data: {
       'userauth': userauth,
@@ -239,7 +239,7 @@ class Api {
     @required String comicId,
   }) async {
     final String url =
-        'https://kanmanapi-main.321mh.com/app_api/v5/getcomicinfo_role/';
+        'http://kanmanapi-main.321mh.com/app_api/v5/getcomicinfo_role/';
 
     Map<String, dynamic> response = await HttpRequest.get(url, params: {
       'comic_id': comicId, // 漫画的id
