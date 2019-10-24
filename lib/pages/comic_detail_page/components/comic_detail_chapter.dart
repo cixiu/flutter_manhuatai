@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/db/provider/has_read_chapters_db_provider.dart';
 import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
 import 'package:flutter_manhuatai/models/comic_info_body.dart';
 import 'package:flutter_manhuatai/pages/comic_read/comic_read.dart';
@@ -23,6 +26,40 @@ class ComicDetailChapter extends StatefulWidget {
 }
 
 class _ComicDetailChapterState extends State<ComicDetailChapter> {
+  List<dynamic> hasReadChapterList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getHasReadChapters();
+  }
+
+  // 获取漫画的阅读章节
+  Future<void> _getHasReadChapters() async {
+    var provider = HasReadChaptersDbProvider();
+    var dbList =
+        await provider.getHasReadChapters(int.tryParse(widget.comicId));
+    if (dbList != null) {
+      setState(() {
+        hasReadChapterList = dbList;
+      });
+    }
+    print('漫画已读章节 $dbList');
+  }
+
+  void _navigateToComicReadPage(Comic_chapter chapter) async {
+    await Navigator.of(context).push(
+      CustomRouter(
+        ComicReadPage(
+          comicId: widget.comicId,
+          chapterTopicId: chapter.chapterTopicId,
+          chapterName: chapter.chapterName,
+        ),
+      ),
+    );
+    await _getHasReadChapters();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SliverList(
@@ -74,19 +111,13 @@ class _ComicDetailChapterState extends State<ComicDetailChapter> {
           }
 
           var chapter = widget.comicChapterList[index];
+          bool hasRead = hasReadChapterList.contains(chapter.chapterTopicId);
+
           return InkResponse(
             highlightShape: BoxShape.rectangle,
             containedInkWell: true,
             onTap: () {
-              Navigator.of(context).push(
-                CustomRouter(
-                  ComicReadPage(
-                    comicId: widget.comicId,
-                    chapterTopicId: chapter.chapterTopicId,
-                    chapterName: chapter.chapterName,
-                  ),
-                ),
-              );
+              _navigateToComicReadPage(chapter);
             },
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -112,7 +143,7 @@ class _ComicDetailChapterState extends State<ComicDetailChapter> {
                       ),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Color(0xffd57100),
+                          color: hasRead ? Colors.grey[400] : Color(0xffd57100),
                         ),
                         borderRadius: BorderRadius.horizontal(
                           right: Radius.circular(16.0),
@@ -120,14 +151,15 @@ class _ComicDetailChapterState extends State<ComicDetailChapter> {
                       ),
                       child: Center(
                         child: Text(
-                          '未读',
+                          hasRead ? '已读' : '未读',
                           strutStyle: StrutStyle(
                             forceStrutHeight: true,
                             fontSize: ScreenUtil().setSp(16),
                           ),
                           style: TextStyle(
                             fontSize: ScreenUtil().setSp(16),
-                            color: Color(0xffd57100),
+                            color:
+                                hasRead ? Colors.grey[400] : Color(0xffd57100),
                           ),
                         ),
                       ),

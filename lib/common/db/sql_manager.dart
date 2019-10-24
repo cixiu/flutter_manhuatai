@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 /// 数据库管理
 class SqlManager {
@@ -17,13 +18,12 @@ class SqlManager {
     var databasesPath = await getDatabasesPath();
     // 构造完整的数据库路径
     String dbName = _NAME;
-    String path = databasesPath + dbName;
-    if (Platform.isIOS) {
-      path = databasesPath + '/' + dbName;
-    }
+    String path = join(databasesPath, dbName);
+    print(path);
     // open the database
     _database = await openDatabase(path, version: _VERSION,
         onCreate: (Database db, int version) async {
+      print('数据库open成功');
       // When creating the db, create the table
       // await db.execute(
       //     'CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)');

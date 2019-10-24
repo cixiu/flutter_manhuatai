@@ -69,13 +69,13 @@ class HasReadChaptersDbProvider extends BaseDbProvider {
   }
 
   /// 根据comicId获取查找到的漫画
-  Future<List<int>> getHasReadChapters(int id) async {
+  Future<List<dynamic>> getHasReadChapters(int id) async {
     Database db = await getDataBase();
     var provider = await _getProvider(db, id);
     if (provider != null) {
       ///使用 compute 的 Isolate 优化 json decode
-      List<int> dataMap =
-          await compute((String data) => json.decode(data), provider.data);
+      List<dynamic> dataMap = json.decode(provider.data);
+      // await compute((String provideData) => json.decode(provideData), provider.data);
 
       return dataMap.length > 0 ? dataMap : [];
     }
@@ -85,24 +85,28 @@ class HasReadChaptersDbProvider extends BaseDbProvider {
   /// 插入一条已阅读的漫画信息
   /// 如果存在则更新
   /// 否则插入一条新的数据
-  void insertOrUpdate(
+  Future<List<dynamic>> insertOrUpdate(
       int id, String comicName, String hasReadChaptersString) async {
     Database db = await getDataBase();
     var provider = await _getProvider(db, id);
     // 此时更新
     if (provider != null) {
+      print('此时更新');
       await db.update(
         name,
         toMap(id, comicName, hasReadChaptersString),
-        where: '$columnId = ?',
+        where: '$columnComicId = ?',
         whereArgs: [id],
       );
-      return;
+    } else {
+      // 插入
+      print('此时插入');
+      await db.insert(
+        name,
+        toMap(id, comicName, hasReadChaptersString),
+      );
     }
-    // 插入
-    await db.insert(
-      name,
-      toMap(id, comicName, hasReadChaptersString),
-    );
+    var dbList = await getHasReadChapters(id);
+    return dbList;
   }
 }

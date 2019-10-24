@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:flutter_manhuatai/common/db/provider/has_read_chapters_db_provider.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/store/user_reads.dart';
@@ -97,6 +99,28 @@ class _ComicReadPageState extends State<ComicReadPage>
     _scrollController.dispose();
   }
 
+  // 将chapterId加入对应漫画的数据中
+  _insertOrUpdateHasReadChapters(int chapterId, String comicName) async {
+    var provider = HasReadChaptersDbProvider();
+    int id = int.tryParse(widget.comicId);
+    var dbList = await provider.getHasReadChapters(id);
+    if (dbList != null) {
+      print('当前需要加入的chapterTopicId: $chapterId');
+      if (!dbList.contains(chapterId)) {
+        dbList.add(chapterId);
+        var newDbList =
+            await provider.insertOrUpdate(id, comicName, json.encode(dbList));
+        print('更新数据完成后： $newDbList');
+      }
+    } else {
+      dbList = [];
+      dbList.add(chapterId);
+      var newDbList =
+          await provider.insertOrUpdate(id, comicName, json.encode(dbList));
+      print('插入数据后： $newDbList');
+    }
+  }
+
   // 获取指定漫画的主体信息
   Future<void> _getComicInfoBody() async {
     var response = await Api.getComicInfoBody(comicId: widget.comicId);
@@ -109,6 +133,10 @@ class _ComicReadPageState extends State<ComicReadPage>
     setState(() {
       comicInfoBody = _comicInfoBody;
     });
+    await _insertOrUpdateHasReadChapters(
+      widget.chapterTopicId,
+      _comicInfoBody.comicName,
+    );
     await _addUserRead(
       chapterId: widget.chapterTopicId,
       chapterName: widget.chapterName,
@@ -189,6 +217,10 @@ class _ComicReadPageState extends State<ComicReadPage>
 
       _readerChapterIndex--;
       var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
+      await _insertOrUpdateHasReadChapters(
+        readerChapter.chapterTopicId,
+        comicInfoBody.comicName,
+      );
       await _addUserRead(
         chapterId: readerChapter.chapterTopicId,
         chapterName: readerChapter.chapterName,
@@ -197,7 +229,7 @@ class _ComicReadPageState extends State<ComicReadPage>
       print(readerChapter.chapterName);
       // 将章节对应的漫画图片插入数组
       int len = readerChapter.startNum + readerChapter.endNum;
-      String imgHost = 'https://mhpic.manhualang.com';
+      String imgHost = 'https://mhpic.isamanhua.com';
       List<int> _imageNum = [];
       Map<int, int> imageHashMap = Map();
       int queueLen = 0;
