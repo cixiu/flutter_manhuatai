@@ -74,8 +74,7 @@ class HasReadChaptersDbProvider extends BaseDbProvider {
     var provider = await _getProvider(db, id);
     if (provider != null) {
       ///使用 compute 的 Isolate 优化 json decode
-      List<dynamic> dataMap = json.decode(provider.data);
-      // await compute((String provideData) => json.decode(provideData), provider.data);
+      List<dynamic> dataMap = await compute(computeCallback, provider.data);
 
       return dataMap.length > 0 ? dataMap : [];
     }
@@ -109,4 +108,8 @@ class HasReadChaptersDbProvider extends BaseDbProvider {
     var dbList = await getHasReadChapters(id);
     return dbList;
   }
+}
+
+List<dynamic> computeCallback(String provideData) {
+  return json.decode(provideData);
 }
