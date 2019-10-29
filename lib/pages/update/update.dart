@@ -92,37 +92,6 @@ class _HomeUpdateState extends State<HomeUpdate>
           ),
         ),
       ),
-      // appBar: PreferredSize(
-      //   preferredSize: Size.fromHeight(toolBarHeight),
-      //   child: Column(
-      //     children: <Widget>[
-      //       Container(
-      //         height: statusBarHeight,
-      //       ),
-      //       Expanded(
-      //         child: TabBar(
-      //           controller: tabController,
-      //           indicatorColor: Colors.blue,
-      //           indicatorSize: TabBarIndicatorSize.label,
-      //           labelColor: Colors.blue,
-      //           labelPadding: EdgeInsets.symmetric(
-      //             vertical: ScreenUtil().setWidth(20),
-      //             horizontal: 0.0,
-      //           ),
-      //           unselectedLabelColor: Colors.grey[800],
-      //           labelStyle: TextStyle(
-      //             color: Colors.blue,
-      //             fontWeight: FontWeight.bold,
-      //           ),
-      //           unselectedLabelStyle: TextStyle(
-      //             fontSize: ScreenUtil().setWidth(24),
-      //           ),
-      //           tabs: _buildTabs(dateList),
-      //         ),
-      //       )
-      //     ],
-      //   ),
-      // ),
       body: TabBarView(
         controller: tabController,
         children: _buildTabBarViews(dateList),

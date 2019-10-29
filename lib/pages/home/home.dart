@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/pages/home/home_index.dart';
 import 'package:flutter_manhuatai/pages/update/update.dart';
@@ -17,6 +20,8 @@ class _MyHomePageState extends State<MyHomePage>
   int _currentIndex = 0;
   PageController _controller = PageController(initialPage: 0);
   List<Widget> pages = List();
+
+  DateTime _lastPopTime; // 记录上次点击退出的时间
 
   @override
   bool get wantKeepAlive => true;
@@ -49,15 +54,33 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      body: PageView(
-        controller: _controller,
-        children: pages,
-        physics: NeverScrollableScrollPhysics(),
-      ),
-      bottomNavigationBar: BottomNavigation(
-        currentIndex: _currentIndex,
-        onChangeIndex: onChangeIndex,
+    return WillPopScope(
+      onWillPop: () {
+        if (_currentIndex != 0) {
+          onChangeIndex(0);
+          return Future.value(false);
+        }
+
+        if (_lastPopTime == null ||
+            DateTime.now().difference(_lastPopTime) >
+                Duration(milliseconds: 1500)) {
+          showToast('再按一次退出');
+          _lastPopTime = DateTime.now();
+          return Future.value(false);
+        }
+
+        return Future.value(true);
+      },
+      child: Scaffold(
+        body: PageView(
+          controller: _controller,
+          children: pages,
+          physics: NeverScrollableScrollPhysics(),
+        ),
+        bottomNavigationBar: BottomNavigation(
+          currentIndex: _currentIndex,
+          onChangeIndex: onChangeIndex,
+        ),
       ),
     );
   }
