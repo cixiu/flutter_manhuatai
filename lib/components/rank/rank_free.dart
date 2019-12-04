@@ -37,7 +37,7 @@ class RankFree extends StatelessWidget {
 
       // 索引大于3后的漫画，每行排2个
       if (i >= 3) {
-        width = (boxWidth - 2 * _spacing) / 3;
+        width = (boxWidth - 2 * _spacing) / 3 * 0.999999;
         height = width;
       }
 
@@ -63,7 +63,7 @@ class RankFree extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: _spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

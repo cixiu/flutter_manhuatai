@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'rank_title.dart';
 import 'rank_item_img.dart';
 import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;
@@ -31,13 +32,15 @@ class RankAll extends StatelessWidget {
       }
 
       if (i == 1 || i == 2) {
-        width = (boxWidth - 2 * _spacing) * 0.31;
+        // 宽高的计算导致的小数点的问题，在渲染是可能会造成数字精度的丢失
+        // 所以，需要留出一点点像素来补足一些计算带来的误差
+        width = (boxWidth - 2 * _spacing) * 0.309;
         height = width / (3 / 4);
       }
 
       // 索引大于3后的漫画，每行排2个
       if (i >= 3) {
-        width = (boxWidth - 10.0) / 2;
+        width = (boxWidth - _spacing) / 2;
         height = width / 2;
         aspectRatio = '2:1';
       }
@@ -66,7 +69,7 @@ class RankAll extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: _spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

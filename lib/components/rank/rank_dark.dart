@@ -29,7 +29,7 @@ class RankDark extends StatelessWidget {
         height = width / 2;
         aspectRatio = '2:1';
       } else {
-        width = (boxWidth - 2 * _spacing) / 3;
+        width = (boxWidth - 2 * _spacing) / 3 * 0.999999;
         height = width;
       }
 
@@ -55,7 +55,7 @@ class RankDark extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: _spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

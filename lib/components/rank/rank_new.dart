@@ -24,7 +24,7 @@ class RankNew extends StatelessWidget {
     // 计算宽高
     for (int i = 0; i < _count; i++) {
       String aspectRatio = '3:4';
-      width = (boxWidth - 2 * _spacing) / 3;
+      width = ((boxWidth - 2 * _spacing) / 3) * 0.999999;
       height = width;
 
       RankList.ListSub item = data.list[i];
@@ -47,9 +47,8 @@ class RankNew extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: _spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
