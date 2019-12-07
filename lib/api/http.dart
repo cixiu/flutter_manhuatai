@@ -19,13 +19,19 @@ class HttpRequest {
       return e;
     }));
 
+  // 开发模式下打开代理进行 http 抓包
   static _proxyClient() {
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (HttpClient client) {
       client.findProxy = (uri) {
         //proxy all request to localhost:8888
         // android emuldator ip = 10.0.2.2
-        return "PROXY 10.0.2.2:8888";
+        // 如果使用的是安卓模拟器则打开下面的注释
+        // return "PROXY 10.0.2.2:8888";
+
+        // android real proxy ip = 192.168.xx.xxx:xxxx
+        // 如果使用的是安卓真机则打开下面的注释
+        return "PROXY 192.168.1.2:8888";
       };
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
@@ -37,7 +43,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<T> response = await dio.get<T>(
       url,
       queryParameters: params,
@@ -52,7 +58,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.post<Map>(
       url,
       data: data,
@@ -68,7 +74,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.put<Map>(
       url,
       data: data,

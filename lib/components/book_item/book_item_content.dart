@@ -70,6 +70,10 @@ class BookItemContent extends StatelessWidget {
       fontSize: ScreenUtil().setSp(28),
     );
 
+    if (config.displayType == 9) {
+      return _buildDisplay9ConfigName(style);
+    }
+
     // displayType == 11 时，在漫画名字前面增加漫画的类型
     if (config.displayType == 11 && item.comicType.first.isNotEmpty) {
       return Container(
@@ -124,6 +128,39 @@ class BookItemContent extends StatelessWidget {
         item.comicName,
         overflow: TextOverflow.ellipsis,
         style: style,
+      ),
+    );
+  }
+
+  Widget _buildDisplay9ConfigName(TextStyle style) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: ScreenUtil().setWidth(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            item.comicName,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+          Row(
+            children: <Widget>[
+              Image.asset(
+                'lib/images/ic_recommend_hot_gray.png',
+                width: ScreenUtil().setWidth(24),
+              ),
+              Text(
+                Utils.formatNumber(item.totalViewNum),
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: ScreenUtil().setWidth(20),
+                ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }

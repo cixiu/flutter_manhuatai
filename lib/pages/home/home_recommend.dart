@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/const/user.dart';
 
 import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper.dart';
 import 'package:flutter_manhuatai/components/banner_swipper/banner_swipper.dart';
@@ -20,6 +21,11 @@ class _HomeRecommendState extends State<HomeRecommend>
         RefreshCommonState,
         WidgetsBindingObserver {
   final recommendPageControl = PullLoadWrapperControl();
+  int _currentPage = 1;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+  // 是否根据用户的喜欢来获取推荐列表
+  bool _isStreamingLoad = false;
   bool isLoading = true;
   List<RecommendList.Book> _bookList;
   List<RecommendList.Comic_info> _bannerList;
@@ -32,34 +38,85 @@ class _HomeRecommendState extends State<HomeRecommend>
     super.initState();
     // 需要头部
     recommendPageControl.needHeader = true;
+    // 需要加载更多
+    recommendPageControl.needLoadMore = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('HomeRecommend didChangeDependencies');
-  }
-
-  @override
-  void didUpdateWidget(HomeRecommend oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // print('更新推荐页面数据');
-  }
-
   Future<void> handleRefrsh() async {
-    Map<String, dynamic> data = await Api.getRecommentList();
-    RecommendList.BookList recommendList =
-        RecommendList.BookList.fromJson(data);
+    var bookList = await _getRecommendList(page: 1);
+
+    setState(() {
+      _currentPage = 1;
+      _bookList = bookList;
+      recommendPageControl.dataListLength = bookList.length;
+      recommendPageControl.needLoadMore = true;
+      isLoading = false;
+      _hasMore = true;
+      _isLoadingMore = false;
+      _isStreamingLoad = false;
+    });
+  }
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) {
+      return;
+    }
+    _isLoadingMore = true;
+    _currentPage++;
+    List<RecommendList.Book> bookList = [];
+
+    if (!_isStreamingLoad) {
+      bookList = await _getRecommendList(page: _currentPage);
+      if (bookList.length == 0) {
+        _isStreamingLoad = true;
+      }
+    }
+
+    if (_isStreamingLoad) {
+      bookList = await _getRecommendList(page: _currentPage, isStreaming: true);
+    }
+
+    setState(() {
+      _isLoadingMore = false;
+      _bookList.addAll(bookList);
+      recommendPageControl.dataListLength += bookList.length;
+      // 最多显示 200 条书籍类目
+      if (bookList.length == 0 || _bookList.length > 200) {
+        recommendPageControl.needLoadMore = false;
+        _hasMore = false;
+      }
+    });
+  }
+
+  Future<List<RecommendList.Book>> _getRecommendList({
+    int page,
+    bool isStreaming = false,
+  }) async {
+    var user = User(context);
+    RecommendList.BookList recommendList;
+    if (isStreaming) {
+      recommendList = await Api.getRecommendStreamingList(
+        userId: user.info.uid,
+      );
+    } else {
+      recommendList = await Api.getRecommenNewList(
+        userId: user.info.uid,
+        page: page,
+      );
+    }
     // 漫画台安卓男样式
     List<RecommendList.Comic_info> bannerList = [];
     List<int> bannerBookIdList = [];
     recommendList.data.book.forEach((book) {
-      if (book.title.contains('样式')) {
+      if (page == 1 && book.title.contains('样式')) {
         bannerList = book.comicInfo.take(6).toList();
         bannerBookIdList.add(book.bookId);
+        setState(() {
+          _bannerList = bannerList;
+        });
       }
     });
 
@@ -75,18 +132,9 @@ class _HomeRecommendState extends State<HomeRecommend>
           item.bookId == 8833;
     });
 
-    // int start = bannerList.length != 0 ? 1 : 0;
-    // int length = recommendList.data.book.length;
-    var bookList = recommendList.data.book.where((book) {
+    return recommendList.data.book.where((book) {
       return book.config.displayType != 20;
     }).toList();
-
-    setState(() {
-      _bannerList = bannerList;
-      _bookList = bookList;
-      recommendPageControl.dataListLength = bookList.length;
-      isLoading = false;
-    });
   }
 
   @override
@@ -98,6 +146,7 @@ class _HomeRecommendState extends State<HomeRecommend>
       control: recommendPageControl,
       isFirstLoading: isLoading,
       onRefresh: handleRefrsh,
+      onLoadMore: loadMore,
       itemBuilder: (context, index) {
         if (index == 0) {
           return _bannerList.length != 0

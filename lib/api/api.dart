@@ -5,6 +5,7 @@ import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 import 'package:flutter_manhuatai/common/model/comment_content.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
+import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/models/book_list.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
 import 'package:flutter_manhuatai/models/follow_list.dart';
@@ -33,7 +34,7 @@ import 'package:flutter_manhuatai/models/rank_types.dart';
 import './http.dart';
 
 class Api {
-  /// 获取首页的推荐推荐列表数据
+  /// 获取首页的推荐推荐列表数据（老版本）
   static Future<Map<String, dynamic>> getRecommentList() async {
     final String url =
         'https://cms-booklist.321mh.com/api/v1/bookList/getBookByType';
@@ -48,6 +49,51 @@ class Api {
       'productname': 'mht'
     });
     return response;
+  }
+
+  /// 获取首页的推荐推荐列表数据（新版本）
+  static Future<RecommendList.BookList> getRecommenNewList({
+    @required int userId,
+    @required int page,
+  }) async {
+    final String url =
+        'http://recommend.321mh.com/api/v2/booklist/getbookbytype';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'user_id': userId,
+      'page': page,
+      'pagesize': 10,
+      'pytype': '',
+      'booktype': 132,
+      'platform': 8,
+      'platformname': 'android',
+      'productname': 'mht'
+    });
+    if (response['status'] != 0) {
+      return RecommendList.BookList.fromJson({});
+    }
+    return RecommendList.BookList.fromJson(response);
+  }
+
+  /// 获取首页的推荐推荐列表数据根据（用户的喜好进行推荐）
+  static Future<RecommendList.BookList> getRecommendStreamingList({
+    @required int userId,
+  }) async {
+    final String url =
+        'http://recommend.321mh.com/api/v2/booklist/recommendstreamlist';
+
+    Map<String, dynamic> response = await HttpRequest.get(url, params: {
+      'user_id': userId,
+      'pytype': '',
+      'booktype': 132,
+      'platform': 8,
+      'platformname': 'android',
+      'productname': 'mht'
+    });
+    if (response['status'] != 0) {
+      return RecommendList.BookList.fromJson({});
+    }
+    return RecommendList.BookList.fromJson(response);
   }
 
   /// 获取首页的排行列表
