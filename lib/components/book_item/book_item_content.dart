@@ -9,12 +9,15 @@ import 'package:flutter_manhuatai/utils/utils.dart';
 class BookItemContent extends StatelessWidget {
   final double width;
   final double horizonratio;
+  // 自定义显示比例，用于显示不同于 config.horizonratio 的图片 eg: '2:1'
+  final String customHorizonratio;
   final Comic_info item;
   final Config config;
 
   BookItemContent({
     this.width,
     this.horizonratio,
+    this.customHorizonratio,
     this.item,
     this.config,
   });
@@ -30,10 +33,11 @@ class BookItemContent extends StatelessWidget {
             url: Utils.formatBookImgUrl(
               comicInfo: item,
               config: config,
+              customHorizonratio: customHorizonratio,
             ),
             width: width,
             height: width / horizonratio,
-            fit: BoxFit.fill,
+            // fit: BoxFit.fill,
           ),
           Container(
             margin: EdgeInsets.only(

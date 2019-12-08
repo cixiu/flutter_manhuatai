@@ -5,10 +5,12 @@ import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'book_item_dispaly_6_8.dart';
 import 'book_item_display_1.dart';
 import 'book_item_display_3.dart';
 import 'book_item_dispaly_29.dart';
 import 'book_item_display_61.dart';
+import 'book_item_display_72.dart';
 import 'book_item_display_9.dart';
 
 import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
@@ -70,7 +72,13 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   /// 根据不同的 book.displayType 呈现不同的布局
   Widget buildBookItem() {
     double totalHorizontalPadding = widget.horizontalPadding * 2;
-    if (widget.book.config.displayType == 9) {
+    if (widget.book.config.displayType == 6 ||
+        widget.book.config.displayType == 8) {
+      return BookItemDisplay6And8(
+        book: book,
+        horizontalPadding: totalHorizontalPadding,
+      );
+    } else if (widget.book.config.displayType == 9) {
       return BookItemDisplay9(
         book: book,
         horizontalPadding: totalHorizontalPadding,
@@ -92,6 +100,11 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
       );
     } else if (book.config.displayType == 61) {
       return BookItemDisplay61(
+        book: book,
+        horizontalPadding: totalHorizontalPadding,
+      );
+    } else if (book.config.displayType == 72) {
+      return BookItemDisplay72(
         book: book,
         horizontalPadding: totalHorizontalPadding,
       );
@@ -119,29 +132,34 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              GestureDetector(
-                onTap: _switchBookList,
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      widget.book.title,
-                      style: TextStyle(
-                        fontSize: ScreenUtil().setSp(40),
-                        fontWeight: FontWeight.bold,
+              Expanded(
+                child: GestureDetector(
+                  onTap: _switchBookList,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          widget.book.title,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(40),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                    widget.needSwith
-                        ? Container(
-                            margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(10),
-                            ),
-                            child: Image.asset(
-                              'lib/images/book_switch.png',
-                              height: ScreenUtil().setWidth(42),
-                            ),
-                          )
-                        : Container(),
-                  ],
+                      widget.needSwith
+                          ? Container(
+                              margin: EdgeInsets.only(
+                                left: ScreenUtil().setWidth(10),
+                              ),
+                              child: Image.asset(
+                                'lib/images/book_switch.png',
+                                height: ScreenUtil().setWidth(42),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
                 ),
               ),
               widget.book.config.isshowmore == 1

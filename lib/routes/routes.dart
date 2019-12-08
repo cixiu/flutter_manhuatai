@@ -23,61 +23,61 @@ class Routes {
     router.define(
       login,
       handler: loginHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       userCenter,
       handler: userCenterHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       comicDetail,
       handler: comicDetailHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       comicComment,
       handler: comicCommentlHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       comicRank,
       handler: comicRankHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       comicSearch,
       handler: comicSearchHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       searchResult,
       handler: searchResultHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       satelliteDetail,
       handler: satelliteDetailHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       bookDetail,
       handler: bookDetailHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
 
     router.define(
       webView,
       handler: webViewHandler,
-      transitionType: TransitionType.inFromRight,
+      transitionType: TransitionType.native,
     );
   }
 }
