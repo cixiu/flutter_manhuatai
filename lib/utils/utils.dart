@@ -19,11 +19,12 @@ class Utils {
   }
 
   // 拼接图片的url
-  static formatBookImgUrl(
-      {RecommendList.Comic_info comicInfo,
-      RecommendList.Config config,
-      String customHorizonratio,
-      bool useDefalut = false}) {
+  static formatBookImgUrl({
+    RecommendList.Comic_info comicInfo,
+    RecommendList.Config config,
+    String customHorizonratio,
+    bool useDefalut = false,
+  }) {
     // double ratio =computedRatio(book.config.horizonratio);
     String horizonratio =
         customHorizonratio != null ? customHorizonratio : config.horizonratio;
@@ -31,7 +32,7 @@ class Utils {
     int widthRatio = int.parse(ratioList[0]);
     int heightRatio = int.parse(ratioList[1]);
 
-    if (comicInfo.imgUrl != '') {
+    if (comicInfo.imgUrl != null && comicInfo.imgUrl != '') {
       return '${AppConst.img_host}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
     } else {
       // 强制使用defaultSuffix

@@ -12,6 +12,7 @@ import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/pages/launch/launch_page.dart';
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   var initialState = await initState();
   final store = Store<AppState>(
     rootReducer,
@@ -19,7 +20,6 @@ main() async {
   );
   // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
   // await FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
-
   runApp(MyApp(
     store: store,
   ));

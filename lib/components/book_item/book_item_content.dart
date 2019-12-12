@@ -47,19 +47,21 @@ class BookItemContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 _buildComicName(),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: ScreenUtil().setWidth(10),
-                  ),
-                  child: Text(
-                    item.content,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: ScreenUtil().setSp(20),
-                    ),
-                  ),
-                ),
+                item.content != null
+                    ? Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setWidth(10),
+                        ),
+                        child: Text(
+                          item.content,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: ScreenUtil().setSp(20),
+                          ),
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           )
@@ -129,7 +131,7 @@ class BookItemContent extends StatelessWidget {
         top: ScreenUtil().setWidth(16),
       ),
       child: Text(
-        item.comicName,
+        item.comicName ?? '',
         overflow: TextOverflow.ellipsis,
         style: style,
       ),
