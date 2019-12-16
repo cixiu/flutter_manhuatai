@@ -44,7 +44,7 @@ class SearchAppBar extends StatelessWidget {
                   width: ScreenUtil().setWidth(1),
                 ),
                 borderRadius: BorderRadius.circular(
-                  ScreenUtil().setWidth(30),
+                  ScreenUtil().setWidth(50),
                 ),
               ),
               child: Row(
