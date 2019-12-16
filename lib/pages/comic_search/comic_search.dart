@@ -100,7 +100,7 @@ class _ComicSearchPageState extends State<ComicSearchPage>
 
   @override
   Widget build(BuildContext context) {
-    // double appBarHeight = ScreenUtil().setWidth(80);
+    double appBarHeight = ScreenUtil().setWidth(80);
 
     TextStyle commonStyle = TextStyle(
       color: Colors.black,
@@ -109,22 +109,25 @@ class _ComicSearchPageState extends State<ComicSearchPage>
     );
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        titleSpacing: 0.0,
-        brightness: Brightness.light,
-        title: SearchAppBar(
-          controller: _searchController,
-          searchKey: _searchKey,
-          onChange: (val) {
-            _inputChange(val);
-          },
-          close: () {
-            setState(() {
-              _searchController.value = TextEditingValue(text: '');
-              _searchKey = '';
-            });
-          },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(appBarHeight),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          titleSpacing: 0.0,
+          brightness: Brightness.light,
+          title: SearchAppBar(
+            controller: _searchController,
+            searchKey: _searchKey,
+            onChange: (val) {
+              _inputChange(val);
+            },
+            close: () {
+              setState(() {
+                _searchController.value = TextEditingValue(text: '');
+                _searchKey = '';
+              });
+            },
+          ),
         ),
       ),
       body: GestureDetector(

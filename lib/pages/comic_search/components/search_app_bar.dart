@@ -38,6 +38,7 @@ class SearchAppBar extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Container(
+              height: ScreenUtil().setWidth(70),
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.blue,
@@ -62,7 +63,7 @@ class SearchAppBar extends StatelessWidget {
                         ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: ScreenUtil().setWidth(20),
-                          vertical: ScreenUtil().setWidth(6),
+                          vertical: ScreenUtil().setWidth(18),
                         ),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide.none,
