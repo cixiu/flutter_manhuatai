@@ -129,9 +129,9 @@ class _ComicDetailBookState extends State<ComicDetailBook>
                     ),
                   );
                 }
-
+                var bookItem = bookList[index];
                 return BookItem(
-                  book: bookList[index],
+                  book: bookItem,
                   horizontalPadding: 0,
                   needSwith: true,
                 );

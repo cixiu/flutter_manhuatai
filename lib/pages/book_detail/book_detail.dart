@@ -11,6 +11,8 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:device_info/device_info.dart';
 
+import 'package:flutter_manhuatai/components/empty_wrapper/empty_wrapper.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
@@ -135,145 +137,153 @@ class _BookDetailPageState extends State<BookDetailPage>
         onRefresh: _handleRefresh,
         child: _isLoading
             ? Container()
-            : Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          Utils.generateImgUrlFromId(
-                            id: _bookData.bookList[_currentIndex].comicId,
-                            aspectRatio: '3:4',
-                          ),
-                        ),
-                        fit: BoxFit.cover,
-                        colorFilter: ColorFilter.mode(
-                          Colors.black,
-                          BlendMode.overlay,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                      child: Opacity(
-                        opacity: 0.5,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[700],
+            : _bookData.bookList.length != 0
+                ? Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              Utils.generateImgUrlFromId(
+                                id: _bookData.bookList[_currentIndex].comicId,
+                                aspectRatio: '3:4',
+                              ),
+                            ),
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                              Colors.black,
+                              BlendMode.overlay,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  StoreConnector<AppState, Store<AppState>>(
-                    converter: (store) => store,
-                    builder: (ctx, store) {
-                      return Container(
-                        child: Swiper(
-                          autoplay: false,
-                          loop: false,
-                          viewportFraction: 0.68,
-                          scale: 0.65,
-                          onIndexChanged: (int index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          itemCount: _bookData.bookList.length,
-                          itemBuilder: (context, index) {
-                            var item = _bookData.bookList[index];
-                            String imgUrl = item.imgUrl.isEmpty
-                                ? Utils.generateImgUrlFromId(
-                                    id: item.comicId,
-                                    aspectRatio: '3:4',
-                                  )
-                                : '${AppConst.img_host}/${item.imgUrl}';
-                            int collectIndex =
-                                store.state.userCollects.indexWhere((collect) {
-                              return collect.comicId == item.comicId;
-                            });
-                            // 是否已经收藏过漫画了
-                            bool hasCollected = collectIndex > -1;
+                      Container(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                          child: Opacity(
+                            opacity: 0.5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      StoreConnector<AppState, Store<AppState>>(
+                        converter: (store) => store,
+                        builder: (ctx, store) {
+                          return Container(
+                            child: Swiper(
+                              autoplay: false,
+                              loop: false,
+                              viewportFraction: 0.68,
+                              scale: 0.65,
+                              onIndexChanged: (int index) {
+                                setState(() {
+                                  _currentIndex = index;
+                                });
+                              },
+                              itemCount: _bookData.bookList.length,
+                              itemBuilder: (context, index) {
+                                var item = _bookData.bookList[index];
+                                String imgUrl = item.imgUrl.isEmpty
+                                    ? Utils.generateImgUrlFromId(
+                                        id: item.comicId,
+                                        aspectRatio: '3:4',
+                                      )
+                                    : '${AppConst.img_host}/${item.imgUrl}';
+                                int collectIndex = store.state.userCollects
+                                    .indexWhere((collect) {
+                                  return collect.comicId == item.comicId;
+                                });
+                                // 是否已经收藏过漫画了
+                                bool hasCollected = collectIndex > -1;
 
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                GestureDetector(
-                                  onTap: () {
-                                    Application.router.navigateTo(
-                                      context,
-                                      '/comic/detail/${item.comicId}',
-                                    );
-                                  },
-                                  child: Transform(
-                                    transform: Matrix4.identity()
-                                      ..setEntry(3, 2, 0.01)
-                                      ..rotateY(0.04)
-                                      ..rotateZ(0.06),
-                                    alignment: FractionalOffset.center,
-                                    child: Container(
-                                      padding: EdgeInsets.all(
-                                        ScreenUtil().setWidth(6),
-                                      ),
-                                      color: Colors.white,
-                                      width: ScreenUtil().setWidth(500),
-                                      height: ScreenUtil().setWidth(667),
-                                      child: Stack(
-                                        children: <Widget>[
-                                          ImageWrapper(
-                                            url: imgUrl,
-                                            width: ScreenUtil().setWidth(500),
-                                            height: ScreenUtil().setWidth(667),
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    GestureDetector(
+                                      onTap: () {
+                                        Application.router.navigateTo(
+                                          context,
+                                          '/comic/detail/${item.comicId}',
+                                        );
+                                      },
+                                      child: Transform(
+                                        transform: Matrix4.identity()
+                                          ..setEntry(3, 2, 0.01)
+                                          ..rotateY(0.04)
+                                          ..rotateZ(0.06),
+                                        alignment: FractionalOffset.center,
+                                        child: Container(
+                                          padding: EdgeInsets.all(
+                                            ScreenUtil().setWidth(6),
                                           ),
-                                          Container(
-                                            color: Colors.black12,
-                                          ),
-                                          Positioned(
-                                            top: ScreenUtil().setWidth(20),
-                                            right: ScreenUtil().setWidth(20),
-                                            child: GestureDetector(
-                                              behavior: HitTestBehavior.opaque,
-                                              onTap: () {
-                                                _setUserCollect(
-                                                  store: store,
-                                                  comicId: item.comicId,
-                                                  hasCollected: hasCollected,
-                                                );
-                                              },
-                                              child: Image.asset(
-                                                hasCollected
-                                                    ? 'lib/images/icon_heart_dianzan.png'
-                                                    : 'lib/images/icon_heart_notdianzan.png',
+                                          color: Colors.white,
+                                          width: ScreenUtil().setWidth(500),
+                                          height: ScreenUtil().setWidth(667),
+                                          child: Stack(
+                                            children: <Widget>[
+                                              ImageWrapper(
+                                                url: imgUrl,
                                                 width:
-                                                    ScreenUtil().setWidth(72),
+                                                    ScreenUtil().setWidth(500),
                                                 height:
-                                                    ScreenUtil().setWidth(72),
+                                                    ScreenUtil().setWidth(667),
                                               ),
-                                            ),
+                                              Container(
+                                                color: Colors.black12,
+                                              ),
+                                              Positioned(
+                                                top: ScreenUtil().setWidth(20),
+                                                right:
+                                                    ScreenUtil().setWidth(20),
+                                                child: GestureDetector(
+                                                  behavior:
+                                                      HitTestBehavior.opaque,
+                                                  onTap: () {
+                                                    _setUserCollect(
+                                                      store: store,
+                                                      comicId: item.comicId,
+                                                      hasCollected:
+                                                          hasCollected,
+                                                    );
+                                                  },
+                                                  child: Image.asset(
+                                                    hasCollected
+                                                        ? 'lib/images/icon_heart_dianzan.png'
+                                                        : 'lib/images/icon_heart_notdianzan.png',
+                                                    width: ScreenUtil()
+                                                        .setWidth(72),
+                                                    height: ScreenUtil()
+                                                        .setWidth(72),
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom:
+                                                    ScreenUtil().setWidth(30),
+                                                child: _buildComicTypes(item),
+                                              )
+                                            ],
                                           ),
-                                          Positioned(
-                                            bottom: ScreenUtil().setWidth(30),
-                                            child: _buildComicTypes(item),
-                                          )
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  _buildAppBar(),
-                  _buildComicInfo(),
-                ],
-              ),
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      _buildAppBar(),
+                      _buildComicInfo(),
+                    ],
+                  )
+                : EmptyWrapper(),
       ),
     );
   }

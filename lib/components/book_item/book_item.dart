@@ -133,64 +133,88 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Expanded(
-                child: GestureDetector(
-                  onTap: _switchBookList,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          widget.book.title,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(40),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      widget.needSwith
-                          ? Container(
-                              margin: EdgeInsets.only(
-                                left: ScreenUtil().setWidth(10),
-                              ),
-                              child: Image.asset(
-                                'lib/images/book_switch.png',
-                                height: ScreenUtil().setWidth(42),
-                              ),
-                            )
-                          : Container(),
-                    ],
+                child: Text(
+                  widget.book.title,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setSp(40),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              widget.book.config.isshowmore == 1
-                  ? GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Application.router.navigateTo(
-                          context,
-                          '${Routes.bookDetail}?bookId=${book.bookId}',
-                        );
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: ScreenUtil().setWidth(10),
-                          top: ScreenUtil().setWidth(10),
-                          bottom: ScreenUtil().setWidth(10),
-                        ),
-                        child: Text(
-                          '更多',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    )
-                  : Text('')
             ],
           ),
         ),
 
         // BookItem 的主要内容
         buildBookItem(),
+
+        // 换一换 或者 更多
+        buildActionWidget()
       ],
+    );
+  }
+
+  Widget buildActionWidget() {
+    var style = TextStyle(
+      color: Colors.lightBlue[200],
+      fontSize: ScreenUtil().setSp(28),
+    );
+    bool needSwith = widget.needSwith;
+    bool showMore = widget.book.config.isshowmore == 1;
+
+    if (!needSwith && !showMore) {
+      return Container();
+    }
+
+    return Container(
+      margin: EdgeInsets.all(
+        ScreenUtil().setWidth(30),
+      ),
+      child: Row(
+        mainAxisAlignment: (showMore && needSwith)
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.center,
+        children: <Widget>[
+          needSwith
+              ? GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _switchBookList,
+                  child: Container(
+                    width: ScreenUtil().setWidth(300),
+                    height: ScreenUtil().setWidth(60),
+                    alignment: Alignment.center,
+                    color: Colors.lightBlue[50],
+                    child: Text(
+                      '换一换(ノ>ω<)ノ',
+                      style: style,
+                    ),
+                  ),
+                )
+              : Container(),
+          showMore
+              ? GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    Application.router.navigateTo(
+                      context,
+                      '${Routes.bookDetail}?bookId=${book.bookId}',
+                    );
+                  },
+                  child: Container(
+                    width: ScreenUtil().setWidth(300),
+                    height: ScreenUtil().setWidth(60),
+                    alignment: Alignment.center,
+                    color: Colors.lightBlue[50],
+                    child: Text(
+                      '更多(つˊωˋ)つ',
+                      style: style,
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
+      ),
     );
   }
 }
