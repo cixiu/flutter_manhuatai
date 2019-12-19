@@ -63,7 +63,7 @@ class SearchAppBar extends StatelessWidget {
                         ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: ScreenUtil().setWidth(20),
-                          vertical: ScreenUtil().setWidth(18),
+                          vertical: ScreenUtil().setWidth(21),
                         ),
                         border: UnderlineInputBorder(
                           borderSide: BorderSide.none,

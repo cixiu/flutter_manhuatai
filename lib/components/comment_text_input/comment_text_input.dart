@@ -146,9 +146,6 @@ class CommentTextInputState extends State<CommentTextInput> {
     return Column(
       children: <Widget>[
         Container(
-          constraints: BoxConstraints(
-            minHeight: ScreenUtil().setWidth(100),
-          ),
           padding: EdgeInsets.symmetric(
             horizontal: ScreenUtil().setWidth(30),
             vertical: ScreenUtil().setWidth(20),
@@ -177,14 +174,8 @@ class CommentTextInputState extends State<CommentTextInput> {
                       ScreenUtil().setWidth(8),
                     ),
                   ),
-                  alignment: Alignment.center,
+                  // alignment: Alignment.center,
                   child: TextField(
-                    // specialTextSpanBuilder:
-                    //     PostSpecialTextSpanBuilder(
-                    //   showAtBackground: true,
-                    //   type: BuilderType.extendedTextField,
-                    // ),
-
                     onChanged: (val) {
                       setState(() {
                         _value = val;
@@ -203,6 +194,7 @@ class CommentTextInputState extends State<CommentTextInput> {
                       fontSize: ScreenUtil().setSp(28),
                     ),
                     decoration: InputDecoration(
+                      isDense: true,
                       hintText: _hintText,
                       border: InputBorder.none,
                       hintStyle: TextStyle(
