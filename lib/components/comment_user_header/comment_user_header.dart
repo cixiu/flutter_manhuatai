@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/utils/utils.dart';
@@ -30,6 +31,9 @@ class CommentUserHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = ScreenUtil().setWidth(80);
+    double height = width;
+
     return Container(
       height: ScreenUtil().setWidth(80),
       child: Row(
@@ -39,8 +43,8 @@ class CommentUserHeader extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             children: <Widget>[
               Container(
-                width: ScreenUtil().setWidth(80),
-                height: ScreenUtil().setWidth(80),
+                width: width,
+                height: height,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.grey,
@@ -50,17 +54,31 @@ class CommentUserHeader extends StatelessWidget {
                     ScreenUtil().setWidth(40),
                   ),
                 ),
-                child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  backgroundImage: NetworkImage(
-                    Utils.generateImgUrlFromId(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    width / 2,
+                  ),
+                  child: ImageWrapper(
+                    url: Utils.generateImgUrlFromId(
                       id: item.uid,
                       aspectRatio: '1:1',
                       type: 'head',
                     ),
+                    width: width,
+                    height: height,
                   ),
-                  radius: ScreenUtil().setWidth(40),
                 ),
+                // child: CircleAvatar(
+                //   backgroundColor: Colors.white,
+                //   backgroundImage: NetworkImage(
+                //     Utils.generateImgUrlFromId(
+                //       id: item.uid,
+                //       aspectRatio: '1:1',
+                //       type: 'head',
+                //     ),
+                //   ),
+                //   radius: ScreenUtil().setWidth(40),
+                // ),
               ),
               Stack(
                 alignment: Alignment(0.5, 1.5),

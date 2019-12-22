@@ -112,7 +112,8 @@ class _HomeRecommendState extends State<HomeRecommend>
     List<int> bannerBookIdList = [];
     recommendList.data.book.forEach((book) {
       if (page == 1 && book.title.contains('样式')) {
-        bannerList = book.comicInfo.take(6).toList();
+        // bannerList = book.comicInfo.take(6).toList();
+        bannerList = book.comicInfo.where((item) => item.url.isEmpty).toList();
         bannerBookIdList.add(book.bookId);
         setState(() {
           _bannerList = bannerList;

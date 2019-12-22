@@ -72,7 +72,7 @@ class CropImage extends StatelessWidget {
           switch (state.extendedImageLoadState) {
             case LoadState.loading:
               widget = Container(
-                color: Colors.grey[200],
+                color: Colors.grey[100],
                 width: num300,
                 height: num400,
                 // alignment: Alignment.center,
@@ -113,7 +113,7 @@ class CropImage extends StatelessWidget {
                   fit: StackFit.expand,
                   children: <Widget>[
                     Container(
-                      color: Colors.grey[200],
+                      color: Colors.grey[100],
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[

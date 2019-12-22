@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -106,26 +107,29 @@ class _LaunchPageState extends State<LaunchPage> {
         ScreenUtil(width: 750, height: 1334, allowFontScaling: true)
           ..init(context);
 
-    return Scaffold(
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.0,
-              ),
-              child: Image.asset(
-                'lib/images/ic_logo_girl.png',
-                fit: BoxFit.cover,
+    return AnnotatedRegion(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ),
+                child: Image.asset(
+                  'lib/images/ic_logo_girl.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          Image.asset(
-            'lib/images/ic_logo.png',
-            fit: BoxFit.cover,
-          ),
-        ],
+            Image.asset(
+              'lib/images/ic_logo.png',
+              fit: BoxFit.cover,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -27,11 +27,11 @@ class HttpRequest {
         //proxy all request to localhost:8888
         // android emuldator ip = 10.0.2.2
         // 如果使用的是安卓模拟器则打开下面的注释
-        return "PROXY 10.0.2.2:8888";
+        // return "PROXY 10.0.2.2:8888";
 
         // android real proxy ip = 192.168.xx.xxx:xxxx
         // 如果使用的是安卓真机则打开下面的注释
-        // return "PROXY 192.168.1.7:8888";
+        return "PROXY 192.168.1.2:8888";
       };
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;

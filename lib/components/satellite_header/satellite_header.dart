@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -18,6 +19,9 @@ class SatelliteHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = ScreenUtil().setWidth(80);
+    double height = width;
+
     return Container(
       height: ScreenUtil().setWidth(80),
       padding: EdgeInsets.symmetric(
@@ -30,27 +34,30 @@ class SatelliteHeader extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             children: <Widget>[
               Container(
-                width: ScreenUtil().setWidth(80),
-                height: ScreenUtil().setWidth(80),
+                width: width,
+                height: height,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.grey,
                     width: ScreenUtil().setWidth(1),
                   ),
                   borderRadius: BorderRadius.circular(
-                    ScreenUtil().setWidth(40),
+                    width / 2,
                   ),
                 ),
-                child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  backgroundImage: NetworkImage(
-                    Utils.generateImgUrlFromId(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    width / 2,
+                  ),
+                  child: ImageWrapper(
+                    url: Utils.generateImgUrlFromId(
                       id: item.useridentifier,
                       aspectRatio: '1:1',
                       type: 'head',
                     ),
+                    width: width,
+                    height: height,
                   ),
-                  radius: ScreenUtil().setWidth(40),
                 ),
               ),
               Stack(

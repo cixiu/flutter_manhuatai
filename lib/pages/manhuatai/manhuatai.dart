@@ -46,6 +46,7 @@ class _HomeManhuataiState extends State<HomeManhuatai>
         child: AppBar(
           automaticallyImplyLeading: false,
           titleSpacing: 0.0,
+          brightness: Brightness.light,
           title: ManhuataiTabBar(
             _currentIndex,
             onChangeIndex,

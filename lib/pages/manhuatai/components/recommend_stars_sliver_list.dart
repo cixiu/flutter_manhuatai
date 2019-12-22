@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
+import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/models/recommend_stars.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,6 +35,7 @@ class RecommendStarsSliverList extends StatelessWidget {
     dataList.take(9).forEach((item) {
       String url = '${AppConst.commentImgHost}/${item.image}';
       _children.add(_buildItem(
+        url: url,
         backgroundImage: NetworkImage(url),
         name: item.targetName,
       ));
@@ -51,14 +53,18 @@ class RecommendStarsSliverList extends StatelessWidget {
 
   Widget _buildItem({
     ImageProvider<dynamic> backgroundImage,
+    String url,
     String name,
     bool needBorder = true,
   }) {
+    double width = ScreenUtil().setWidth(106);
+    double height = width;
+
     return Column(
       children: <Widget>[
         Container(
-          width: ScreenUtil().setWidth(106),
-          height: ScreenUtil().setWidth(106),
+          width: width,
+          height: height,
           decoration: BoxDecoration(
             border: needBorder
                 ? Border.all(
@@ -67,14 +73,25 @@ class RecommendStarsSliverList extends StatelessWidget {
                   )
                 : null,
             borderRadius: BorderRadius.circular(
-              ScreenUtil().setWidth(53),
+              width / 2,
             ),
           ),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            backgroundImage: backgroundImage,
-            radius: ScreenUtil().setWidth(53),
-          ),
+          child: needBorder
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    width / 2,
+                  ),
+                  child: ImageWrapper(
+                    url: url,
+                    width: width,
+                    height: height,
+                  ),
+                )
+              : CircleAvatar(
+                  backgroundColor: Colors.white,
+                  backgroundImage: backgroundImage,
+                  radius: ScreenUtil().setWidth(53),
+                ),
         ),
         Container(
           margin: EdgeInsets.only(

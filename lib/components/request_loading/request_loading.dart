@@ -15,7 +15,7 @@ class RequestLoading extends StatelessWidget {
     return Center(
       child: Container(
         margin: EdgeInsets.symmetric(
-          horizontal: ScreenUtil().setHeight(180),
+          horizontal: ScreenUtil().setWidth(180),
         ),
         height: ScreenUtil().setWidth(80),
         decoration: BoxDecoration(

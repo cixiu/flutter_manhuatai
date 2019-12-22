@@ -47,18 +47,18 @@ class ManhuataiTabBar extends StatelessWidget {
           strutStyle: StrutStyle(
             forceStrutHeight: true,
             fontSize: currentIndex == index
-                ? ScreenUtil().setSp(34)
-                : ScreenUtil().setSp(28),
+                ? ScreenUtil().setSp(36)
+                : ScreenUtil().setSp(32),
           ),
           style: currentIndex == index
               ? TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
-                  fontSize: ScreenUtil().setSp(34),
+                  fontSize: ScreenUtil().setSp(36),
                 )
               : TextStyle(
                   color: Colors.grey,
-                  fontSize: ScreenUtil().setSp(28),
+                  fontSize: ScreenUtil().setSp(32),
                 ),
         ),
       ),

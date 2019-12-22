@@ -28,11 +28,16 @@ class ImageWrapper extends StatelessWidget {
     return CachedNetworkImage(
       alignment: alignment,
       placeholder: placeholder ??
-          (context, url) => Image.memory(
-                kTransparentImage,
+          (context, url) => Container(
+                color: Colors.grey[100],
                 width: width,
                 height: height,
               ),
+      // (context, url) => Image.memory(
+      //       kTransparentImage,
+      //       width: width,
+      //       height: height,
+      //     ),
       imageUrl: url,
       errorWidget: (context, url, error) => Image.asset(
         'lib/images/pic_cache.png',

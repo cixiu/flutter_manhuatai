@@ -38,9 +38,17 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   int switchNumber = 0;
   int diff = 4;
 
+  AnimationController _controller;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 100),
+      reverseDuration: Duration(milliseconds: 400),
+    );
+
     setState(() {
       // 深克隆一份数据，以防后续的操作修改原数据
       book = RecommendList.Book.fromJson(
@@ -49,8 +57,17 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
     });
   }
 
-  void _switchBookList() {
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _switchBookList() async {
     if (widget.needSwith) {
+      await _controller.forward();
+      _controller.reverse();
+
       double totalSwitchNumber = widget.book.comicInfo.length / this.diff;
       this.switchNumber++;
 
@@ -147,7 +164,14 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
         ),
 
         // BookItem 的主要内容
-        buildBookItem(),
+        FadeTransition(
+          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+            parent: _controller,
+            curve: Curves.ease,
+          )),
+          child: buildBookItem(),
+        ),
+        // buildBookItem(),
 
         // 换一换 或者 更多
         buildActionWidget()

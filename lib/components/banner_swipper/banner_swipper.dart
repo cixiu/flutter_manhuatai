@@ -15,8 +15,12 @@ class BannerSwipper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double imgWidth = MediaQuery.of(context).size.width;
+    double imgHeight = imgWidth / (16 / 9);
+    double height = imgHeight + ScreenUtil().setWidth(72);
+
     return SizedBox(
-      height: ScreenUtil().setWidth(472),
+      height: height,
       child: Swiper(
         itemCount: bannerList.length,
         itemBuilder: (context, index) {
@@ -30,9 +34,9 @@ class BannerSwipper extends StatelessWidget {
                 ImageWrapper(
                   url:
                       '${AppConst.img_host}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
-                  width: MediaQuery.of(context).size.width,
-                  height: ScreenUtil().setWidth(400),
-                  fit: BoxFit.fill,
+                  width: imgWidth,
+                  height: imgHeight,
+                  fit: BoxFit.cover,
                 ),
                 Expanded(
                   child: Padding(

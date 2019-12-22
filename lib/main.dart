@@ -20,14 +20,15 @@ main() async {
   );
   // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
   // await FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
+
   runApp(MyApp(
     store: store,
   ));
-
-  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-  //   statusBarColor: Colors.transparent,
-  //   statusBarBrightness: Brightness.dark,
-  // ));
 }
 
 class MyApp extends StatelessWidget {
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
               iconTheme: IconThemeData(
                 color: Colors.blue,
               ),
-              brightness: Brightness.dark,
+              brightness: Brightness.light,
               textTheme: TextTheme(
                 title: TextStyle(
                   color: Colors.black,

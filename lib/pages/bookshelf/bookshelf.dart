@@ -35,6 +35,7 @@ class _HomeBookshelfState extends State<HomeBookshelf>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        brightness: Brightness.light,
         title: Text('我的书架'),
       ),
       body: Column(
