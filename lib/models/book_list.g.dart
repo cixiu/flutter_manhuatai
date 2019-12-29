@@ -8,56 +8,61 @@ part of 'book_list.dart';
 
 BookList _$BookListFromJson(Map<String, dynamic> json) {
   return BookList(
-      json['data'] == null
-          ? null
-          : Data.fromJson(json['data'] as Map<String, dynamic>),
-      json['status'] as int,
-      json['message'] as String);
+    json['data'] == null
+        ? null
+        : Data.fromJson(json['data'] as Map<String, dynamic>),
+    json['status'] as int,
+    json['message'] as String,
+  );
 }
 
 Map<String, dynamic> _$BookListToJson(BookList instance) => <String, dynamic>{
       'data': instance.data,
       'status': instance.status,
-      'message': instance.message
+      'message': instance.message,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) {
   return Data(
-      (json['book'] as List)
-          ?.map((e) =>
-              e == null ? null : Book.fromJson(e as Map<String, dynamic>))
-          ?.toList(),
-      json['name'] as String);
+    (json['book'] as List)
+        ?.map(
+            (e) => e == null ? null : Book.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+    json['name'] as String,
+  );
 }
 
-Map<String, dynamic> _$DataToJson(Data instance) =>
-    <String, dynamic>{'book': instance.book, 'name': instance.name};
+Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+      'book': instance.book,
+      'name': instance.name,
+    };
 
 Book _$BookFromJson(Map<String, dynamic> json) {
   return Book(
-      json['book_id'] as int,
-      json['siteid'] as int,
-      json['union_type'] as int,
-      json['union_id'] as int,
-      json['istop'] as int,
-      json['top_num'] as int,
-      json['ordernum'] as int,
-      json['version_filter'] as int,
-      json['version_num'] as String,
-      json['title'] as String,
-      json['config'] == null
-          ? null
-          : Config.fromJson(json['config'] as Map<String, dynamic>),
-      json['bookcomic_order'] as int,
-      json['bookcomic_imgstyle'] as int,
-      json['advertise_location'] as String,
-      json['advertise_sdktype'] as String,
-      json['book_datasource'] as String,
-      json['book_intellrecommend'] as String,
-      (json['comic_info'] as List)
-          ?.map((e) =>
-              e == null ? null : Comic_info.fromJson(e as Map<String, dynamic>))
-          ?.toList());
+    json['book_id'] as int,
+    json['siteid'] as int,
+    json['union_type'] as int,
+    json['union_id'] as int,
+    json['istop'] as int,
+    json['top_num'] as int,
+    json['ordernum'] as int,
+    json['version_filter'] as int,
+    json['version_num'] as String,
+    json['title'] as String,
+    json['config'] == null
+        ? null
+        : Config.fromJson(json['config'] as Map<String, dynamic>),
+    json['bookcomic_order'] as int,
+    json['bookcomic_imgstyle'] as int,
+    json['advertise_location'] as String,
+    json['advertise_sdktype'] as String,
+    json['book_datasource'] as String,
+    json['book_intellrecommend'] as String,
+    (json['comic_info'] as List)
+        ?.map((e) =>
+            e == null ? null : Comic_info.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
 }
 
 Map<String, dynamic> _$BookToJson(Book instance) => <String, dynamic>{
@@ -78,21 +83,22 @@ Map<String, dynamic> _$BookToJson(Book instance) => <String, dynamic>{
       'advertise_sdktype': instance.advertiseSdktype,
       'book_datasource': instance.bookDatasource,
       'book_intellrecommend': instance.bookIntellrecommend,
-      'comic_info': instance.comicInfo
+      'comic_info': instance.comicInfo,
     };
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
   return Config(
-      json['display_type'] as int,
-      json['isautoslide'] as int,
-      json['isshowtitle'] as int,
-      json['horizonratio'] as String,
-      json['interwidth'] as int,
-      json['outerwidth'] as int,
-      json['order_type'] as int,
-      json['isshowchange'] as int,
-      json['isshowdetail'] as int,
-      json['isshowmore'] as int);
+    json['display_type'] as int,
+    json['isautoslide'] as int,
+    json['isshowtitle'] as int,
+    json['horizonratio'] as String,
+    json['interwidth'] as int,
+    json['outerwidth'] as int,
+    json['order_type'] as int,
+    json['isshowchange'] as int,
+    json['isshowdetail'] as int,
+    json['isshowmore'] as int,
+  );
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
@@ -105,22 +111,23 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'order_type': instance.orderType,
       'isshowchange': instance.isshowchange,
       'isshowdetail': instance.isshowdetail,
-      'isshowmore': instance.isshowmore
+      'isshowmore': instance.isshowmore,
     };
 
 Comic_info _$Comic_infoFromJson(Map<String, dynamic> json) {
   return Comic_info(
-      json['comic_id'] as int,
-      json['content'] as String,
-      json['comic_name'] as String,
-      json['total_view_num'],
-      json['update_time'],
-      json['score'],
-      json['url'] as String,
-      json['img_url'] as String,
-      json['last_comic_chapter_name'] as String,
-      json['ordernum'] as int,
-      (json['comic_type'] as List)?.map((e) => e as String)?.toList());
+    json['comic_id'] as int,
+    json['content'] as String,
+    json['comic_name'] as String,
+    json['total_view_num'],
+    json['update_time'],
+    json['score'],
+    json['url'] as String,
+    json['img_url'] as String,
+    json['last_comic_chapter_name'] as String,
+    json['ordernum'] as int,
+    (json['comic_type'] as List)?.map((e) => e as String)?.toList(),
+  );
 }
 
 Map<String, dynamic> _$Comic_infoToJson(Comic_info instance) =>
@@ -135,5 +142,5 @@ Map<String, dynamic> _$Comic_infoToJson(Comic_info instance) =>
       'img_url': instance.imgUrl,
       'last_comic_chapter_name': instance.lastComicChapterName,
       'ordernum': instance.ordernum,
-      'comic_type': instance.comicType
+      'comic_type': instance.comicType,
     };

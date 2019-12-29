@@ -8,23 +8,24 @@ part of 'comment_content.dart';
 
 CommentContent _$CommentContentFromJson(Map<String, dynamic> json) {
   return CommentContent(
-      (json['id'] as num)?.toDouble(),
-      json['content'] as String,
-      (json['fatherid'] as num)?.toDouble(),
-      json['images'] as String,
-      (json['ssid'] as num)?.toDouble(),
-      json['title'] as String,
-      json['url'] as String,
-      (json['supportcount'] as num)?.toDouble(),
-      json['iselite'] as int,
-      json['istop'] as int,
-      (json['revertcount'] as num)?.toDouble(),
-      (json['useridentifier'] as num)?.toDouble(),
-      json['createtime'] as int,
-      json['updatetime'] as int,
-      json['ssidtype'] as int,
-      json['issupport'] as int,
-      json['RelateId'] as String);
+    (json['id'] as num)?.toDouble(),
+    json['content'] as String,
+    (json['fatherid'] as num)?.toDouble(),
+    json['images'] as String,
+    (json['ssid'] as num)?.toDouble(),
+    json['title'] as String,
+    json['url'] as String,
+    (json['supportcount'] as num)?.toDouble(),
+    json['iselite'] as int,
+    json['istop'] as int,
+    (json['revertcount'] as num)?.toDouble(),
+    (json['useridentifier'] as num)?.toDouble(),
+    json['createtime'] as int,
+    json['updatetime'] as int,
+    json['ssidtype'] as int,
+    json['issupport'] as int,
+    json['RelateId'] as String,
+  );
 }
 
 Map<String, dynamic> _$CommentContentToJson(CommentContent instance) =>
@@ -45,5 +46,5 @@ Map<String, dynamic> _$CommentContentToJson(CommentContent instance) =>
       'updatetime': instance.updatetime,
       'ssidtype': instance.ssidtype,
       'issupport': instance.issupport,
-      'RelateId': instance.relateId
+      'RelateId': instance.relateId,
     };

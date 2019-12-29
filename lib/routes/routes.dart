@@ -6,6 +6,7 @@ class Routes {
   static String root = '/';
   static String login = '/login'; // 登录
   static String userCenter = '/user_center'; // 用户中心
+  static String userTaskList = '/user_task_list'; // 任务中心
   static String comicDetail = '/comic/detail/:comicId'; // 漫画详情
   static String comicComment =
       '/comic/comment'; // 漫画的评论吐槽 eg: /comic/comment?comicId=12345
@@ -29,6 +30,12 @@ class Routes {
     router.define(
       userCenter,
       handler: userCenterHandler,
+      transitionType: TransitionType.native,
+    );
+
+    router.define(
+      userTaskList,
+      handler: userTaskListHandler,
       transitionType: TransitionType.native,
     );
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MineEntryListWidget extends StatelessWidget {
@@ -29,6 +31,9 @@ class MineEntryListWidget extends StatelessWidget {
               _buildEntryWidget(
                 icon: 'lib/images/mine/icon_mine_mission.png',
                 text: '任务中心',
+                onTap: () {
+                  Application.router.navigateTo(context, Routes.userTaskList);
+                },
               ),
               _buildEntryWidget(
                 icon: 'lib/images/mine/icon_mine_sign.png',
@@ -73,27 +78,35 @@ class MineEntryListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildEntryWidget({String icon, String text}) {
-    return Column(
-      children: <Widget>[
-        Image.asset(
-          icon,
-          width: ScreenUtil().setWidth(80),
-          height: ScreenUtil().setWidth(80),
-        ),
-        Container(
-          margin: EdgeInsets.only(
-            top: ScreenUtil().setWidth(10),
+  Widget _buildEntryWidget({String icon, String text, VoidCallback onTap}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (onTap != null) {
+          onTap();
+        }
+      },
+      child: Column(
+        children: <Widget>[
+          Image.asset(
+            icon,
+            width: ScreenUtil().setWidth(80),
+            height: ScreenUtil().setWidth(80),
           ),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: ScreenUtil().setSp(30),
+          Container(
+            margin: EdgeInsets.only(
+              top: ScreenUtil().setWidth(10),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: ScreenUtil().setSp(30),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
