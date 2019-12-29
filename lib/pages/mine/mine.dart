@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/models/user_info.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_info.dart';
 
 import 'components/mine_entry_list_widget.dart';
 
@@ -26,8 +28,8 @@ class _HomeMineState extends State<HomeMine>
   bool get wantKeepAlive => true;
 
   Future<void> onRefresh() async {
-    print('todo update userInfo or guestInfo');
-    await Future.delayed(Duration(seconds: 1));
+    Store<AppState> store = StoreProvider.of(context);
+    await getUseroOrGuestInfo(store);
   }
 
   void _goLogin(UserInfo userInfo) {
