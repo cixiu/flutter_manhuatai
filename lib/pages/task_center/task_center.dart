@@ -70,9 +70,12 @@ class _TaskCenterState extends State<TaskCenter>
     });
   }
 
+  List<Task> getTaskList(name) {
+    return taskInfo.sortTasks.singleWhere((task) => task.name == name).taskList;
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('任务中心'),
@@ -148,14 +151,17 @@ class _TaskCenterState extends State<TaskCenter>
                     TaskTabView(
                       positionKey: 'Tab0',
                       name: '日常',
+                      taskList: getTaskList('日常'),
                     ),
                     TaskTabView(
                       positionKey: 'Tab1',
                       name: '萌新',
+                      taskList: getTaskList('萌新'),
                     ),
                     TaskTabView(
                       positionKey: 'Tab2',
                       name: '成就',
+                      taskList: getTaskList('成就'),
                     ),
                   ],
                 ),

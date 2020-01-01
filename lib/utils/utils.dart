@@ -231,4 +231,51 @@ class Utils {
 
     return deviceid;
   }
+
+  /// 获取今天的开始和结束的时间戳
+  static List<int> getTodayStartAndEndTimeStamp() {
+    List<int> list = List();
+    int year = DateTime.now().year;
+    int month = DateTime.now().month;
+    int day = DateTime.now().day;
+    String monthString = month.toString().padLeft(2, '0');
+    String dayString = day.toString().padLeft(2, '0');
+    String todayStartFormatString = '$year-$monthString-$dayString 00:00:00';
+    String todayEndFormatString = '$year-$monthString-$dayString 23:59:59';
+    // 今天开始的时间戳
+    int todayStartTime =
+        DateTime.tryParse(todayStartFormatString).millisecondsSinceEpoch;
+    // 今天结束的时间戳
+    int todayEndTime =
+        DateTime.tryParse(todayEndFormatString).millisecondsSinceEpoch;
+
+    list..add(todayStartTime)..add(todayEndTime);
+    return list;
+  }
+
+  /// 获取本周的开始时间和结束时间的时间戳
+  static List<int> getWeekStartAndEndTimeStamp() {
+    List<int> list = List();
+
+    int daysPerWeek = DateTime.daysPerWeek;
+    // 今天是周几
+    int today = DateTime.now().weekday;
+    // 一天的 milliseconds = 24 * 60 * 60 * 1000
+    int unitMilliseconds = 86400000;
+    // 今天与周一相差的天数
+    int diffStart = today - 1;
+    // 今天与周日相差的天数
+    int diffEnd = daysPerWeek - today;
+
+    var todayTimeStamps = getTodayStartAndEndTimeStamp();
+
+    list
+      ..add(
+        todayTimeStamps.first - unitMilliseconds * diffStart,
+      )
+      ..add(
+        todayTimeStamps.last + unitMilliseconds * diffEnd,
+      );
+    return list;
+  }
 }

@@ -5,7 +5,7 @@ part 'task_info.g.dart';
 @JsonSerializable()
 class TaskInfo extends Object {
   @JsonKey(name: 'limit_tasks')
-  List<Limit_tasks> limitTasks;
+  List<Task> limitTasks;
 
   @JsonKey(name: 'sort_tasks')
   List<Sort_tasks> sortTasks;
@@ -23,101 +23,6 @@ class TaskInfo extends Object {
       _$TaskInfoFromJson(srcJson);
 
   Map<String, dynamic> toJson() => _$TaskInfoToJson(this);
-}
-
-@JsonSerializable()
-class Limit_tasks extends Object {
-  @JsonKey(name: 'id')
-  int id;
-
-  @JsonKey(name: 'sort_id')
-  int sortId;
-
-  @JsonKey(name: 'name')
-  String name;
-
-  @JsonKey(name: 'start_time')
-  int startTime;
-
-  @JsonKey(name: 'end_time')
-  int endTime;
-
-  @JsonKey(name: 'created_time')
-  String createdTime;
-
-  @JsonKey(name: 'updated_time')
-  String updatedTime;
-
-  @JsonKey(name: 'time_span_value')
-  int timeSpanValue;
-
-  @JsonKey(name: 'time_span_unit')
-  String timeSpanUnit;
-
-  @JsonKey(name: 'is_hidden')
-  int isHidden;
-
-  @JsonKey(name: 'is_auto_popup')
-  int isAutoPopup;
-
-  @JsonKey(name: 'is_show_step')
-  int isShowStep;
-
-  @JsonKey(name: 'desc')
-  String desc;
-
-  @JsonKey(name: 'is_delete')
-  int isDelete;
-
-  @JsonKey(name: 'task_type')
-  int taskType;
-
-  @JsonKey(name: 'order_num')
-  int orderNum;
-
-  @JsonKey(name: 'time_type')
-  int timeType;
-
-  @JsonKey(name: 'show_time')
-  String showTime;
-
-  @JsonKey(name: 'complete_type')
-  int completeType;
-
-  @JsonKey(name: 'action_awards')
-  List<Action_awards> actionAwards;
-
-  @JsonKey(name: 'finish_awards')
-  List<dynamic> finishAwards;
-
-  Limit_tasks(
-    this.id,
-    this.sortId,
-    this.name,
-    this.startTime,
-    this.endTime,
-    this.createdTime,
-    this.updatedTime,
-    this.timeSpanValue,
-    this.timeSpanUnit,
-    this.isHidden,
-    this.isAutoPopup,
-    this.isShowStep,
-    this.desc,
-    this.isDelete,
-    this.taskType,
-    this.orderNum,
-    this.timeType,
-    this.showTime,
-    this.completeType,
-    this.actionAwards,
-    this.finishAwards,
-  );
-
-  factory Limit_tasks.fromJson(Map<String, dynamic> srcJson) =>
-      _$Limit_tasksFromJson(srcJson);
-
-  Map<String, dynamic> toJson() => _$Limit_tasksToJson(this);
 }
 
 @JsonSerializable()
@@ -262,7 +167,7 @@ class Sort_tasks extends Object {
   int taskVersion;
 
   @JsonKey(name: 'task_list')
-  List<Task_list> taskList;
+  List<Task> taskList;
 
   Sort_tasks(
     this.id,
@@ -282,7 +187,7 @@ class Sort_tasks extends Object {
 }
 
 @JsonSerializable()
-class Task_list extends Object {
+class Task extends Object {
   @JsonKey(name: 'id')
   int id;
 
@@ -346,7 +251,7 @@ class Task_list extends Object {
   @JsonKey(name: 'finish_awards')
   List<Finish_awards> finishAwards;
 
-  Task_list(
+  Task(
     this.id,
     this.sortId,
     this.name,
@@ -370,10 +275,10 @@ class Task_list extends Object {
     this.finishAwards,
   );
 
-  factory Task_list.fromJson(Map<String, dynamic> srcJson) =>
-      _$Task_listFromJson(srcJson);
+  factory Task.fromJson(Map<String, dynamic> srcJson) =>
+      _$TaskFromJson(srcJson);
 
-  Map<String, dynamic> toJson() => _$Task_listToJson(this);
+  Map<String, dynamic> toJson() => _$TaskToJson(this);
 }
 
 @JsonSerializable()

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_manhuatai/api/http.dart';
@@ -63,5 +64,53 @@ class TaskApi {
       return TaskProcess.fromJson(response);
     }
     return TaskProcess.fromJson({});
+  }
+
+  /// 验证任务
+  static Future<Map<String, dynamic>> validateTask({
+    String type,
+    String openid,
+    String authorization,
+    Action_awards taskAward,
+  }) async {
+    final String url = 'http://task.321mh.com/v1/tasks/validatetask';
+
+    var data = {
+      'targets': {
+        '${taskAward.id}_${taskAward.triggerType}': {
+          'id': taskAward.targetLimit,
+          'value': taskAward.minValue
+        }
+      },
+      'task_award_ids': [taskAward.id],
+      'taskid': taskAward.taskId,
+      'localtime':
+          '${DateTime.now().millisecondsSinceEpoch + 1000 * taskAward.minValue}',
+      'productname': 'mht',
+      'platformname': 'android',
+      'client-type': 'android',
+      'client-version': '2.3.1',
+      'client-channel': 'meizu',
+      'type': type,
+      'openid': openid,
+    };
+    print(data);
+
+    Map<String, dynamic> response = await HttpRequest.post(
+      url,
+      data: data,
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authorization',
+        },
+        contentType: ContentType.json,
+      ),
+    );
+
+    return response;
+    // if (response['status'] == 0) {
+    //   return TaskProcess.fromJson(response);
+    // }
+    // return TaskProcess.fromJson({});
   }
 }

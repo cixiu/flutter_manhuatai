@@ -9,8 +9,8 @@ part of 'task_info.dart';
 TaskInfo _$TaskInfoFromJson(Map<String, dynamic> json) {
   return TaskInfo(
     (json['limit_tasks'] as List)
-        ?.map((e) =>
-            e == null ? null : Limit_tasks.fromJson(e as Map<String, dynamic>))
+        ?.map(
+            (e) => e == null ? null : Task.fromJson(e as Map<String, dynamic>))
         ?.toList(),
     (json['sort_tasks'] as List)
         ?.map((e) =>
@@ -24,61 +24,6 @@ Map<String, dynamic> _$TaskInfoToJson(TaskInfo instance) => <String, dynamic>{
       'limit_tasks': instance.limitTasks,
       'sort_tasks': instance.sortTasks,
       'service_time': instance.serviceTime,
-    };
-
-Limit_tasks _$Limit_tasksFromJson(Map<String, dynamic> json) {
-  return Limit_tasks(
-    json['id'] as int,
-    json['sort_id'] as int,
-    json['name'] as String,
-    json['start_time'] as int,
-    json['end_time'] as int,
-    json['created_time'] as String,
-    json['updated_time'] as String,
-    json['time_span_value'] as int,
-    json['time_span_unit'] as String,
-    json['is_hidden'] as int,
-    json['is_auto_popup'] as int,
-    json['is_show_step'] as int,
-    json['desc'] as String,
-    json['is_delete'] as int,
-    json['task_type'] as int,
-    json['order_num'] as int,
-    json['time_type'] as int,
-    json['show_time'] as String,
-    json['complete_type'] as int,
-    (json['action_awards'] as List)
-        ?.map((e) => e == null
-            ? null
-            : Action_awards.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-    json['finish_awards'] as List,
-  );
-}
-
-Map<String, dynamic> _$Limit_tasksToJson(Limit_tasks instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'sort_id': instance.sortId,
-      'name': instance.name,
-      'start_time': instance.startTime,
-      'end_time': instance.endTime,
-      'created_time': instance.createdTime,
-      'updated_time': instance.updatedTime,
-      'time_span_value': instance.timeSpanValue,
-      'time_span_unit': instance.timeSpanUnit,
-      'is_hidden': instance.isHidden,
-      'is_auto_popup': instance.isAutoPopup,
-      'is_show_step': instance.isShowStep,
-      'desc': instance.desc,
-      'is_delete': instance.isDelete,
-      'task_type': instance.taskType,
-      'order_num': instance.orderNum,
-      'time_type': instance.timeType,
-      'show_time': instance.showTime,
-      'complete_type': instance.completeType,
-      'action_awards': instance.actionAwards,
-      'finish_awards': instance.finishAwards,
     };
 
 Action_awards _$Action_awardsFromJson(Map<String, dynamic> json) {
@@ -160,8 +105,8 @@ Sort_tasks _$Sort_tasksFromJson(Map<String, dynamic> json) {
     json['updated_time'] as String,
     json['task_version'] as int,
     (json['task_list'] as List)
-        ?.map((e) =>
-            e == null ? null : Task_list.fromJson(e as Map<String, dynamic>))
+        ?.map(
+            (e) => e == null ? null : Task.fromJson(e as Map<String, dynamic>))
         ?.toList(),
   );
 }
@@ -178,8 +123,8 @@ Map<String, dynamic> _$Sort_tasksToJson(Sort_tasks instance) =>
       'task_list': instance.taskList,
     };
 
-Task_list _$Task_listFromJson(Map<String, dynamic> json) {
-  return Task_list(
+Task _$TaskFromJson(Map<String, dynamic> json) {
+  return Task(
     json['id'] as int,
     json['sort_id'] as int,
     json['name'] as String,
@@ -212,7 +157,7 @@ Task_list _$Task_listFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$Task_listToJson(Task_list instance) => <String, dynamic>{
+Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'id': instance.id,
       'sort_id': instance.sortId,
       'name': instance.name,
