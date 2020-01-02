@@ -143,8 +143,8 @@ class _TaskTabViewState extends State<TaskTabView>
             return Container();
           }
           return GestureDetector(
-            onTap: () {
-              customButtonSheet.showModalBottomSheet(
+            onTap: () async {
+              await customButtonSheet.showModalBottomSheet(
                 // isScrollControlled: true,
                 backgroundColor: Colors.transparent,
                 context: context,
@@ -155,6 +155,8 @@ class _TaskTabViewState extends State<TaskTabView>
                   );
                 },
               );
+              // 重排任务列表 更新视图
+              sortTaskList();
             },
             child: _buildTaskItem(task),
           );

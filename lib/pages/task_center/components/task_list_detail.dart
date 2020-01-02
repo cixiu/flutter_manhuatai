@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
+
 import 'package:flutter_manhuatai/api/task.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/award_result.dart';
-import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/common/model/task_info.dart' hide Icon;
+
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'task_result_toast.dart';
 
 class TaskListDetail extends StatefulWidget {
   final Task task;
@@ -120,6 +124,15 @@ class _TaskListDetailState extends State<TaskListDetail> {
           authorization: authorization,
           taskAward: award,
         );
+        hideLoading(context);
+
+        if (awardResult.awardresult == null) {
+          showToast('任务领取失败');
+          return;
+        }
+        setState(() {
+          award.lastFinishTime = awardResult.achievetime;
+        });
       } else {
         awardResult = await TaskApi.validateTask(
           type: type,
@@ -127,9 +140,25 @@ class _TaskListDetailState extends State<TaskListDetail> {
           authorization: authorization,
           task: task,
         );
+        hideLoading(context);
+
+        if (awardResult.awardresult == null) {
+          showToast('任务领取失败');
+          return;
+        }
+        setState(() {
+          task.actionAwards.forEach((award) {
+            award.lastFinishTime = awardResult.achievetime;
+          });
+        });
       }
-      print(awardResult);
-      hideLoading(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TaskResultToast(awardResult: awardResult);
+        },
+      );
     } catch (e) {
       hideLoading(context);
     }

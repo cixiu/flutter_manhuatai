@@ -90,7 +90,6 @@ class TaskApi {
       'platformname': 'android',
       'client-type': 'android',
       'client-version': '2.3.1',
-      'client-channel': 'meizu',
       'type': type,
       'openid': openid,
     };
@@ -126,8 +125,6 @@ class TaskApi {
         'taskid': task.id,
       });
     }
-
-    print(data);
 
     Map<String, dynamic> response = await HttpRequest.post(
       url,
