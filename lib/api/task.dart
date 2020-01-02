@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_manhuatai/api/http.dart';
+import 'package:flutter_manhuatai/common/model/award_result.dart';
 import 'package:flutter_manhuatai/common/model/task_info.dart';
 import 'package:flutter_manhuatai/common/model/task_process.dart';
 
@@ -67,25 +69,23 @@ class TaskApi {
   }
 
   /// 验证任务
-  static Future<Map<String, dynamic>> validateTask({
-    String type,
-    String openid,
-    String authorization,
+  static Future<AwardResult> validateTask({
+    @required String type,
+    @required String openid,
+    @required String authorization,
+    // 完成单个传入的任务
     Action_awards taskAward,
+    // 批量完成整个传入的列表任务
+    Task task,
   }) async {
+    assert(task != null || taskAward != null);
+    if (task != null && taskAward != null) {
+      throw Exception('task and taskAward just need one');
+    }
     final String url = 'http://task.321mh.com/v1/tasks/validatetask';
-
-    var data = {
-      'targets': {
-        '${taskAward.id}_${taskAward.triggerType}': {
-          'id': taskAward.targetLimit,
-          'value': taskAward.minValue
-        }
-      },
-      'task_award_ids': [taskAward.id],
-      'taskid': taskAward.taskId,
-      'localtime':
-          '${DateTime.now().millisecondsSinceEpoch + 1000 * taskAward.minValue}',
+    Map<String, dynamic> data = Map();
+    data = {
+      'localtime': '${DateTime.now().millisecondsSinceEpoch}',
       'productname': 'mht',
       'platformname': 'android',
       'client-type': 'android',
@@ -94,6 +94,39 @@ class TaskApi {
       'type': type,
       'openid': openid,
     };
+
+    if (taskAward != null) {
+      data.addAll({
+        'targets': {
+          '${taskAward.id}_${taskAward.triggerType}': {
+            'id': taskAward.targetLimit,
+            'value': taskAward.minValue
+          }
+        },
+        'task_award_ids': [taskAward.id],
+        'taskid': taskAward.taskId,
+      });
+    }
+
+    if (task != null) {
+      Map targets = Map();
+      List<int> taskAwardIds = List();
+      task.actionAwards.forEach((award) {
+        targets.addAll({
+          '${award.id}_${award.triggerType}': {
+            'id': award.targetLimit,
+            'value': award.minValue
+          }
+        });
+        taskAwardIds.add(award.id);
+      });
+      data.addAll({
+        'targets': targets,
+        'task_award_ids': taskAwardIds,
+        'taskid': task.id,
+      });
+    }
+
     print(data);
 
     Map<String, dynamic> response = await HttpRequest.post(
@@ -107,10 +140,9 @@ class TaskApi {
       ),
     );
 
-    return response;
-    // if (response['status'] == 0) {
-    //   return TaskProcess.fromJson(response);
-    // }
-    // return TaskProcess.fromJson({});
+    if (response['status'] == 0) {
+      return AwardResult.fromJson(response['data']);
+    }
+    return AwardResult.fromJson({});
   }
 }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     as extended;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/model/task_info.dart' as TaskInfo;
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_manhuatai/components/bottom_sheet/bottom_sheet.dart'
+    as customButtonSheet;
+
+import 'task_list_detail.dart';
 
 class TaskTabView extends StatefulWidget {
   final String positionKey;
@@ -24,14 +29,13 @@ class TaskTabView extends StatefulWidget {
 class _TaskTabViewState extends State<TaskTabView>
     with AutomaticKeepAliveClientMixin {
   List<TaskInfo.Task> taskList;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    // sortTasks = widget.sortTasks;
-    // taskList = widget.taskList;
     sortTaskList();
   }
 
@@ -138,7 +142,22 @@ class _TaskTabViewState extends State<TaskTabView>
           if (task.isHidden == 1) {
             return Container();
           }
-          return _buildTaskItem(task);
+          return GestureDetector(
+            onTap: () {
+              customButtonSheet.showModalBottomSheet(
+                // isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (BuildContext ctx) {
+                  return TaskListDetail(
+                    task: task,
+                    hasAllFinished: _hasFinished,
+                  );
+                },
+              );
+            },
+            child: _buildTaskItem(task),
+          );
         }).toList(),
       ),
     );
@@ -250,28 +269,22 @@ class _TaskTabViewState extends State<TaskTabView>
             : Positioned(
                 bottom: ScreenUtil().setWidth(40),
                 right: ScreenUtil().setWidth(60),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    // _openCurrentTaskList();
-                  },
-                  child: Container(
-                    width: ScreenUtil().setWidth(220),
-                    height: ScreenUtil().setWidth(80),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue),
-                      borderRadius: BorderRadius.circular(
-                        ScreenUtil().setWidth(45),
-                      ),
+                child: Container(
+                  width: ScreenUtil().setWidth(220),
+                  height: ScreenUtil().setWidth(80),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(
+                      ScreenUtil().setWidth(45),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '去完成',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: ScreenUtil().setSp(32),
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '去完成',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: ScreenUtil().setSp(32),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),

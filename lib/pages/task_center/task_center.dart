@@ -61,8 +61,6 @@ class _TaskCenterState extends State<TaskCenter>
       }
     });
 
-    print(taskProcessMap[23]);
-
     setState(() {
       taskInfo = _taskInfo;
       taskProcess = _taskProcess.data;
