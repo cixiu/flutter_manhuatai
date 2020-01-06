@@ -140,6 +140,7 @@ class _TaskResultToastState extends State<TaskResultToast>
                   'lib/images/task/icon_movie$_imageIndex.png',
                   width: ScreenUtil().setWidth(438),
                   height: ScreenUtil().setWidth(172),
+                  gaplessPlayback: true,
                 ),
               ),
             ],

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:flutter_manhuatai/common/model/task_info.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
@@ -277,5 +278,56 @@ class Utils {
         todayTimeStamps.last + unitMilliseconds * diffEnd,
       );
     return list;
+  }
+
+  // 任务是否完成
+  static hasFinishedAward({
+    Task task,
+    Action_awards award,
+  }) {
+    bool flag = true;
+    int lastFinishTime = award.lastFinishTime;
+
+    // 一次行的任务或者限时性任务
+    if (task.timeSpanUnit == 'total') {
+      if (lastFinishTime == 0) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 每周更新的任务
+    if (task.timeSpanUnit == 'week') {
+      var times = Utils.getWeekStartAndEndTimeStamp();
+      int startTime = times.first;
+      // 如果 lastFinishTime 小于 本周的开始时间
+      // 那么这个任务一定还没有完成
+      if (lastFinishTime < startTime) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 每日更新的任务
+    if (task.timeSpanUnit == 'day') {
+      var times = Utils.getTodayStartAndEndTimeStamp();
+      int startTime = times.first;
+      // 如果 lastFinishTime 小于 今天的开始时间
+      // 那么这个任务一定还没有完成
+      if (lastFinishTime < startTime) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 小时的奖励
+    if (task.timeSpanUnit == 'hour') {
+      bool flag = true;
+      int nowTime = DateTime.now().millisecondsSinceEpoch;
+      // 如果 现在时间 - lastFinishTime 大于 1小时
+      // 那么这个任务一定还没有完成
+      if (nowTime - lastFinishTime > 60 * 60 * 1000) {
+        flag = false;
+      }
+      return flag;
+    }
+    return false;
   }
 }

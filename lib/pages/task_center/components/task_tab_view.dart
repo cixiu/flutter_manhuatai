@@ -44,18 +44,36 @@ class _TaskTabViewState extends State<TaskTabView>
     List<TaskInfo.Task> hasFinishedList = [];
     List<TaskInfo.Task> notFinishedList = [];
     widget.taskList.forEach((task) {
-      if (_hasFinished(task)) {
+      sortTaskAward(task);
+      if (_hasAllFinished(task)) {
         hasFinishedList.add(task);
       } else {
         notFinishedList.add(task);
       }
     });
+
     setState(() {
       taskList = List()..addAll(notFinishedList)..addAll(hasFinishedList);
     });
   }
 
-  bool _hasFinished(TaskInfo.Task task) {
+  // 对单个任务的列表任务进行排序，完成的排后面
+  void sortTaskAward(TaskInfo.Task task) {
+    List<TaskInfo.Action_awards> hasFinishedAwardList = [];
+    List<TaskInfo.Action_awards> notFinishedAwardList = [];
+    task.actionAwards.forEach((award) {
+      if (Utils.hasFinishedAward(task: task, award: award)) {
+        hasFinishedAwardList.add(award);
+      } else {
+        notFinishedAwardList.add(award);
+      }
+    });
+    task.actionAwards = List()
+      ..addAll(notFinishedAwardList)
+      ..addAll(hasFinishedAwardList);
+  }
+
+  bool _hasAllFinished(TaskInfo.Task task) {
     // 一次行的任务或者限时性任务
     if (task.timeSpanUnit == 'total') {
       bool flag = true;
@@ -151,7 +169,7 @@ class _TaskTabViewState extends State<TaskTabView>
                 builder: (BuildContext ctx) {
                   return TaskListDetail(
                     task: task,
-                    hasAllFinished: _hasFinished,
+                    hasAllFinished: _hasAllFinished,
                   );
                 },
               );
@@ -221,30 +239,35 @@ class _TaskTabViewState extends State<TaskTabView>
           left: positionedLeft,
           child: Row(
             children: task.actionAwards.first.awardList.map((award) {
-              return Stack(
-                children: <Widget>[
-                  Image.network(
-                    '${AppConst.img_host}${award.icon}',
-                    width: ScreenUtil().setWidth(80),
-                    height: ScreenUtil().setWidth(80),
-                  ),
-                  Positioned(
-                    bottom: ScreenUtil().setWidth(4),
-                    right: ScreenUtil().setWidth(4),
-                    child: Text(
-                      '${award.amount}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: ScreenUtil().setSp(28),
-                      ),
+              return Container(
+                margin: EdgeInsets.only(
+                  right: ScreenUtil().setWidth(20),
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Image.network(
+                      '${AppConst.img_host}${award.icon}',
+                      width: ScreenUtil().setWidth(80),
+                      height: ScreenUtil().setWidth(80),
                     ),
-                  )
-                ],
+                    Positioned(
+                      bottom: ScreenUtil().setWidth(4),
+                      right: ScreenUtil().setWidth(4),
+                      child: Text(
+                        '${award.amount}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: ScreenUtil().setSp(28),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               );
             }).toList(),
           ),
         ),
-        _hasFinished(task)
+        _hasAllFinished(task)
             ? Positioned(
                 top: ScreenUtil().setWidth(20),
                 right: ScreenUtil().setWidth(60),
@@ -258,7 +281,7 @@ class _TaskTabViewState extends State<TaskTabView>
               )
             : Container(),
         // 是否显示已完成标志
-        _hasFinished(task)
+        _hasAllFinished(task)
             ? Positioned(
                 bottom: ScreenUtil().setWidth(20),
                 right: ScreenUtil().setWidth(60),
