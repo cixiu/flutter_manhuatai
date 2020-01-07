@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -9,6 +13,8 @@ import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/award_result.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_info.dart';
 
 import 'package:flutter_manhuatai/common/model/task_info.dart' hide Icon;
 
@@ -68,6 +74,11 @@ class _TaskListDetailState extends State<TaskListDetail> {
 
     try {
       var user = User(context);
+      // 如果未登录，则跳转去登录
+      if (!user.hasLogin) {
+        Application.router.navigateTo(context, '${Routes.login}');
+        return;
+      }
       var type = user.info.type;
       var openid = user.info.openid;
       var authorization = user.info.authData.authcode;
@@ -81,15 +92,11 @@ class _TaskListDetailState extends State<TaskListDetail> {
           authorization: authorization,
           taskAward: award,
         );
-        hideLoading(context);
-
-        if (awardResult.awardresult == null) {
-          showToast('任务领取失败');
-          return;
+        if (awardResult.awardresult != null) {
+          setState(() {
+            award.lastFinishTime = awardResult.achievetime;
+          });
         }
-        setState(() {
-          award.lastFinishTime = awardResult.achievetime;
-        });
       } else {
         awardResult = await TaskApi.validateTask(
           type: type,
@@ -97,18 +104,24 @@ class _TaskListDetailState extends State<TaskListDetail> {
           authorization: authorization,
           task: task,
         );
-        hideLoading(context);
-
-        if (awardResult.awardresult == null) {
-          showToast('任务领取失败');
-          return;
-        }
-        setState(() {
-          task.actionAwards.forEach((award) {
-            award.lastFinishTime = awardResult.achievetime;
+        if (awardResult.awardresult != null) {
+          setState(() {
+            task.actionAwards.forEach((award) {
+              award.lastFinishTime = awardResult.achievetime;
+            });
           });
-        });
+        }
       }
+
+      if (awardResult.awardresult == null) {
+        hideLoading(context);
+        showToast('任务领取失败');
+        return;
+      }
+
+      Store<AppState> store = StoreProvider.of(context);
+      await getUseroOrGuestInfo(store);
+      hideLoading(context);
 
       showDialog(
         context: context,
@@ -286,25 +299,30 @@ class _TaskListDetailState extends State<TaskListDetail> {
             left: positionedLeft,
             child: Row(
               children: award.awardList.map((_award) {
-                return Stack(
-                  children: <Widget>[
-                    Image.network(
-                      '${AppConst.img_host}${_award.icon}',
-                      width: ScreenUtil().setWidth(80),
-                      height: ScreenUtil().setWidth(80),
-                    ),
-                    Positioned(
-                      bottom: ScreenUtil().setWidth(4),
-                      right: ScreenUtil().setWidth(4),
-                      child: Text(
-                        '${_award.amount}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: ScreenUtil().setSp(28),
-                        ),
+                return Container(
+                  margin: EdgeInsets.only(
+                    right: ScreenUtil().setWidth(20),
+                  ),
+                  child: Stack(
+                    children: <Widget>[
+                      Image.network(
+                        '${AppConst.img_host}${_award.icon}',
+                        width: ScreenUtil().setWidth(80),
+                        height: ScreenUtil().setWidth(80),
                       ),
-                    )
-                  ],
+                      Positioned(
+                        bottom: ScreenUtil().setWidth(4),
+                        right: ScreenUtil().setWidth(4),
+                        child: Text(
+                          '${_award.amount}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: ScreenUtil().setSp(28),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 );
               }).toList(),
             ),
