@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/db/provider/has_read_chapters_db_provider.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
@@ -349,7 +350,8 @@ class _ComicReadPageState extends State<ComicReadPage>
     var readerChapter = comicInfoBody.comicChapter[_readerChapterIndex];
     // 将章节对应的漫画图片插入数组
     int len = readerChapter.startNum + readerChapter.endNum;
-    String imgHost = 'https://mhpic.isamanhua.com';
+    // String imgHost = 'https://mhpic.isamanhua.com';
+    String imgHost = AppConst.mhImgHost;
 
     if (this.mounted) {
       int queueLen = 0;

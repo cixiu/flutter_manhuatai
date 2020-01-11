@@ -44,7 +44,7 @@ class RecommendBannerSliverList extends StatelessWidget {
                             ScreenUtil().setWidth(8),
                           ),
                           child: ImageWrapper(
-                            url: '${AppConst.img_host}/${item.imgUrl}',
+                            url: '${AppConst.cmsHost}/${item.imgUrl}',
                             height: ScreenUtil().setWidth(250),
                             fit: BoxFit.cover,
                           ),

@@ -34,18 +34,18 @@ class Utils {
     int heightRatio = int.parse(ratioList[1]);
 
     if (comicInfo.imgUrl != null && comicInfo.imgUrl != '') {
-      return '${AppConst.img_host}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
+      return '${AppConst.imgNewHost}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
     } else {
       // 强制使用defaultSuffix
       if (useDefalut) {
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffix.defaultSuffix}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffix.defaultSuffix}';
       }
 
       if (widthRatio / heightRatio == 2.0) {
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}_2_1.jpg${AppConst.imageSizeSuffix.m2x1}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}_2_1.jpg${AppConst.imageSizeSuffix.m2x1}';
       } else {
         String suffixString = 'm${widthRatio}x$heightRatio';
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffixMap[suffixString]}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffixMap[suffixString]}';
       }
     }
   }
@@ -98,7 +98,7 @@ class Utils {
     @required String aspectRatio,
     String type,
   }) {
-    String imgHost = AppConst.img_host;
+    String imgHost = AppConst.imgNewHost;
 
     List<String> ratioList = aspectRatio.split(':');
     int widthRatio = int.parse(ratioList[0]);
