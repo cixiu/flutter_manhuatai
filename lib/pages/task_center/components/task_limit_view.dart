@@ -1,6 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/common/model/award_result.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_info.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/task.dart';
@@ -8,6 +15,10 @@ import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/model/task_info.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:redux/redux.dart';
+
+import 'task_result_toast.dart';
 
 class TaskLimitView extends StatefulWidget {
   final List<Task> limitTask;
@@ -21,23 +32,50 @@ class TaskLimitView extends StatefulWidget {
 }
 
 class _TaskLimitViewState extends State<TaskLimitView> {
-  // 打开当前任务的任务列表
-  void _openCurrentTaskList() {
-    print('打开当前任务的任务列表');
-  }
+  Future<void> _finishTask({Task task}) async {
+    try {
+      var user = User(context);
+      // 如果未登录，则跳转去登录
+      if (!user.hasLogin) {
+        Application.router.navigateTo(context, '${Routes.login}');
+        return;
+      }
+      var type = user.info.type;
+      var openid = user.info.openid;
+      var authorization = user.info.authData.authcode;
+      AwardResult awardResult;
 
-  // TODO: 一键完成
-  Future<void> _finishTask({List<Action_awards> taskListAward}) async {
-    var user = User(context);
-    for (int i = 0; i < taskListAward.length; i++) {
-      var taskAward = taskListAward[i];
-      var response = await TaskApi.validateTask(
-        taskAward: taskAward,
-        type: user.info.type,
-        openid: user.info.openid,
-        authorization: user.info.taskData.authcode,
+      showLoading(context);
+      awardResult = await TaskApi.validateTask(
+        type: type,
+        openid: openid,
+        authorization: authorization,
+        task: task,
       );
-      print(response);
+      if (awardResult.awardresult != null) {
+        setState(() {
+          task.actionAwards.forEach((award) {
+            award.lastFinishTime = awardResult.achievetime;
+          });
+        });
+      } else {
+        hideLoading(context);
+        showToast('任务领取失败');
+        return;
+      }
+
+      Store<AppState> store = StoreProvider.of(context);
+      await getUseroOrGuestInfo(store);
+      hideLoading(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TaskResultToast(awardResult: awardResult);
+        },
+      );
+    } catch (e) {
+      hideLoading(context);
     }
   }
 
@@ -88,25 +126,30 @@ class _TaskLimitViewState extends State<TaskLimitView> {
               left: positionedLeft,
               child: Row(
                 children: task.actionAwards.first.awardList.map((award) {
-                  return Stack(
-                    children: <Widget>[
-                      Image.network(
-                        '${AppConst.img_host}${award.icon}',
-                        width: ScreenUtil().setWidth(80),
-                        height: ScreenUtil().setWidth(80),
-                      ),
-                      Positioned(
-                        bottom: ScreenUtil().setWidth(4),
-                        right: ScreenUtil().setWidth(4),
-                        child: Text(
-                          '${award.amount}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: ScreenUtil().setSp(28),
-                          ),
+                  return Container(
+                    margin: EdgeInsets.only(
+                      right: ScreenUtil().setWidth(20),
+                    ),
+                    child: Stack(
+                      children: <Widget>[
+                        Image.network(
+                          '${AppConst.img_host}${award.icon}',
+                          width: ScreenUtil().setWidth(80),
+                          height: ScreenUtil().setWidth(80),
                         ),
-                      )
-                    ],
+                        Positioned(
+                          bottom: ScreenUtil().setWidth(4),
+                          right: ScreenUtil().setWidth(4),
+                          child: Text(
+                            '${award.amount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: ScreenUtil().setSp(28),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   );
                 }).toList(),
               ),
@@ -139,7 +182,7 @@ class _TaskLimitViewState extends State<TaskLimitView> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
-                        _openCurrentTaskList();
+                        _finishTask(task: task);
                       },
                       child: Container(
                         width: ScreenUtil().setWidth(220),
@@ -152,7 +195,7 @@ class _TaskLimitViewState extends State<TaskLimitView> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          '去完成',
+                          '一键完成',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: ScreenUtil().setSp(32),
