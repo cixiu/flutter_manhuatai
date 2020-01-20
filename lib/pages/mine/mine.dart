@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -198,7 +199,7 @@ class _HomeMineState extends State<HomeMine>
         horizontal: ScreenUtil().setWidth(20),
       ),
       child: Text(
-        userInfo?.uname ?? guestInfo.uname + '的及时反馈风格就是了',
+        userInfo?.uname ?? guestInfo.uname,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         style: TextStyle(
@@ -214,27 +215,34 @@ class _HomeMineState extends State<HomeMine>
     UserInfo userInfo,
     UserInfo guestInfo,
   }) {
-    return Stack(
-      alignment: Alignment.center,
-      children: <Widget>[
-        Image.asset(
-          'lib/images/mine/icon_mine_lv.png',
-          width: ScreenUtil().setWidth(72),
-          height: ScreenUtil().setWidth(42),
-        ),
-        Container(
-          margin: EdgeInsets.only(
-            top: ScreenUtil().setWidth(10),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        // 导航去等级详情
+        Application.router.navigateTo(context, Routes.myLevel);
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Image.asset(
+            'lib/images/mine/icon_mine_lv.png',
+            width: ScreenUtil().setWidth(72),
+            height: ScreenUtil().setWidth(42),
           ),
-          child: Text(
-            'LV${userInfo?.ulevel ?? guestInfo.ulevel}',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: ScreenUtil().setSp(24),
+          Container(
+            margin: EdgeInsets.only(
+              top: ScreenUtil().setWidth(10),
+            ),
+            child: Text(
+              'LV${userInfo?.ulevel ?? guestInfo.ulevel}',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(24),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
