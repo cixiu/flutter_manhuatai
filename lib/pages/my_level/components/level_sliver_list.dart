@@ -4,9 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LevelSliverList extends StatefulWidget {
   final List<LevelInfo> levelList;
+  final int currentLevel;
 
   LevelSliverList({
     this.levelList,
+    this.currentLevel,
   });
 
   @override
@@ -14,6 +16,34 @@ class LevelSliverList extends StatefulWidget {
 }
 
 class _LevelSliverListState extends State<LevelSliverList> {
+  ScrollController _scrollController;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    double width = ScreenUtil().setWidth(180);
+    double initialScrollOffset = 0.0;
+    int currentIndex = widget.levelList.indexWhere((item) {
+      return widget.currentLevel >= item.startLevel &&
+          widget.currentLevel <= item.endLevel;
+    });
+    if (currentIndex >= 2) {
+      initialScrollOffset = (currentIndex - 1) * width;
+    }
+    _scrollController =
+        ScrollController(initialScrollOffset: initialScrollOffset);
+    setState(() {
+      _currentIndex = currentIndex;
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     BorderSide borderSide = BorderSide(
@@ -73,58 +103,8 @@ class _LevelSliverListState extends State<LevelSliverList> {
                     children: <Widget>[
                       ListView(
                         scrollDirection: Axis.horizontal,
-                        children: widget.levelList.map((item) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: borderSide,
-                              ),
-                            ),
-                            child: Column(
-                              children: <Widget>[
-                                _buildColumnValueItem(
-                                  text: 'LV${item.startLevel}+',
-                                  primary: true,
-                                ),
-                                _buildColumnValueItem(
-                                  text: item.limitComment != -1
-                                      ? '${item.limitComment}条/天'
-                                      : '不限量',
-                                ),
-                                _buildColumnValueItem(
-                                  text: item.limitSatellite != -1
-                                      ? '${item.limitSatellite}条/天'
-                                      : '不限量',
-                                ),
-                                _buildColumnValueItem(
-                                  text: item.limitFriends != -1
-                                      ? '${item.limitFriends}人'
-                                      : '不限量',
-                                ),
-                                _buildColumnValueItem(
-                                  enable: item.isCommentPicture == 1,
-                                ),
-                                _buildColumnValueItem(
-                                  enable: item.isCommentCheck == 1,
-                                ),
-                                _buildColumnValueItem(
-                                  enable: item.isApplyAuditOfficer == 1,
-                                ),
-                                _buildColumnValueItem(
-                                  text: '${item.giveRecommendTicket}个/日',
-                                ),
-                                _buildColumnValueItem(
-                                  text: '${item.giveMonthTicket}张/月',
-                                ),
-                                _buildColumnValueItem(
-                                  enable: item.giveCoin != 0,
-                                  text: '${item.giveCoin}/月',
-                                  isLast: true,
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                        controller: _scrollController,
+                        children: _buildLevelList(borderSide),
                       ),
                       IgnorePointer(
                         child: Opacity(
@@ -144,6 +124,62 @@ class _LevelSliverListState extends State<LevelSliverList> {
         )
       ]),
     );
+  }
+
+  List<Widget> _buildLevelList(BorderSide borderSide) {
+    List<Widget> result = [];
+    for (int i = 0; i < widget.levelList.length; i++) {
+      var item = widget.levelList[i];
+      result.add(Container(
+        decoration: BoxDecoration(
+          color: _currentIndex == i ? Colors.lightBlue[50] : null,
+          border: Border(
+            right: borderSide,
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            _buildColumnValueItem(
+              text: 'LV${item.startLevel}+',
+              primary: true,
+            ),
+            _buildColumnValueItem(
+              text: item.limitComment != -1 ? '${item.limitComment}条/天' : '不限量',
+            ),
+            _buildColumnValueItem(
+              text: item.limitSatellite != -1
+                  ? '${item.limitSatellite}条/天'
+                  : '不限量',
+            ),
+            _buildColumnValueItem(
+              text: item.limitFriends != -1 ? '${item.limitFriends}人' : '不限量',
+            ),
+            _buildColumnValueItem(
+              enable: item.isCommentPicture == 1,
+            ),
+            _buildColumnValueItem(
+              enable: item.isCommentCheck == 1,
+            ),
+            _buildColumnValueItem(
+              enable: item.isApplyAuditOfficer == 1,
+            ),
+            _buildColumnValueItem(
+              text: '${item.giveRecommendTicket}个/日',
+            ),
+            _buildColumnValueItem(
+              text: '${item.giveMonthTicket}张/月',
+            ),
+            _buildColumnValueItem(
+              enable: item.giveCoin != 0,
+              text: '${item.giveCoin}/月',
+              isLast: true,
+            ),
+          ],
+        ),
+      ));
+    }
+
+    return result;
   }
 
   Widget _buildColumnTextItem(String text) {
@@ -176,7 +212,7 @@ class _LevelSliverListState extends State<LevelSliverList> {
       height: ScreenUtil().setWidth(70),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: primary ? Colors.blue[50] : null,
+        color: primary ? Colors.lightBlue[50] : null,
         border: Border(
           bottom: isLast
               ? BorderSide.none

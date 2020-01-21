@@ -69,32 +69,51 @@ class _MyLevelState extends State<MyLevel>
                 converter: (store) => store,
                 builder: (ctx, store) {
                   var userInfo = getUserInfo(store);
-                  return CustomScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    slivers: <Widget>[
-                      SliverList(
-                        delegate: SliverChildListDelegate([
-                          Stack(
-                            alignment: Alignment.topCenter,
-                            children: <Widget>[
-                              _buildBackground(),
-                              Positioned(
-                                top: ScreenUtil().setWidth(100),
-                                child: _buildUserInfo(userInfo),
+                  return Stack(
+                    children: <Widget>[
+                      CustomScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        slivers: <Widget>[
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              Stack(
+                                alignment: Alignment.topCenter,
+                                children: <Widget>[
+                                  _buildBackground(),
+                                  Positioned(
+                                    top: ScreenUtil().setWidth(100),
+                                    child: _buildUserInfo(userInfo),
+                                  ),
+                                  Positioned(
+                                    bottom: ScreenUtil().setWidth(100),
+                                    child: _buildLevelInfo(userInfo),
+                                  ),
+                                ],
                               ),
-                              Positioned(
-                                bottom: ScreenUtil().setWidth(100),
-                                child: _buildLevelInfo(userInfo),
-                              ),
-                            ],
+                            ]),
                           ),
-                        ]),
+                          LevelSliverList(
+                            levelList: _levelList,
+                            currentLevel: userInfo.ulevel,
+                          ),
+                          LevelWaySliverList(),
+                        ],
                       ),
-                      LevelSliverList(
-                        levelList: _levelList,
+                      Positioned(
+                        top: ScreenUtil().setWidth(70),
+                        left: ScreenUtil().setWidth(20),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Icon(
+                            Icons.navigate_before,
+                            size: ScreenUtil().setWidth(60),
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                      LevelWaySliverList(),
                     ],
                   );
                 },
