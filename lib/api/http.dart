@@ -31,7 +31,7 @@ class HttpRequest {
 
         // android real proxy ip = 192.168.xx.xxx:xxxx
         // 如果使用的是安卓真机则打开下面的注释
-        return "PROXY 192.168.1.2:8888";
+        return "PROXY 192.168.1.8:8888";
       };
       client.badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
@@ -43,7 +43,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<T> response = await dio.get<T>(
       url,
       queryParameters: params,
@@ -58,7 +58,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.post<Map>(
       url,
       data: data,
@@ -74,7 +74,7 @@ class HttpRequest {
     Map<String, dynamic> params,
     Options options,
   }) async {
-    // _proxyClient();
+    _proxyClient();
     Response<Map> response = await dio.put<Map>(
       url,
       data: data,
