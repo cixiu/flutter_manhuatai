@@ -8,12 +8,15 @@ part of 'comic_comment_count.dart';
 
 ComicCommentCount _$ComicCommentCountFromJson(Map<String, dynamic> json) {
   return ComicCommentCount(
-      json['data'] as int, json['status'] as int, json['msg'] as String);
+    json['data'] as int,
+    json['status'] as int,
+    json['msg'] as String,
+  );
 }
 
 Map<String, dynamic> _$ComicCommentCountToJson(ComicCommentCount instance) =>
     <String, dynamic>{
       'data': instance.data,
       'status': instance.status,
-      'msg': instance.msg
+      'msg': instance.msg,
     };

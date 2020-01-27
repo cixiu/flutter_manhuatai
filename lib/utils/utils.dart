@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:flutter_manhuatai/common/model/task_info.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
@@ -33,18 +34,18 @@ class Utils {
     int heightRatio = int.parse(ratioList[1]);
 
     if (comicInfo.imgUrl != null && comicInfo.imgUrl != '') {
-      return '${AppConst.img_host}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
+      return '${AppConst.imgNewHost}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
     } else {
       // 强制使用defaultSuffix
       if (useDefalut) {
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffix.defaultSuffix}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffix.defaultSuffix}';
       }
 
       if (widthRatio / heightRatio == 2.0) {
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}_2_1.jpg${AppConst.imageSizeSuffix.m2x1}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}_2_1.jpg${AppConst.imageSizeSuffix.m2x1}';
       } else {
         String suffixString = 'm${widthRatio}x$heightRatio';
-        return '${AppConst.img_host}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffixMap[suffixString]}';
+        return '${AppConst.imgNewHost}/mh/${comicInfo.comicId}.jpg${AppConst.imageSizeSuffixMap[suffixString]}';
       }
     }
   }
@@ -97,7 +98,7 @@ class Utils {
     @required String aspectRatio,
     String type,
   }) {
-    String imgHost = AppConst.img_host;
+    String imgHost = AppConst.imgNewHost;
 
     List<String> ratioList = aspectRatio.split(':');
     int widthRatio = int.parse(ratioList[0]);
@@ -230,5 +231,103 @@ class Utils {
     }
 
     return deviceid;
+  }
+
+  /// 获取今天的开始和结束的时间戳
+  static List<int> getTodayStartAndEndTimeStamp() {
+    List<int> list = List();
+    int year = DateTime.now().year;
+    int month = DateTime.now().month;
+    int day = DateTime.now().day;
+    String monthString = month.toString().padLeft(2, '0');
+    String dayString = day.toString().padLeft(2, '0');
+    String todayStartFormatString = '$year-$monthString-$dayString 00:00:00';
+    String todayEndFormatString = '$year-$monthString-$dayString 23:59:59';
+    // 今天开始的时间戳
+    int todayStartTime =
+        DateTime.tryParse(todayStartFormatString).millisecondsSinceEpoch;
+    // 今天结束的时间戳
+    int todayEndTime =
+        DateTime.tryParse(todayEndFormatString).millisecondsSinceEpoch;
+
+    list..add(todayStartTime)..add(todayEndTime);
+    return list;
+  }
+
+  /// 获取本周的开始时间和结束时间的时间戳
+  static List<int> getWeekStartAndEndTimeStamp() {
+    List<int> list = List();
+
+    int daysPerWeek = DateTime.daysPerWeek;
+    // 今天是周几
+    int today = DateTime.now().weekday;
+    // 一天的 milliseconds = 24 * 60 * 60 * 1000
+    int unitMilliseconds = 86400000;
+    // 今天与周一相差的天数
+    int diffStart = today - 1;
+    // 今天与周日相差的天数
+    int diffEnd = daysPerWeek - today;
+
+    var todayTimeStamps = getTodayStartAndEndTimeStamp();
+
+    list
+      ..add(
+        todayTimeStamps.first - unitMilliseconds * diffStart,
+      )
+      ..add(
+        todayTimeStamps.last + unitMilliseconds * diffEnd,
+      );
+    return list;
+  }
+
+  // 任务是否完成
+  static hasFinishedAward({
+    Task task,
+    Action_awards award,
+  }) {
+    bool flag = true;
+    int lastFinishTime = award.lastFinishTime;
+
+    // 一次行的任务或者限时性任务
+    if (task.timeSpanUnit == 'total') {
+      if (lastFinishTime == 0) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 每周更新的任务
+    if (task.timeSpanUnit == 'week') {
+      var times = Utils.getWeekStartAndEndTimeStamp();
+      int startTime = times.first;
+      // 如果 lastFinishTime 小于 本周的开始时间
+      // 那么这个任务一定还没有完成
+      if (lastFinishTime < startTime) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 每日更新的任务
+    if (task.timeSpanUnit == 'day') {
+      var times = Utils.getTodayStartAndEndTimeStamp();
+      int startTime = times.first;
+      // 如果 lastFinishTime 小于 今天的开始时间
+      // 那么这个任务一定还没有完成
+      if (lastFinishTime < startTime) {
+        flag = false;
+      }
+      return flag;
+    }
+    // 小时的奖励
+    if (task.timeSpanUnit == 'hour') {
+      bool flag = true;
+      int nowTime = DateTime.now().millisecondsSinceEpoch;
+      // 如果 现在时间 - lastFinishTime 大于 1小时
+      // 那么这个任务一定还没有完成
+      if (nowTime - lastFinishTime > 60 * 60 * 1000) {
+        flag = false;
+      }
+      return flag;
+    }
+    return false;
   }
 }

@@ -6,8 +6,10 @@ import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
 import 'package:flutter_manhuatai/pages/comic_search/comic_search.dart';
 
 import 'package:flutter_manhuatai/pages/login/login.dart';
+import 'package:flutter_manhuatai/pages/my_level/my_level.dart';
 import 'package:flutter_manhuatai/pages/satellite_detail/satellite_detail.dart';
 import 'package:flutter_manhuatai/pages/search_result/search_result.dart';
+import 'package:flutter_manhuatai/pages/task_center/task_center.dart';
 import 'package:flutter_manhuatai/pages/user_center/user_center.dart';
 import 'package:flutter_manhuatai/pages/comic_detail_page/comic_detail_page.dart';
 import 'package:flutter_manhuatai/pages/web_view/web_view.dart';
@@ -23,6 +25,13 @@ var loginHandler = Handler(
 var userCenterHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return UserCenterPage();
+  },
+);
+
+// 任务中心
+var userTaskListHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return TaskCenter();
   },
 );
 
@@ -102,5 +111,12 @@ var webViewHandler = Handler(
     return WebViewPage(
       url: url,
     );
+  },
+);
+
+// 我的等级详情
+var myLevelHandler = Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return MyLevel();
   },
 );

@@ -33,7 +33,7 @@ class BannerSwipper extends StatelessWidget {
               children: <Widget>[
                 ImageWrapper(
                   url:
-                      '${AppConst.img_host}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
+                      '${AppConst.cmsHost}/${bannerList[index].imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}',
                   width: imgWidth,
                   height: imgHeight,
                   fit: BoxFit.cover,

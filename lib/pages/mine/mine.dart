@@ -1,14 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
+import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/models/user_info.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/store/user_info.dart';
+
+import 'components/mine_entry_list_widget.dart';
 
 class HomeMine extends StatefulWidget {
   @override
@@ -16,9 +24,14 @@ class HomeMine extends StatefulWidget {
 }
 
 class _HomeMineState extends State<HomeMine>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, RefreshCommonState {
   @override
   bool get wantKeepAlive => true;
+
+  Future<void> onRefresh() async {
+    Store<AppState> store = StoreProvider.of(context);
+    await getUseroOrGuestInfo(store);
+  }
 
   void _goLogin(UserInfo userInfo) {
     if (userInfo.uname == null) {
@@ -36,16 +49,196 @@ class _HomeMineState extends State<HomeMine>
     }
   }
 
-  Widget _getGiftItem({String assetIcon, String text}) {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    print('我的页面build');
+
+    return Scaffold(
+      body: RefreshIndicator(
+        key: refreshIndicatorKey,
+        onRefresh: onRefresh,
+        child: StoreBuilder<AppState>(
+          builder: (context, store) {
+            var userInfo = store.state.userInfo;
+            var guestInfo = store.state.guestInfo;
+            print(userInfo.uname);
+
+            return CustomScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              shrinkWrap: true,
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    <Widget>[
+                      ClipPath(
+                        clipper: BottomClipper(),
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: <Widget>[
+                            Container(
+                              height: ScreenUtil().setWidth(360),
+                              color: Colors.white,
+                              child: Image.asset(
+                                'lib/images/mine/pic_mine_bj.jpg',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            Container(
+                              width: ScreenUtil().setWidth(680),
+                              height: ScreenUtil().setWidth(240),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(255, 255, 255, 0.6),
+                                borderRadius: BorderRadius.horizontal(
+                                  left: Radius.circular(
+                                      ScreenUtil().setWidth(30)),
+                                  right: Radius.circular(
+                                      ScreenUtil().setWidth(30)),
+                                ),
+                              ),
+                              child: Container(
+                                height: ScreenUtil().setWidth(180),
+                                margin: EdgeInsets.only(
+                                  top: ScreenUtil().setWidth(30),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: ScreenUtil().setWidth(30),
+                                ),
+                                alignment: Alignment.topCenter,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _goLogin(userInfo);
+                                  },
+                                  child: Row(
+                                    children: <Widget>[
+                                      // 用户头像
+                                      _buildAvatar(userInfo),
+                                      // 用户名称
+                                      _buildUserName(
+                                        userInfo: userInfo,
+                                        guestInfo: guestInfo,
+                                      ),
+                                      // 用户等级
+                                      _buildUserLevel(
+                                        userInfo: userInfo,
+                                        guestInfo: guestInfo,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // 我的消费品
+                      _buildMineGoods(
+                        userInfo: userInfo,
+                        guestInfo: guestInfo,
+                      ),
+                      // 我的相关入口列表
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        color: Colors.grey[100],
+                        child: MineEntryListWidget(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // 用户头像
+  Widget _buildAvatar(UserInfo userInfo) {
     return Container(
-      height: ScreenUtil().setHeight(60),
-      child: Row(
+      width: ScreenUtil().setWidth(170),
+      height: ScreenUtil().setWidth(170),
+      padding: EdgeInsets.all(
+        ScreenUtil().setWidth(10),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(
+          ScreenUtil().setWidth(170),
+        ),
+      ),
+      child: userInfo.uid != null
+          ? ClipOval(
+              child: ImageWrapper(
+                url: Utils.generateImgUrlFromId(
+                  id: userInfo.uid,
+                  aspectRatio: '1:1',
+                  type: 'head',
+                ),
+                width: ScreenUtil().setWidth(160),
+                height: ScreenUtil().setWidth(160),
+              ),
+            )
+          : Image.asset(
+              'lib/images/ic_default_avatar.png',
+            ),
+    );
+  }
+
+  // 用户名称
+  Widget _buildUserName({
+    UserInfo userInfo,
+    UserInfo guestInfo,
+  }) {
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: ScreenUtil().setWidth(320),
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: ScreenUtil().setWidth(20),
+      ),
+      child: Text(
+        userInfo?.uname ?? guestInfo.uname,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        style: TextStyle(
+          fontSize: ScreenUtil().setSp(32),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  // 用户等级
+  Widget _buildUserLevel({
+    UserInfo userInfo,
+    UserInfo guestInfo,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        // 导航去等级详情
+        Application.router.navigateTo(context, Routes.myLevel);
+      },
+      child: Stack(
+        alignment: Alignment.center,
         children: <Widget>[
-          Image.asset(assetIcon),
+          Image.asset(
+            'lib/images/mine/icon_mine_lv.png',
+            width: ScreenUtil().setWidth(72),
+            height: ScreenUtil().setWidth(42),
+          ),
           Container(
-            margin: EdgeInsets.only(left: ScreenUtil().setWidth(16)),
+            margin: EdgeInsets.only(
+              top: ScreenUtil().setWidth(10),
+            ),
             child: Text(
-              text,
+              'LV${userInfo?.ulevel ?? guestInfo.ulevel}',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(24),
+              ),
             ),
           ),
         ],
@@ -53,205 +246,103 @@ class _HomeMineState extends State<HomeMine>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    print('我的页面build');
-
-    return Scaffold(
-      body: StoreBuilder<AppState>(
-        builder: (context, store) {
-          var userInfo = store.state.userInfo;
-          var guestInfo = store.state.guestInfo;
-          print(userInfo.uname);
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                overflow: Overflow.visible,
-                children: <Widget>[
-                  Container(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          color: Colors.blue,
-                          child: Image.asset(
-                            'lib/images/star_home_bg.png',
-                            width: ScreenUtil.screenWidth,
-                            height: ScreenUtil().setHeight(300),
-                          ),
-                        ),
-                        Container(
-                          height: ScreenUtil().setHeight(100),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: ScreenUtil().setWidth(80),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                '粉丝 ${userInfo?.uname != null ? userInfo.cfans : guestInfo.cfans}',
-                                style: TextStyle(
-                                  fontSize: ScreenUtil().setSp(24),
-                                ),
-                              ),
-                              Text(
-                                '关注 ${userInfo?.uname != null ? userInfo.cfocus : guestInfo.cfocus}',
-                                style: TextStyle(
-                                  fontSize: ScreenUtil().setSp(24),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    child: GestureDetector(
-                      onTap: () {
-                        _goLogin(userInfo);
-                      },
-                      child: Stack(
-                        alignment: AlignmentDirectional.center,
-                        overflow: Overflow.visible,
-                        children: <Widget>[
-                          Container(
-                            width: ScreenUtil().setHeight(200),
-                            height: ScreenUtil().setHeight(200),
-                            padding: EdgeInsets.all(
-                              ScreenUtil().setHeight(20),
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(
-                                ScreenUtil().setHeight(200),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: ScreenUtil().setHeight(160),
-                            height: ScreenUtil().setHeight(160),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                ScreenUtil().setHeight(160),
-                              ),
-                            ),
-                            child: userInfo.uid != null
-                                ? ClipOval(
-                                    child: ImageWrapper(
-                                      url: Utils.generateImgUrlFromId(
-                                        id: userInfo.uid,
-                                        aspectRatio: '1:1',
-                                        type: 'head',
-                                      ),
-                                      width: ScreenUtil().setHeight(160),
-                                      height: ScreenUtil().setHeight(160),
-                                    ),
-                                  )
-                                : Image.asset(
-                                    'lib/images/ic_default_avatar.png',
-                                  ),
-                          ),
-                          Positioned(
-                            right: -ScreenUtil().setHeight(20),
-                            bottom: ScreenUtil().setHeight(20),
-                            child: Container(
-                              width: ScreenUtil().setHeight(40),
-                              height: ScreenUtil().setHeight(40),
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    'lib/images/icon_userhome_boy4.png',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _getGiftItem({String assetIcon, String text}) {
+    return Container(
+      height: ScreenUtil().setWidth(200),
+      child: Column(
+        children: <Widget>[
+          Image.asset(
+            assetIcon,
+            width: ScreenUtil().setWidth(96),
+            height: ScreenUtil().setWidth(96),
+          ),
+          Container(
+            width: ScreenUtil().setWidth(120),
+            height: ScreenUtil().setWidth(50),
+            margin: EdgeInsets.only(
+              top: ScreenUtil().setWidth(30),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(
+                ScreenUtil().setWidth(25),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: ScreenUtil().setHeight(40),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(
-                        bottom: ScreenUtil().setHeight(20),
-                      ),
-                      child: Text(
-                        userInfo?.uname ?? guestInfo.uname,
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(32),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      userInfo?.usign != null
-                          ? userInfo?.usign
-                          : guestInfo.usign != null
-                              ? guestInfo.usign
-                              : '这个家伙很懒，什么都没留下',
-                      style: TextStyle(
-                        fontSize: ScreenUtil().setSp(24),
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              Utils.formatNumber(text),
+              strutStyle: StrutStyle(
+                forceStrutHeight: true,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ScreenUtil().setWidth(48),
-                ),
-                margin: EdgeInsets.only(
-                  bottom: ScreenUtil().setHeight(40),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    _getGiftItem(
-                      assetIcon: 'lib/images/icon_mine_wow1.png',
-                      text: userInfo?.uname != null
-                          ? userInfo.cgold.toString()
-                          : guestInfo.cgold.toString(),
-                    ),
-                    _getGiftItem(
-                      assetIcon: 'lib/images/icon_mine_wow2.png',
-                      text: userInfo?.uname != null
-                          ? userInfo.coins.toString()
-                          : guestInfo.coins.toString(),
-                    ),
-                    _getGiftItem(
-                      assetIcon: 'lib/images/icon_mine_wow3.png',
-                      text: userInfo?.uname != null
-                          ? userInfo.recommend.toString()
-                          : guestInfo.recommend.toString(),
-                    ),
-                    _getGiftItem(
-                      assetIcon: 'lib/images/icon_mine_wow4.png',
-                      text: userInfo?.uname != null
-                          ? userInfo.cticket.toString()
-                          : guestInfo.cticket.toString(),
-                    ),
-                  ],
-                ),
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: ScreenUtil().setSp(30),
               ),
-              Container(
-                height: ScreenUtil().setHeight(20),
-                color: Colors.grey[200],
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  // 我的消费品
+  Widget _buildMineGoods({
+    UserInfo userInfo,
+    UserInfo guestInfo,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        _getGiftItem(
+          assetIcon: 'lib/images/mine/icon_mine_ciyuan.png',
+          text: '${userInfo?.cactive ?? guestInfo?.cactive}',
+        ),
+        _getGiftItem(
+          assetIcon: 'lib/images/mine/icon_mine_guobi.png',
+          text: '${userInfo?.cgold ?? guestInfo?.cgold}',
+        ),
+        _getGiftItem(
+          assetIcon: 'lib/images/mine/icon_mine_mengbi.png',
+          text: '${userInfo?.coins ?? guestInfo?.coins}',
+        ),
+        _getGiftItem(
+          assetIcon: 'lib/images/mine/icon_mine_luobo.png',
+          text: '${userInfo?.recommend ?? guestInfo?.recommend}',
+        ),
+        _getGiftItem(
+          assetIcon: 'lib/images/mine/icon_mine_yuepiao.png',
+          text: '${userInfo?.cticket ?? guestInfo?.cticket}',
+        ),
+      ],
+    );
+  }
+}
+
+class BottomClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    double bendingHeight = ScreenUtil().setWidth(30);
+    path.lineTo(0, 0); //第1个点
+    path.lineTo(0, size.height - bendingHeight); //第2个点
+
+    var firstControlPoint = Offset(size.width / 2, size.height);
+    var firstEdnPoint = Offset(size.width, size.height - bendingHeight);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEdnPoint.dx,
+      firstEdnPoint.dy,
+    );
+
+    path.lineTo(size.width, size.height - bendingHeight); //第3个点
+    path.lineTo(size.width, 0); //第4个点
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return true;
   }
 }

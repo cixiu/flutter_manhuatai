@@ -94,11 +94,14 @@ class RecommendStarsSliverList extends StatelessWidget {
                 ),
         ),
         Container(
+          width: width,
           margin: EdgeInsets.only(
             top: ScreenUtil().setWidth(10),
           ),
+          alignment: Alignment.center,
           child: Text(
             '$name',
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Colors.black87,
               fontSize: ScreenUtil().setSp(24),

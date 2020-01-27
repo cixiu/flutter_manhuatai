@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 import 'package:flutter_manhuatai/common/model/comment_content.dart';
+import 'package:flutter_manhuatai/common/model/level_info.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
@@ -1298,6 +1299,30 @@ class Api {
           return ChapterInfo.fromJson(item);
         }).toList();
       }
+    }
+
+    return [];
+  }
+
+  /// 通过特权等级列表
+  static Future<List<LevelInfo>> getUserLevelInfo({
+    @required String openid,
+  }) async {
+    String url = 'http://kanmanapi-main.321mh.com/v1/user/getuserlevelinfo';
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: {
+        'openid': openid,
+        'type': 'mkxq',
+        'platformname': 'android',
+        'productname': 'mht',
+      },
+    );
+
+    if (response['status'] == 0 && response['data'] is List) {
+      var data = response['data'] as List<dynamic>;
+      return getLevelInfoList(data);
     }
 
     return [];
