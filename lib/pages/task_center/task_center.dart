@@ -132,7 +132,7 @@ class _TaskCenterState extends State<TaskCenter>
                                 child: Text('萌新'),
                               ),
                               Tab(
-                                child: Text('成绩'),
+                                child: Text('成就'),
                               ),
                             ],
                           ),
