@@ -23,7 +23,10 @@ class HomeRank extends StatefulWidget {
 }
 
 class _HomeRankState extends State<HomeRank>
-    with AutomaticKeepAliveClientMixin, RefreshCommonState<HomeRank> {
+    with
+        AutomaticKeepAliveClientMixin,
+        RefreshCommonState<HomeRank>,
+        WidgetsBindingObserver {
   final rankPageControl = PullLoadWrapperControl();
   bool isFirstShow = true;
   bool isLoading = true;
@@ -55,7 +58,9 @@ class _HomeRankState extends State<HomeRank>
         isFirstShow = false;
       });
       // 显示下拉刷新的Indicator, 只需RefrshIndicator的onRefresh函数
-      showRefreshLoading();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showRefreshLoading();
+      });
     }
   }
 

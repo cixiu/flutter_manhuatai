@@ -45,3 +45,7 @@ child: Text(
 8. [border 属性不支持 dashed(虚线)设置，需要自己绘制](https://github.com/flutter/flutter/issues/4858)
 9. [Flutter 真机(魅族)开发卡在 Installing build\app\outputs\apk\app.apk 的问题](https://blog.csdn.net/donkor_/article/details/82972790)
    - 解决方法： 开发者选项 -> 性能优化 -> 高级日志输出 -> 全部允许
+
+## 说明
+
+1. 启动项目时，请将 routes 下相关的 another 有关的路由配置注释掉，此部分有关的 another 路由代码并未上传。

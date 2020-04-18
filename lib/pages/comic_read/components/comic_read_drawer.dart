@@ -102,7 +102,7 @@ class _ComicReadDrawerState extends State<ComicReadDrawer> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      '共${widget.comicInfoBody.lastChapterId}话 ${widget.comicInfoBody.comicStatus == 2 ? '已完结' : '连载中'}',
+                      '${widget.comicInfoBody.comicStatus == 2 ? '已完结' : '连载中'}',
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: ScreenUtil().setSp(24),

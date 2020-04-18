@@ -11,6 +11,7 @@ import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/api/api.dart';
@@ -230,7 +231,8 @@ class _ComicReadPageState extends State<ComicReadPage>
       print(readerChapter.chapterName);
       // 将章节对应的漫画图片插入数组
       int len = readerChapter.startNum + readerChapter.endNum;
-      String imgHost = 'https://mhpic.isamanhua.com';
+      // String imgHost = 'https://mhpic.isamanhua.com';
+      String imgHost = AppConst.mhImgHost;
       List<int> _imageNum = [];
       Map<int, int> imageHashMap = Map();
       int queueLen = 0;
@@ -240,8 +242,11 @@ class _ComicReadPageState extends State<ComicReadPage>
       for (var i = 1; i < len; i++) {
         String imgUrl = '$imgHost' +
             readerChapter.chapterImage.middle.replaceAll(RegExp(r'\$\$'), '$i');
-        var _imageStream =
-            Image.network(imgUrl).image.resolve(ImageConfiguration());
+        var _imageStream = Image(
+          image: CachedNetworkImageProvider(imgUrl),
+        ).image.resolve(ImageConfiguration.empty);
+        // var _imageStream =
+        //     Image.network(imgUrl).image.resolve(ImageConfiguration.empty);
         _imageStream.addListener(ImageStreamListener(
           (info, _) {
             if (!this.mounted) {
@@ -260,29 +265,41 @@ class _ComicReadPageState extends State<ComicReadPage>
             chapterTotalHeight += height;
             queueLen++;
             _imageNum.add(i);
-            setState(() {
-              _customImageListState
-                ..imageViews[i + lastImageNumLength] = _buildImageWidget(
-                  imgUrl: imgUrl,
-                  width: screenWidth,
-                  height: height.toDouble(),
-                  index: i,
-                );
-            });
 
-            // 等所有图片都加载完后在显示漫画图片
-            if (queueLen == len - 1) {
-              chapterTotalHeight += _listHeight[_listHeight.length - 1];
-              _listHeight.add(chapterTotalHeight);
-              _isLoadingMore = false;
-              // 需要先排序
-              _imageNum.sort();
-              setState(() {
-                _customImageListState.imageNum.addAll(_imageNum);
-              });
-              print(_listHeight);
-              print(_customImageListState.imageNum);
-            }
+            filterLoadMoreChapterHeight(
+              lastImageNumLength: lastImageNumLength,
+              imageNum: _imageNum,
+              chapterTotalHeight: chapterTotalHeight,
+              height: height,
+              screenWidth: screenWidth,
+              len: len,
+              queueLen: queueLen,
+              i: i,
+              imgUrl: imgUrl,
+              readerChapter: readerChapter,
+            );
+          },
+          onError: (e, stack) {
+            // 图片在屏幕中的高度
+            int height = 300;
+            // 将整个章节的所有图片相加得出这个章节的高度
+            chapterTotalHeight += height;
+            queueLen++;
+            _imageNum.add(i);
+            print('第$i 图片加载失败');
+
+            filterLoadMoreChapterHeight(
+              lastImageNumLength: lastImageNumLength,
+              imageNum: _imageNum,
+              chapterTotalHeight: chapterTotalHeight,
+              height: height,
+              screenWidth: screenWidth,
+              len: len,
+              queueLen: queueLen,
+              i: i,
+              imgUrl: imgUrl,
+              readerChapter: readerChapter,
+            );
           },
         ));
       }
@@ -358,54 +375,127 @@ class _ComicReadPageState extends State<ComicReadPage>
       int chapterTotalHeight = 0;
       double screenWidth = MediaQuery.of(context).size.width;
       Map<int, int> imageHashMap = Map();
-
       for (var i = 1; i < len; i++) {
         String imgUrl = '$imgHost' +
             readerChapter.chapterImage.middle.replaceAll(RegExp(r'\$\$'), '$i');
-        var _imageStream =
-            Image.network(imgUrl).image.resolve(ImageConfiguration());
+        var _imageStream = Image(
+          image: CachedNetworkImageProvider(imgUrl),
+        ).image.resolve(ImageConfiguration.empty);
+        // Image.network(imgUrl).image.resolve(ImageConfiguration());
 
-        _imageStream.addListener(ImageStreamListener(
-          (info, _) {
-            if (!this.mounted) {
-              return;
-            }
-            if (imageHashMap[info.hashCode] != null) {
-              return;
-            }
-            if (queueLen < 0) {
-              return;
-            }
-            imageHashMap[info.hashCode] = i;
-            // 图片在屏幕中的高度
-            int height = screenWidth * info.image.height ~/ info.image.width;
-            // 将整个章节的所有图片相加得出这个章节的高度
-            chapterTotalHeight += height;
-            queueLen++;
-            setState(() {
-              _customImageListState
-                ..imageViews[i] = _buildImageWidget(
-                  imgUrl: imgUrl,
-                  width: screenWidth,
-                  height: height.toDouble(),
-                  index: i,
-                )
-                ..imageNum.add(i);
-              _customImageListState.imageNum.sort();
-            });
+        _imageStream.addListener(ImageStreamListener((info, _) {
+          if (!this.mounted) {
+            return;
+          }
+          if (imageHashMap[info.hashCode] != null) {
+            return;
+          }
+          if (queueLen < 0) {
+            return;
+          }
+          imageHashMap[info.hashCode] = i;
+          // 图片在屏幕中的高度
+          int height = screenWidth * info.image.height ~/ info.image.width;
+          // 将整个章节的所有图片相加得出这个章节的高度
+          chapterTotalHeight += height;
+          queueLen++;
 
-            // 等所有图片都加载完后在显示漫画图片
-            if (queueLen == len - 1) {
-              _listHeight.add(chapterTotalHeight);
-              print(_listHeight);
-              setState(() {
-                _isLoading = false;
-                _readerChapter = readerChapter;
-              });
-            }
-          },
-        ));
+          filterChapterHeight(
+            chapterTotalHeight: chapterTotalHeight,
+            height: height,
+            screenWidth: screenWidth,
+            len: len,
+            queueLen: queueLen,
+            i: i,
+            imgUrl: imgUrl,
+            readerChapter: readerChapter,
+          );
+        }, onError: (e, stack) {
+          int height = 300;
+          chapterTotalHeight += height;
+          queueLen++;
+          print('第$i 图片加载失败');
+          filterChapterHeight(
+            chapterTotalHeight: chapterTotalHeight,
+            height: height,
+            screenWidth: screenWidth,
+            len: len,
+            queueLen: queueLen,
+            i: i,
+            imgUrl: imgUrl,
+            readerChapter: readerChapter,
+          );
+        }));
       }
+    }
+  }
+
+  void filterChapterHeight({
+    int chapterTotalHeight,
+    int height,
+    double screenWidth,
+    int len,
+    int queueLen,
+    int i,
+    String imgUrl,
+    Comic_chapter readerChapter,
+  }) {
+    setState(() {
+      _customImageListState
+        ..imageViews[i] = _buildImageWidget(
+          imgUrl: imgUrl,
+          width: screenWidth,
+          height: height.toDouble(),
+          index: i,
+        )
+        ..imageNum.add(i);
+    });
+
+    // 等所有图片都加载完后在显示漫画图片
+    if (queueLen == len - 1) {
+      _listHeight.add(chapterTotalHeight);
+      print(_listHeight);
+      setState(() {
+        _isLoading = false;
+        _readerChapter = readerChapter;
+        _customImageListState.imageNum.sort();
+      });
+    }
+  }
+
+  void filterLoadMoreChapterHeight({
+    int lastImageNumLength,
+    List<int> imageNum,
+    int chapterTotalHeight,
+    int height,
+    double screenWidth,
+    int len,
+    int queueLen,
+    int i,
+    String imgUrl,
+    Comic_chapter readerChapter,
+  }) {
+    setState(() {
+      _customImageListState
+        ..imageViews[i + lastImageNumLength] = _buildImageWidget(
+          imgUrl: imgUrl,
+          width: screenWidth,
+          height: height.toDouble(),
+          index: i,
+        );
+    });
+    // 等所有图片都加载完后在显示漫画图片
+    if (queueLen == len - 1) {
+      chapterTotalHeight += _listHeight[_listHeight.length - 1];
+      _listHeight.add(chapterTotalHeight);
+      _isLoadingMore = false;
+      // 需要先排序
+      imageNum.sort();
+      setState(() {
+        _customImageListState.imageNum.addAll(imageNum);
+      });
+      print(_listHeight);
+      print(_customImageListState.imageNum);
     }
   }
 
@@ -422,11 +512,13 @@ class _ComicReadPageState extends State<ComicReadPage>
 
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: ComicReadDrawer(
-        comicInfoBody: comicInfoBody,
-        readingComicChapter: _readerChapter,
-        selectChapter: _selectChapter,
-      ),
+      endDrawer: _isLoading
+          ? Container()
+          : ComicReadDrawer(
+              comicInfoBody: comicInfoBody,
+              readingComicChapter: _readerChapter,
+              selectChapter: _selectChapter,
+            ),
       body: comicInfoBody != null && !_isLoading
           ? GestureDetector(
               // 点击中间区域，呼起菜单

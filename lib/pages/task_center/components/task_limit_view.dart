@@ -82,6 +82,7 @@ class _TaskLimitViewState extends State<TaskLimitView> {
   @override
   Widget build(BuildContext context) {
     double positionedLeft = ScreenUtil().setWidth(60);
+    double positionedRight = ScreenUtil().setWidth(40);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,8 +114,10 @@ class _TaskLimitViewState extends State<TaskLimitView> {
             Positioned(
               top: ScreenUtil().setWidth(80),
               left: positionedLeft,
+              right: positionedRight,
               child: Text(
                 task.actionAwards.first.display,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: ScreenUtil().setSp(28),
@@ -169,7 +172,7 @@ class _TaskLimitViewState extends State<TaskLimitView> {
             task.actionAwards.last.lastFinishTime > task.startTime &&
                     task.actionAwards.last.lastFinishTime < task.endTime
                 ? Positioned(
-                    bottom: ScreenUtil().setWidth(20),
+                    bottom: ScreenUtil().setWidth(15),
                     right: ScreenUtil().setWidth(40),
                     child: Image.asset(
                       'lib/images/task/icon_task_done_xianshi.png',

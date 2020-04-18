@@ -23,6 +23,12 @@ class Routes {
   static String commentReply = '/comment_reply'; // 评论的回复详情页使用CustomRouter进行跳转传参
   static String myLevel = '/my_level'; // 我的等级详情
 
+  static String anotherComicHome = '/another_comic_home'; // 另一个漫画的首页
+  static String anotherComicBookList = '/another_comic_book_list'; // 另一个漫画的数据列表
+  static String anotherComicDetail = '/another_comic_detail'; // 另一个漫画的漫画详情目录
+  static String anotherComicRead = '/another_comic_read'; // 另一个漫画的漫画详情目录
+
+
   static configureRoutes(Router router) {
     router.define(
       login,
@@ -93,6 +99,30 @@ class Routes {
     router.define(
       myLevel,
       handler: myLevelHandler,
+      transitionType: transitionType,
+    );
+
+    router.define(
+      anotherComicHome,
+      handler: anotherComicHomeHandler,
+      transitionType: transitionType,
+    );
+
+    router.define(
+      anotherComicBookList,
+      handler: anotherComicBookListHandler,
+      transitionType: transitionType,
+    );
+
+    router.define(
+      anotherComicDetail,
+      handler: anotherComicDetailHandler,
+      transitionType: transitionType,
+    );
+
+    router.define(
+      anotherComicRead,
+      handler: anotherComicReadHandler,
       transitionType: transitionType,
     );
   }

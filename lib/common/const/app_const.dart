@@ -3,7 +3,8 @@ import 'dart:io';
 class AppConst {
   static const img_host = 'https://image.mhxk.com';
   static const imgNewHost = 'http://image.yqmh.com';
-  static const mhImgHost = 'http://mhpic.mh51.com';
+  // static const mhImgHost = 'http://mhpic.mh51.com';
+  static const mhImgHost = 'http://mhpic.jumanhua.com';
   static const cmsHost = 'http://cms.samanlehua.com';
   static const userHeadImgHost = 'http://head.samanlehua.com';
   static const commentImgHost = 'https://comment.yyhao.com';

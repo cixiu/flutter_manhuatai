@@ -111,7 +111,8 @@ class _HomeRecommendState extends State<HomeRecommend>
     List<RecommendList.Comic_info> bannerList = [];
     List<int> bannerBookIdList = [];
     recommendList.data.book.forEach((book) {
-      if (page == 1 && book.title.contains('样式')) {
+      if (page == 1 && book.title.contains('安卓')) {
+        print(book.title);
         // bannerList = book.comicInfo.take(6).toList();
         bannerList = book.comicInfo.where((item) => item.url.isEmpty).toList();
         bannerBookIdList.add(book.bookId);
@@ -124,6 +125,10 @@ class _HomeRecommendState extends State<HomeRecommend>
     recommendList.data.book.removeWhere((item) {
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
       return bannerBookIdList.contains(item.bookId) ||
+          item.bookId == 485437 ||
+          item.bookId == 485438 ||
+          item.bookId == 486467 ||
+          item.bookId == 486455 ||
           item.bookId == 5035 ||
           item.bookId == 4938 ||
           item.bookId == 6669 ||

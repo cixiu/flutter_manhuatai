@@ -10,8 +10,8 @@
   "scripts": {
     "start": "flutter run",
     "dev": "flutter run",
-    "build": "flutter build apk",
-    "build_runner": "flutter pub run build_runner build"
+    "build_android": "flutter build apk --target-platform android-arm",
+    "build_runner": "flutter pub run build_runner build --delete-conflicting-outputs"
   },
   "repository": {
     "type": "git",

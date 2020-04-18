@@ -60,9 +60,12 @@ class MineEntryListWidget extends StatelessWidget {
                 text: '设置',
               ),
               _buildEntryWidget(
-                icon: 'lib/images/mine/icon_mine_dhm.png',
-                text: '兑换码',
-              ),
+                  icon: 'lib/images/mine/icon_mine_dhm.png',
+                  text: '兑换码',
+                  onTap: () {
+                    Application.router
+                        .navigateTo(context, Routes.anotherComicHome);
+                  }),
               _buildEntryWidget(
                 icon: 'lib/images/mine/mht_mine_welfare.png',
                 text: '福利中心',

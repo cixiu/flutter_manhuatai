@@ -92,11 +92,11 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
     json['isautoslide'] as int,
     json['isshowtitle'] as int,
     json['horizonratio'] as String,
-    json['interwidth'] as int,
-    json['outerwidth'] as int,
+    json['interwidth'] as dynamic,
+    json['outerwidth'] as dynamic,
     json['order_type'] as int,
     json['isshowchange'] as int,
-    json['isshowdetail'] as int,
+    json['isshowdetail'] as dynamic,
     json['isshowmore'] as int,
   );
 }

@@ -142,10 +142,10 @@ class Config extends Object {
   String horizonratio;
 
   @JsonKey(name: 'interwidth')
-  int interwidth;
+  dynamic interwidth;
 
   @JsonKey(name: 'outerwidth')
-  int outerwidth;
+  dynamic outerwidth;
 
   @JsonKey(name: 'order_type')
   int orderType;
@@ -154,7 +154,7 @@ class Config extends Object {
   int isshowchange;
 
   @JsonKey(name: 'isshowdetail')
-  int isshowdetail;
+  dynamic isshowdetail;
 
   @JsonKey(name: 'isshowmore')
   int isshowmore;

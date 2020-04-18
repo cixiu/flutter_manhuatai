@@ -58,6 +58,19 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(BookItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.book.title != widget.book.title) {
+      setState(() {
+        // 深克隆一份数据，以防后续的操作修改原数据
+        book = RecommendList.Book.fromJson(
+          json.decode(json.encode(widget.book.toJson())),
+        );
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -154,7 +167,7 @@ class _BookItemState extends State<BookItem> with TickerProviderStateMixin {
                   widget.book.title,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: ScreenUtil().setSp(40),
+                    fontSize: ScreenUtil().setSp(36),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
