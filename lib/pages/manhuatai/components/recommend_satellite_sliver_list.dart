@@ -8,13 +8,17 @@ import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';
 import 'package:flutter_manhuatai/components/satellite_content/satellite_content.dart';
+import 'package:flutter_manhuatai/pages/search_result/components/related_header.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
 
 typedef void ItemCallBack(Satellite item, int index);
 
 class RecommendSatelliteSliverList extends StatelessWidget {
+  final int satelliteCount;
+  final bool isRelated;
   final List<Satellite> recommendSatelliteList;
   final List<UserRoleInfo.Data> userRoleInfoList;
   final bool hasMore;
@@ -22,6 +26,8 @@ class RecommendSatelliteSliverList extends StatelessWidget {
   final ItemCallBack updateSatellite;
 
   RecommendSatelliteSliverList({
+    this.satelliteCount,
+    this.isRelated = false,
     this.recommendSatelliteList,
     this.userRoleInfoList,
     this.hasMore,
@@ -48,13 +54,31 @@ class RecommendSatelliteSliverList extends StatelessWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          if (index == recommendSatelliteList.length) {
+          if (index == 0) {
+            if (isRelated) {
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: ScreenUtil().setWidth(20),
+                ),
+                child: RelatedHeader(
+                  title: '相关帖子($satelliteCount)',
+                  showAll: satelliteCount > 10,
+                  onTap: () {
+                    showToast('TODO: 跳转查看全部的相关帖子');
+                  },
+                ),
+              );
+            }
+            return Container();
+          }
+
+          if (index == recommendSatelliteList.length + 1) {
             return LoadMoreWidget(
               hasMore: hasMore,
             );
           }
 
-          var item = recommendSatelliteList[index];
+          var item = recommendSatelliteList[index - 1];
           UserRoleInfo.Data roleInfo;
           roleInfo = userRoleInfoList.firstWhere(
             (userRole) {
@@ -90,7 +114,7 @@ class RecommendSatelliteSliverList extends StatelessWidget {
             ],
           );
         },
-        childCount: recommendSatelliteList.length + 1,
+        childCount: recommendSatelliteList.length + 2,
       ),
     );
   }

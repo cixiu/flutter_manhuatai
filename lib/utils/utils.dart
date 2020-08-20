@@ -33,8 +33,11 @@ class Utils {
     int widthRatio = int.parse(ratioList[0]);
     int heightRatio = int.parse(ratioList[1]);
 
+    // 判断是否是动态漫
+    // if (comicInfo.anim_cover_image)
+
     if (comicInfo.imgUrl != null && comicInfo.imgUrl != '') {
-      return '${AppConst.imgNewHost}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
+      return '${AppConst.cmsHost}/${comicInfo.imgUrl}${AppConst.imageSizeSuffix.defaultSuffix}';
     } else {
       // 强制使用defaultSuffix
       if (useDefalut) {

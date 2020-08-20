@@ -129,7 +129,7 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       setState(() {
         _isLoading = false;
         _satellite = getSatelliteDetail;
-        _satelliteCommentCount = getSatelliteCommentCount;
+        _satelliteCommentCount = getSatelliteCommentCount ?? 0;
         _fatherCommentList = fatherCommentList;
         _roleInfo = roleInfo;
         _inputKey = GlobalKey<CommentTextInputState>();

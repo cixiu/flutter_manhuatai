@@ -147,7 +147,7 @@ class Today extends Object {
   String comicChapterName;
 
   @JsonKey(name: 'update_time')
-  int updateTime;
+  String updateTime;
 
   @JsonKey(name: 'author_name')
   String authorName;

@@ -131,7 +131,7 @@ class Api {
         'platformname': 'android',
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
 
@@ -156,7 +156,7 @@ class Api {
         'platformname': 'android',
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
 
@@ -205,7 +205,7 @@ class Api {
       url,
       data: data,
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
 
@@ -343,8 +343,7 @@ class Api {
 
   /// 获取更新列表
   static Future<UpdateList> getUpdateList() async {
-    final String url =
-        'https://getconfig-globalapi.yyhao.com/app_api/v5/updatelist/';
+    final String url = 'https://comic.321mh.com/app_api/v5/updatelist/';
 
     Map<String, dynamic> response = await HttpRequest.get(
       url,
@@ -454,7 +453,7 @@ class Api {
     int level,
     String keyword,
   }) async {
-    final String url = 'https://community.321mh.com/star/gets/';
+    final String url = 'https://community-new.321mh.com/star/gets/';
 
     Map<String, dynamic> params = {
       'userIdentifier': userIdentifier, // 登录用户的id
@@ -510,6 +509,40 @@ class Api {
     );
 
     return GetSatelliteRes.fromJson(response);
+  }
+
+  /// 获取关键词相关的帖子(new)
+  static Future<RecommendSatellite> getRelatedSatellite({
+    String openid,
+    String type,
+    String keyword,
+    int page = 1,
+    int size = 10,
+  }) async {
+    final String url =
+        'http://community-new.321mh.com/satellite/getsatellitebykeyword/';
+
+    Map<String, dynamic> params = {
+      'openid': openid,
+      'type': type,
+      'keyword': keyword,
+      'page': page,
+      'size': size,
+      'productname': 'mht',
+      'platformname': 'android',
+    };
+
+    Map<String, dynamic> response = await HttpRequest.get(
+      url,
+      params: params,
+    );
+
+    var data = response['data'];
+    if (data is List && data.length == 0) {
+      return RecommendSatellite.fromJson({});
+    }
+
+    return RecommendSatellite.fromJson(response);
   }
 
   /// 根据用户的id列表获取用户的列表信息
@@ -573,7 +606,7 @@ class Api {
         'client-version': '2.0.2'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
         headers: {
           HttpHeaders.authorizationHeader: '$authorization',
         },
@@ -658,7 +691,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
         headers: {
           'auth_token': '$authorization',
         },
@@ -686,7 +719,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
         headers: {
           'auth_token': '$authorization',
         },
@@ -721,7 +754,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
     return FollowList.fromJson(response);
@@ -794,7 +827,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
         headers: {
           'auth_token': '$authorization',
         },
@@ -1085,7 +1118,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
     return UserRecord.fromJson(response);
@@ -1142,7 +1175,7 @@ class Api {
       url,
       data: data,
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
 
@@ -1181,7 +1214,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
     return response['status'] == 0;
@@ -1212,7 +1245,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
     return response['status'];
@@ -1233,7 +1266,7 @@ class Api {
         'productname': 'mht'
       },
       options: Options(
-        contentType: ContentType.parse('application/x-www-form-urlencoded'),
+        contentType: Headers.formUrlEncodedContentType,
       ),
     );
     return GetBookInfoById.fromJson(response);

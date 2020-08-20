@@ -75,3 +75,4 @@ build/
 # 护理另一个漫画的内容
 lib/api/another.dart
 another_*
+.flutter-plugins-dependencies

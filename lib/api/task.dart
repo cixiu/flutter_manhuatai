@@ -133,7 +133,7 @@ class TaskApi {
         headers: {
           'Authorization': 'Bearer $authorization',
         },
-        contentType: ContentType.json,
+        contentType: Headers.jsonContentType,
       ),
     );
 

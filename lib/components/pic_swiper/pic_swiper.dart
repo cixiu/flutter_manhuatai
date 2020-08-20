@@ -248,7 +248,8 @@ class _PicSwiperState extends State<PicSwiper>
       slideAxis: slideAxis,
       slideType: SlideType.onlyImage,
       resetPageDuration: Duration(milliseconds: 300),
-      slideEndHandler: (offset) {
+      slideEndHandler: (offset,
+          {ScaleEndDetails details, ExtendedImageSlidePageState state}) {
         Size pageSize = context.size;
         if (slideAxis == SlideAxis.both) {
           return offset.distance >

@@ -41,6 +41,7 @@ Book _$BookFromJson(Map<String, dynamic> json) {
   return Book(
     json['book_id'] as int,
     json['siteid'] as int,
+    json['modular_type'] as int,
     json['union_type'] as int,
     json['union_id'] as int,
     json['istop'] as int,
@@ -68,6 +69,7 @@ Book _$BookFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$BookToJson(Book instance) => <String, dynamic>{
       'book_id': instance.bookId,
       'siteid': instance.siteid,
+      'modular_type': instance.modularType,
       'union_type': instance.unionType,
       'union_id': instance.unionId,
       'istop': instance.istop,

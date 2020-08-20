@@ -95,7 +95,7 @@ Today _$TodayFromJson(Map<String, dynamic> json) {
     json['comic_id'] as int,
     json['comic_name'] as String,
     json['comic_chapter_name'] as String,
-    json['update_time'] as int,
+    json['update_time'] as String,
     json['author_name'] as String,
     (json['comic_type'] as List)?.map((e) => e as String)?.toList(),
     json['yesterday_view_num'] as int,

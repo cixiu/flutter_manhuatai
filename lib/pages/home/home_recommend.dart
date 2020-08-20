@@ -10,6 +10,8 @@ import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 
+// TODO: 动态漫画的展示
+
 class HomeRecommend extends StatefulWidget {
   @override
   _HomeRecommendState createState() => _HomeRecommendState();
@@ -124,7 +126,9 @@ class _HomeRecommendState extends State<HomeRecommend>
 
     recommendList.data.book.removeWhere((item) {
       // 将漫画台漫画头条, 精品小说, 游戏专区, 独家策划的book_id过滤掉
+      // TODO:暂时先过滤点动态漫modularType = 2
       return bannerBookIdList.contains(item.bookId) ||
+          item.modularType == 2 ||
           item.bookId == 485437 ||
           item.bookId == 485438 ||
           item.bookId == 486467 ||

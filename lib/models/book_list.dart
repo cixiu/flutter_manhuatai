@@ -52,6 +52,9 @@ class Book extends Object {
   @JsonKey(name: 'siteid')
   int siteid;
 
+  @JsonKey(name: 'modular_type')
+  int modularType;
+
   @JsonKey(name: 'union_type')
   int unionType;
 
@@ -103,6 +106,7 @@ class Book extends Object {
   Book(
     this.bookId,
     this.siteid,
+    this.modularType,
     this.unionType,
     this.unionId,
     this.istop,

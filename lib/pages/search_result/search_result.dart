@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/pages/manhuatai/components/recommend_satellite_sliver_list.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -11,14 +12,13 @@ import 'package:flutter_manhuatai/models/search_author.dart' as SearchAuthor;
 import 'package:flutter_manhuatai/models/sort_list.dart' as SortList;
 import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
-import 'package:flutter_manhuatai/models/get_satellite_res.dart'
-    as GetSatelliteRes;
-import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
+import 'package:flutter_manhuatai/common/model/satellite.dart';
+import 'package:flutter_manhuatai/models/recommend_satellite.dart';
+import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 
 import 'components/related_authors.dart';
 import 'components/related_channels.dart';
 import 'components/related_comics.dart';
-import 'components/related_posts.dart';
 
 class SearchResultPage extends StatefulWidget {
   final String keyword;
@@ -38,12 +38,20 @@ class _SearchResultPageState extends State<SearchResultPage>
   List<SortList.Data> _sortListData;
   SearchAuthor.Data _searchAuthorData;
   List<GetChannelsRes.Data> _channelList;
-  List<GetSatelliteRes.Data> _postList;
-  Map<int, CommentUser.Data> _postListUserMap;
+
+  ScrollController _scrollController = ScrollController();
+  int page = 1;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+  List<Satellite> _recommendSatelliteList = [];
+  int _satelliteCount = 0;
+  List<UserRoleInfo.Data> _userRoleInfoList = [];
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_listenenScroll);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showRefreshLoading();
     });
@@ -53,6 +61,11 @@ class _SearchResultPageState extends State<SearchResultPage>
     Store<AppState> store = StoreProvider.of(context);
     var userInfo = store.state.userInfo;
     var guestInfo = store.state.guestInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
 
     List<Future<dynamic>> futures = List()
       ..add(Api.getSortList(
@@ -66,9 +79,9 @@ class _SearchResultPageState extends State<SearchResultPage>
         level: userInfo.uid != null ? userInfo.ulevel : guestInfo.ulevel,
         keyword: widget.keyword,
       ))
-      ..add(Api.getSatellite(
-        userIdentifier: userInfo.uid ?? guestInfo.uid,
-        level: userInfo.uid != null ? userInfo.ulevel : guestInfo.ulevel,
+      ..add(Api.getRelatedSatellite(
+        openid: openid,
+        type: type,
         keyword: widget.keyword,
       ));
 
@@ -79,27 +92,117 @@ class _SearchResultPageState extends State<SearchResultPage>
     var getSortListRes = result[0] as SortList.SortList;
     var searchAuthorRes = result[1] as SearchAuthor.SearchAuthor;
     var getChannelsRes = result[2] as GetChannelsRes.GetChannelsRes;
-    var getSatelliteRes = result[3] as GetSatelliteRes.GetSatelliteRes;
+    var getRelatedSatelliteRes = result[3] as RecommendSatellite;
+    List<int> userids = [];
+    getRelatedSatelliteRes.data.list.forEach((item) {
+      userids.add(item.useridentifier);
+    });
 
-    Map<int, CommentUser.Data> postListUserMap = Map();
-    if (getSatelliteRes.data.length != 0) {
-      List<int> userids = getSatelliteRes.data.map((item) {
-        return item.userIdentifier.toInt();
-      }).toList();
-      // 获取用户列表信息
-      var getCommentUserRes = await Api.getCommentUser(userids: userids);
-      getCommentUserRes.data.forEach((item) {
-        postListUserMap[item.uid] = item;
-      });
-    }
+    var getUserroleInfoByUseridsRes = await Api.getUserroleInfoByUserids(
+      userids: userids,
+      authorization: authorization,
+    );
+    var data = getRelatedSatelliteRes.data;
 
     setState(() {
       _sortListData = getSortListRes.data;
       _searchAuthorData = searchAuthorRes.data;
       _channelList = getChannelsRes.data;
-      _postList = getSatelliteRes.data;
-      _postListUserMap = postListUserMap;
+      _satelliteCount = data == null ? 0 : data.pager.count;
+      _recommendSatelliteList = data == null ? [] : data.list;
+      _userRoleInfoList = getUserroleInfoByUseridsRes.data;
       _isLoading = false;
+    });
+  }
+
+  void _listenenScroll() {
+    bool isBottom = _scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent;
+    // 判断当前滑动位置是不是到达底部，触发加载更多回调
+    if (isBottom) {
+      loadMore();
+    }
+  }
+
+  // 上拉加载更多
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !_hasMore) {
+      return;
+    }
+    _isLoadingMore = true;
+
+    page++;
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+
+    print('加载更多');
+    var getRecommendSatelliteRes = await Api.getRelatedSatellite(
+      type: type,
+      openid: openid,
+      keyword: widget.keyword,
+      page: page,
+    );
+    _isLoadingMore = false;
+
+    var recommendSatelliteList = getRecommendSatelliteRes.data?.list;
+    if (recommendSatelliteList == null || recommendSatelliteList.length == 0) {
+      setState(() {
+        _hasMore = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _recommendSatelliteList.addAll(recommendSatelliteList);
+    });
+  }
+
+  Future<void> _supportSatellite(Satellite item, int index) async {
+    // var item = _recommendSatelliteList[index];
+    Store<AppState> store = StoreProvider.of(context);
+    var guestInfo = store.state.guestInfo;
+    var userInfo = store.state.userInfo;
+    var type = userInfo.uid != null ? 'mkxq' : 'device';
+    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var authorization = userInfo.uid != null
+        ? userInfo.authData.authcode
+        : guestInfo.authData.authcode;
+
+    var success = await Api.supportSatellite(
+      type: type,
+      openid: openid,
+      authorization: authorization,
+      satelliteId: item.id,
+      status: item.issupport == 1 ? 0 : 1,
+    );
+
+    if (success) {
+      setState(() {
+        if (item.issupport == 1) {
+          item.issupport = 0;
+          item.supportnum -= 1;
+        } else {
+          item.issupport = 1;
+          item.supportnum += 1;
+        }
+      });
+    }
+  }
+
+  void _updateSatellite(Satellite item, int index) {
+    var _item = _recommendSatelliteList[index];
+    setState(() {
+      if (_item.issupport != item.issupport) {
+        _item.issupport = item.issupport;
+        if (item.issupport == 1) {
+          _item.supportnum += 1;
+        } else {
+          _item.supportnum -= 1;
+        }
+      }
     });
   }
 
@@ -120,6 +223,7 @@ class _SearchResultPageState extends State<SearchResultPage>
                 physics: ClampingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
+                controller: _scrollController,
                 slivers: <Widget>[
                   _sortListData.length == 0
                       ? SliverList(
@@ -145,14 +249,18 @@ class _SearchResultPageState extends State<SearchResultPage>
                           keyword: widget.keyword,
                           relatedChannelList: _channelList,
                         ),
-                  _postList.length == 0
+                  _recommendSatelliteList.length == 0
                       ? SliverList(
                           delegate: SliverChildListDelegate([]),
                         )
-                      : RelatedPosts(
-                          keyword: widget.keyword,
-                          postList: _postList,
-                          postListUserMap: _postListUserMap,
+                      : RecommendSatelliteSliverList(
+                          isRelated: true,
+                          satelliteCount: _satelliteCount,
+                          recommendSatelliteList: _recommendSatelliteList,
+                          userRoleInfoList: _userRoleInfoList,
+                          hasMore: _hasMore,
+                          supportSatellite: _supportSatellite,
+                          updateSatellite: _updateSatellite,
                         ),
                 ],
               ),
