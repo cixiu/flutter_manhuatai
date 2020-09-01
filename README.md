@@ -54,32 +54,32 @@ child: Text(
 
 ### 首页
 
-![首页](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/home.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/home.jpg" width="375" height="812">
 
 ### 每日更新页面
 
-![每日更新](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/update.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/update.jpg" width="375" height="812">
 
 ### 帖子列表页面
 
-![帖子列表](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/manhuatai.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/manhuatai.jpg" width="375" height="812">
 
 ### 用户个人页面
 
-![我的](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/mine.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/mine.jpg" width="375" height="812">
 
 ### 漫画详情页
 
-![漫画详情](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/comic_detail.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/comic_detail.jpg" width="375" height="812">
 
 ### 帖子详情页
 
-![帖子详情](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/post_detail.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/post_detail.jpg" width="375" height="812">
 
 ### 搜索结果页面
 
-![搜索结果](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/search_result.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/search_result.jpg" width="375" height="812">
 
 ### 任务中心页面
 
-![任务中心](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/task_center.jpg)
+<img src="https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/task_center.jpg" width="375" height="812">
