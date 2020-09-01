@@ -49,3 +49,37 @@ child: Text(
 ## 说明
 
 1. 启动项目时，请将 routes 下相关的 another 有关的路由配置注释掉，此部分有关的 another 路由代码并未上传。
+
+## 部分截图
+
+### 首页
+
+![首页](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/home.jpg)
+
+### 每日更新页面
+
+![每日更新](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/update.jpg)
+
+### 帖子列表页面
+
+![帖子列表](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/manhuatai.jpg)
+
+### 用户个人页面
+
+![我的](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/mine.jpg)
+
+### 漫画详情页
+
+![漫画详情](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/comic_detail.jpg)
+
+### 帖子详情页
+
+![帖子详情](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/post_detail.jpg)
+
+### 搜索结果页面
+
+![搜索结果](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/search_result.jpg)
+
+### 任务中心页面
+
+![任务中心](https://github.com/cixiu/flutter_manhuatai/blob/master/screenshots/task_center.jpg)
