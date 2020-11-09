@@ -28,8 +28,7 @@ class Routes {
   static String anotherComicDetail = '/another_comic_detail'; // 另一个漫画的漫画详情目录
   static String anotherComicRead = '/another_comic_read'; // 另一个漫画的漫画详情目录
 
-
-  static configureRoutes(Router router) {
+  static configureRoutes(FluroRouter router) {
     router.define(
       login,
       handler: loginHandler,

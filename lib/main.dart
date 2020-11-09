@@ -34,7 +34,7 @@ main() async {
 class MyApp extends StatelessWidget {
   final Store<AppState> store;
   MyApp({this.store}) {
-    final router = Router();
+    final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
   }
