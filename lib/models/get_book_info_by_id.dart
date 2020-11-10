@@ -99,7 +99,7 @@ class Book_list extends Object {
   String comicFeature;
 
   @JsonKey(name: 'load_type')
-  int loadType;
+  dynamic loadType;
 
   @JsonKey(name: 'img_url')
   String imgUrl;
