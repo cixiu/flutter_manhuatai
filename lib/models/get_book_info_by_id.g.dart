@@ -64,7 +64,7 @@ Book_list _$Book_listFromJson(Map<String, dynamic> json) {
     json['comic_name'] as String,
     json['product_id'] as int,
     json['comic_feature'] as String,
-    json['load_type'] as int,
+    json['load_type'],
     json['img_url'] as String,
     json['nofollow'] as int,
     json['sort_num'] as int,
