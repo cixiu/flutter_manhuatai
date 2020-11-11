@@ -1,9 +1,5 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/pages/another_comic_book_list/another_comic_book_list.dart';
-import 'package:flutter_manhuatai/pages/another_comic_detail/another_comic_detail.dart';
-import 'package:flutter_manhuatai/pages/another_comic_home/another_comic_home.dart';
-import 'package:flutter_manhuatai/pages/another_comic_read/another_comic_read.dart';
 import 'package:flutter_manhuatai/pages/book_detail/book_detail.dart';
 import 'package:flutter_manhuatai/pages/comic_comment/comic_comment.dart';
 import 'package:flutter_manhuatai/pages/comic_rank/comic_rank.dart';
@@ -122,59 +118,5 @@ var webViewHandler = Handler(
 var myLevelHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return MyLevel();
-  },
-);
-
-// 另一个漫画的首页
-var anotherComicHomeHandler = Handler(
-  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    return AnotherComicHome();
-  },
-);
-
-// 另一个漫画的数据列表
-var anotherComicBookListHandler = Handler(
-  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    String bookName = params['bookName']?.first;
-    String recommendId = params['recommendId']?.first;
-    String recommendOperation = params['recommendOperation']?.first;
-
-    return AnotherComicBookList(
-      bookName: bookName,
-      recommendId: recommendId,
-      recommendOperation: recommendOperation,
-    );
-  },
-);
-
-// 另一个漫画的数据列表
-var anotherComicDetailHandler = Handler(
-  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    String bookName = params['bookName']?.first;
-    String bookId = params['bookId']?.first;
-    String dataType = params['dataType']?.first;
-
-    return AnotherComicDetail(
-      bookName: bookName,
-      bookId: bookId,
-      dataType: dataType,
-    );
-  },
-);
-
-// 另一个漫画的漫画阅读
-var anotherComicReadHandler = Handler(
-  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
-    String indexNumber = params['indexNumber']?.first;
-    String bookName = params['bookName']?.first;
-    String bookId = params['bookId']?.first;
-    String dataType = params['dataType']?.first;
-
-    return AnotherComicRead(
-      indexNumber: indexNumber,
-      bookName: bookName,
-      bookId: bookId,
-      dataType: dataType,
-    );
   },
 );

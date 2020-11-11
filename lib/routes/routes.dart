@@ -100,29 +100,5 @@ class Routes {
       handler: myLevelHandler,
       transitionType: transitionType,
     );
-
-    router.define(
-      anotherComicHome,
-      handler: anotherComicHomeHandler,
-      transitionType: transitionType,
-    );
-
-    router.define(
-      anotherComicBookList,
-      handler: anotherComicBookListHandler,
-      transitionType: transitionType,
-    );
-
-    router.define(
-      anotherComicDetail,
-      handler: anotherComicDetailHandler,
-      transitionType: transitionType,
-    );
-
-    router.define(
-      anotherComicRead,
-      handler: anotherComicReadHandler,
-      transitionType: transitionType,
-    );
   }
 }
