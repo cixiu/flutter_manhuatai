@@ -45,6 +45,13 @@ child: Text(
 8. [border 属性不支持 dashed(虚线)设置，需要自己绘制](https://github.com/flutter/flutter/issues/4858)
 9. [Flutter 真机(魅族)开发卡在 Installing build\app\outputs\apk\app.apk 的问题](https://blog.csdn.net/donkor_/article/details/82972790)
    - 解决方法： 开发者选项 -> 性能优化 -> 高级日志输出 -> 全部允许
+10. macbook 上安卓模拟器无法连接网络问题记录
+    > 步骤：
+    > 1. 右上角点击 wifi — 打开网络偏好设置
+    > 2. 底部高级 — 选择 DNS
+    > 3. 添加 DNS 服务器 8.8.8.8
+    > 4. 保存 — 应用
+    > 5. 重启模拟器即可
 
 ## 说明
 
