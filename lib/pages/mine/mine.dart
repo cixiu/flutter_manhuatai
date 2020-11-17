@@ -2,19 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/models/user_info.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_info.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 import 'components/mine_entry_list_widget.dart';
 
@@ -29,8 +27,8 @@ class _HomeMineState extends State<HomeMine>
   bool get wantKeepAlive => true;
 
   Future<void> onRefresh() async {
-    Store<AppState> store = StoreProvider.of(context);
-    await getUseroOrGuestInfo(store);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    userInfoModel.getUseroOrGuestInfo();
   }
 
   void _goLogin(UserInfo userInfo) {
@@ -58,10 +56,11 @@ class _HomeMineState extends State<HomeMine>
       body: RefreshIndicator(
         key: refreshIndicatorKey,
         onRefresh: onRefresh,
-        child: StoreBuilder<AppState>(
-          builder: (context, store) {
-            var userInfo = store.state.userInfo;
-            var guestInfo = store.state.guestInfo;
+        child: Selector<UserInfoModel, UserInfoModel>(
+          selector: (context, userInfoModel) => userInfoModel,
+          builder: (context, userInfoModel, _) {
+            var userInfo = userInfoModel.userInfo;
+            var guestInfo = userInfoModel.guestInfo;
             print(userInfo.uname);
 
             return CustomScrollView(

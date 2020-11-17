@@ -3,13 +3,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/db/provider/has_read_chapters_db_provider.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_reads.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
+import 'package:provider/provider.dart';
+// import 'package:redux/redux.dart';
+// import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -153,33 +153,33 @@ class _ComicReadPageState extends State<ComicReadPage>
     int chapterPage = 1,
     ComicInfoBody comicInfoBody,
   }) async {
-    var user = User(context);
-    Store<AppState> store = StoreProvider.of(context);
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
+    var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
     var deviceid = await Utils.getDeviceId();
 
     // 进入漫画阅读页时，将要阅读的漫画的章节的第一张添加到用户的阅读历史
     await Api.addUserRead(
-      type: user.info.type,
-      openid: user.info.openid,
+      type: user.type,
+      openid: user.openid,
       deviceid: deviceid,
-      myUid: user.info.uid,
-      authorization: user.info.authData.authcode,
+      myUid: user.uid,
+      authorization: user.authData.authcode,
       comicId: int.tryParse(widget.comicId),
       chapterId: chapterId,
       chapterName: chapterName,
       chapterPage: chapterPage,
     );
 
-    int index = store.state.userReads.indexWhere((comicRead) {
+    int index = userRecordModel.userReads.indexWhere((comicRead) {
       return comicRead.comicId == int.tryParse(widget.comicId);
     });
 
     if (index > -1) {
-      var userRead = store.state.userReads[index];
+      var userRead = userRecordModel.userReads[index];
       userRead.readTime = DateTime.now().millisecondsSinceEpoch;
       userRead.chapterId = chapterId;
       userRead.chapterName = chapterName;
-      store.dispatch(ChangeUserReadAction(userRead));
+      userRecordModel.changeUserRead(userRead);
     } else {
       var userRead = User_read.fromJson({
         "comic_id": int.tryParse(widget.comicId),
@@ -195,7 +195,7 @@ class _ComicReadPageState extends State<ComicReadPage>
         "chapter_id": chapterId,
         "last_chapter_newid": comicInfoBody.lastChapterId,
       });
-      store.dispatch(AddUserReadAction(userRead));
+      userRecordModel.addUserRead(userRead);
     }
   }
 

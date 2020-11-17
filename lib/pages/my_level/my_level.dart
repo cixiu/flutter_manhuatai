@@ -1,18 +1,16 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/common/model/level_info.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/user_level_widget/user_level_widget.dart';
 import 'package:flutter_manhuatai/models/user_info.dart';
-import 'package:flutter_manhuatai/store/index.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:redux/redux.dart';
 
 import 'components/level_sliver_list.dart';
 import 'components/level_way_sliver_list.dart';
@@ -36,8 +34,8 @@ class _MyLevelState extends State<MyLevel>
   }
 
   Future<void> onRefresh() async {
-    var user = User(context);
-    var openid = user.info.openid;
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
+    var openid = user.openid;
 
     var result = await Api.getUserLevelInfo(openid: openid);
 
@@ -51,12 +49,6 @@ class _MyLevelState extends State<MyLevel>
     });
   }
 
-  UserInfo getUserInfo(Store<AppState> store) {
-    return store.state.userInfo.uid != null
-        ? store.state.userInfo
-        : store.state.guestInfo;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,10 +57,9 @@ class _MyLevelState extends State<MyLevel>
         onRefresh: onRefresh,
         child: _isLoading
             ? Container()
-            : StoreConnector<AppState, Store<AppState>>(
-                converter: (store) => store,
-                builder: (ctx, store) {
-                  var userInfo = getUserInfo(store);
+            : Selector<UserInfoModel, UserInfo>(
+                selector: (context, userInfoModel) => userInfoModel.user,
+                builder: (context, userInfo, _) {
                   return Stack(
                     children: <Widget>[
                       CustomScrollView(

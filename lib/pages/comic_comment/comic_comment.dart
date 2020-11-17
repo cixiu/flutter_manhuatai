@@ -12,7 +12,9 @@ import 'package:flutter_manhuatai/components/comment_text_input/comment_text_inp
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class ComicCommentPage extends StatefulWidget {
   final String comicId;
@@ -70,10 +72,11 @@ class _ComicCommentPageState extends State<ComicCommentPage>
       page = 1;
       _hasMore = true;
       _maxFirstScrollTop = null;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
       var ssid = int.tryParse(widget.comicId);
       // 获取漫画的吐槽总数
       var commentCount = await Api.getCommentCount(
@@ -121,10 +124,10 @@ class _ComicCommentPageState extends State<ComicCommentPage>
     _isLoadingMore = true;
 
     page++;
-    var user = User(context);
-    var userType = user.info.type;
-    var openid = user.info.openid;
-    var authorization = user.info.authData.authcode;
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
+    var userType = user.type;
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
     var ssid = int.tryParse(widget.comicId);
 
     var fatherCommentList = await getCommentListInfo(
@@ -183,10 +186,10 @@ class _ComicCommentPageState extends State<ComicCommentPage>
       });
       _hasMore = true;
       page = 1;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
       var ssid = int.tryParse(widget.comicId);
 
       var fatherCommentList = await getCommentListInfo(

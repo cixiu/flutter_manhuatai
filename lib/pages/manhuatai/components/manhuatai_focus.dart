@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
@@ -70,14 +72,12 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
 
   Future<void> _handleRefresh() async {
     page = 1;
-    Store<AppState> store = StoreProvider.of(context);
-    var guestInfo = store.state.guestInfo;
-    var userInfo = store.state.userInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
-    var authorization = userInfo.uid != null
-        ? userInfo.authData.authcode
-        : guestInfo.authData.authcode;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
+
     var userids = [
       2573857,
       3062527,
@@ -99,7 +99,7 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
       ..add(Api.getUsergFollowList(
         type: type,
         openid: openid,
-        myuid: userInfo.uid ?? guestInfo.uid,
+        myuid: user.uid,
       ))
       ..add(Api.getUserFollowLine(
         type: type,
@@ -139,14 +139,11 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
     _isLoadingMore = true;
 
     page++;
-    Store<AppState> store = StoreProvider.of(context);
-    var guestInfo = store.state.guestInfo;
-    var userInfo = store.state.userInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
-    var authorization = userInfo.uid != null
-        ? userInfo.authData.authcode
-        : guestInfo.authData.authcode;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     print('加载更多');
     var getUserFollowLineRes = await Api.getUserFollowLine(
@@ -173,14 +170,11 @@ class _ManhuataiFocusState extends State<ManhuataiFocus>
 
   Future<void> _supportSatellite(int index) async {
     var item = _followTimeLineList[index].satellite;
-    Store<AppState> store = StoreProvider.of(context);
-    var guestInfo = store.state.guestInfo;
-    var userInfo = store.state.userInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
-    var authorization = userInfo.uid != null
-        ? userInfo.authData.authcode
-        : guestInfo.authData.authcode;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     var success = await Api.supportSatellite(
       type: type,

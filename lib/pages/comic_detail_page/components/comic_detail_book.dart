@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/components/book_item/book_item.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/models/book_list_by_comic_id.dart';
+import 'package:provider/provider.dart';
 
 class ComicDetailBook extends StatefulWidget {
   final String comicId;
@@ -34,16 +33,9 @@ class _ComicDetailBookState extends State<ComicDetailBook>
   }
 
   void _getBookByComicId() async {
-    Store<AppState> store = StoreProvider.of(context);
-    var userInfo = store.state.userInfo;
-    var guestInfo = store.state.guestInfo;
-    String userauth = '';
-
-    if (userInfo.uid != null) {
-      userauth = userInfo.taskData.authcode;
-    } else {
-      userauth = guestInfo.taskData.authcode;
-    }
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    String userauth = user.taskData.authcode;
 
     var bookListMap = await Api.getBookByComicId(
       comicId: widget.comicId,

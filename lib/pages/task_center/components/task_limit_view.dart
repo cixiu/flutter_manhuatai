@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/model/award_result.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/store/index.dart';
@@ -16,6 +17,7 @@ import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/model/task_info.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 
 import 'task_result_toast.dart';
@@ -34,15 +36,16 @@ class TaskLimitView extends StatefulWidget {
 class _TaskLimitViewState extends State<TaskLimitView> {
   Future<void> _finishTask({Task task}) async {
     try {
-      var user = User(context);
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
       // 如果未登录，则跳转去登录
-      if (!user.hasLogin) {
+      if (!userInfoModel.hasLogin) {
         Application.router.navigateTo(context, '${Routes.login}');
         return;
       }
-      var type = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var type = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
       AwardResult awardResult;
 
       showLoading(context);
@@ -64,8 +67,10 @@ class _TaskLimitViewState extends State<TaskLimitView> {
         return;
       }
 
-      Store<AppState> store = StoreProvider.of(context);
-      await getUseroOrGuestInfo(store);
+      // Store<AppState> store = StoreProvider.of(context);
+      // await getUseroOrGuestInfo(store);
+      await userInfoModel.getUseroOrGuestInfo();
+
       hideLoading(context);
 
       showDialog(

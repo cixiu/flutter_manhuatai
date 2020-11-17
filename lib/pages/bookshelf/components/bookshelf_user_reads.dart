@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
@@ -14,9 +14,8 @@ import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
+import 'package:provider/provider.dart';
 
 class BookshelfUserReads extends StatefulWidget {
   @override
@@ -45,22 +44,26 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
   }
 
   Future<void> _handleRefresh() async {
-    Store<AppState> store = StoreProvider.of(context);
-    if (store.state.userReads != null && _isLoading == true) {
-      _control.dataListLength = store.state.userReads.length;
+    // Store<AppState> store = StoreProvider.of(context);
+    var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+
+    if (userRecordModel.userReads != null && _isLoading == true) {
+      _control.dataListLength = userRecordModel.userReads.length;
       setState(() {
         _isLoading = false;
       });
       return;
     }
 
-    await getUserRecordAsyncAction(store, !_isLoading);
+    await userRecordModel.getUserRecordAsyncAction(
+        userInfoModel.user, !_isLoading);
 
     if (!this.mounted) {
       return;
     }
 
-    _control.dataListLength = store.state.userReads.length;
+    _control.dataListLength = userRecordModel.userReads.length;
     setState(() {
       _isLoading = false;
     });
@@ -68,13 +71,12 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
 
   Future<void> deleteOneRead({
     User_read item,
-    Store<AppState> store,
   }) async {
     try {
       showLoading(context);
-      var userInfo = store.state.userInfo;
-      var guestInfo = store.state.guestInfo;
-      var user = userInfo.uid != null ? userInfo : guestInfo;
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
+
       int _comicId = item.comicId;
       var deviceid = await Utils.getDeviceId();
 
@@ -88,12 +90,10 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
 
       if (status) {
         showToast('已取消对${item.comicName}的订阅');
-        store.state.userReads.removeWhere((comicRead) {
-          return comicRead.comicId == item.comicId;
-        });
-        store.dispatch(
-          UpdateUserReadsAction(store.state.userReads),
-        );
+        var userRecordModel =
+            Provider.of<UserRecordModel>(context, listen: false);
+
+        userRecordModel.deleteOneUserRead(item);
         hideLoading(context);
       } else {
         hideLoading(context);
@@ -109,9 +109,9 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return StoreBuilder<AppState>(
-      builder: (context, store) {
-        var userReads = store.state.userReads;
+    return Selector<UserRecordModel, List<User_read>>(
+      selector: (context, userRecordModel) => userRecordModel.userReads,
+      builder: (context, userReads, _) {
         _control.dataListLength = userReads.length;
 
         return PullLoadWrapper(
@@ -125,7 +125,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
             return _buildReadComicItem(
               context: context,
               item: item,
-              store: store,
             );
           },
         );
@@ -136,7 +135,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
   Widget _buildReadComicItem({
     BuildContext context,
     User_read item,
-    Store<AppState> store,
   }) {
     return GestureDetector(
       onTap: () async {
@@ -152,7 +150,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
               confirm: () async {
                 await deleteOneRead(
                   item: item,
-                  store: store,
                 );
               },
             );

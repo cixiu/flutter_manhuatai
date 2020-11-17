@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/models/user_info.dart';
+import 'package:flutter_manhuatai/provider_store/count_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import './home_rank.dart';
 import './home_recommend.dart';
@@ -46,6 +50,7 @@ class _HomeIndexState extends State<HomeIndex>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final countModel = Provider.of<CountModal>(context);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -128,6 +133,38 @@ class _HomeIndexState extends State<HomeIndex>
           HomeRank(),
           HomeRecommend(),
         ],
+      ),
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          countModel.addCount();
+        },
+        child: Container(
+          width: 100.0,
+          height: 100.0,
+          decoration: BoxDecoration(
+            color: Colors.blueAccent,
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+          child: Selector<CountModal, int>(
+            selector: (_, model) => model.count,
+            builder: (context, count, _) {
+              return Selector<UserInfoModel, UserInfo>(
+                selector: (_, model) => model.guestInfo,
+                builder: (context, guestInfo, _) {
+                  return Center(
+                    child: Text(
+                      '点击次数：$count \n ${guestInfo.uname}',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
       ),
     );
   }

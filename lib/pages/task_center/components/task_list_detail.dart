@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
@@ -73,15 +75,16 @@ class _TaskListDetailState extends State<TaskListDetail> {
     }
 
     try {
-      var user = User(context);
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
       // 如果未登录，则跳转去登录
-      if (!user.hasLogin) {
+      if (!userInfoModel.hasLogin) {
         Application.router.navigateTo(context, '${Routes.login}');
         return;
       }
-      var type = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var type = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
       AwardResult awardResult;
 
       showLoading(context);
@@ -119,8 +122,9 @@ class _TaskListDetailState extends State<TaskListDetail> {
         return;
       }
 
-      Store<AppState> store = StoreProvider.of(context);
-      await getUseroOrGuestInfo(store);
+      // Store<AppState> store = StoreProvider.of(context);
+      // await getUseroOrGuestInfo(store);
+      await userInfoModel.getUseroOrGuestInfo();
       hideLoading(context);
 
       showDialog(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/common/dao/comment.dart';
 import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_manhuatai/components/comment_content_item/comment_conten
 import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
+import 'package:provider/provider.dart';
 
 class CommentReplyPage extends StatefulWidget {
   final SatelliteComment fatherComment;
@@ -82,16 +84,16 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       page = 1;
       _hasMore = true;
       _maxFirstScrollTop = null;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
 
       // 获取父级评论的详细内容
       var fatherComment = await Api.getCommentContent(
         commentId: widget.fatherComment.id,
-        userIdentifier: user.info.uid,
-        level: user.info.ulevel,
+        userIdentifier: user.uid,
+        level: user.ulevel,
       );
 
       var fatherCommentUserRes = await Api.getCommentUser(
@@ -150,7 +152,6 @@ class _CommentReplyPageState extends State<CommentReplyPage>
             'ulevel': fatherCommentUser.ulevel,
             'floor_num': widget.fatherComment.floorNum,
             'floor_desc': widget.fatherComment.floorDesc,
-            'createtime': fatherComment.createtime,
             'device_tail': widget.fatherComment.deviceTail,
           });
         }
@@ -177,10 +178,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
     _isLoadingMore = true;
 
     page++;
-    var user = User(context);
-    var userType = user.info.type;
-    var openid = user.info.openid;
-    var authorization = user.info.authData.authcode;
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
+    var userType = user.type;
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     var commentList = await getCommentListInfo(
       type: _commentType == WhyFarther.hot ? 'hot' : 'new',
@@ -240,10 +241,10 @@ class _CommentReplyPageState extends State<CommentReplyPage>
       });
       _hasMore = true;
       page = 1;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
 
       var fatherCommentList = await getCommentListInfo(
         type: _commentType == WhyFarther.hot ? 'hot' : 'new',
