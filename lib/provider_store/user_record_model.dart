@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/user_info.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:redux/redux.dart';
 
 class UserRecordModel extends ChangeNotifier {
   /// 用户收藏

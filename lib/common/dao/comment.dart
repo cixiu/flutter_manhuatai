@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';

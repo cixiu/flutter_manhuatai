@@ -28,11 +28,12 @@ class _HomeMineState extends State<HomeMine>
 
   Future<void> onRefresh() async {
     var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
-    userInfoModel.getUseroOrGuestInfo();
+    await userInfoModel.getUseroOrGuestInfo();
   }
 
-  void _goLogin(UserInfo userInfo) {
-    if (userInfo.uname == null) {
+  void _goLogin() {
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    if (!userInfoModel.hasLogin) {
       Application.router.navigateTo(
         context,
         '/login',
@@ -56,12 +57,10 @@ class _HomeMineState extends State<HomeMine>
       body: RefreshIndicator(
         key: refreshIndicatorKey,
         onRefresh: onRefresh,
-        child: Selector<UserInfoModel, UserInfoModel>(
-          selector: (context, userInfoModel) => userInfoModel,
-          builder: (context, userInfoModel, _) {
-            var userInfo = userInfoModel.userInfo;
-            var guestInfo = userInfoModel.guestInfo;
-            print(userInfo.uname);
+        child: Selector<UserInfoModel, UserInfo>(
+          selector: (context, userInfoModel) => userInfoModel.user,
+          builder: (context, user, _) {
+            print('当前用户： ${user.uname}');
 
             return CustomScrollView(
               physics: AlwaysScrollableScrollPhysics(),
@@ -106,21 +105,19 @@ class _HomeMineState extends State<HomeMine>
                                 alignment: Alignment.topCenter,
                                 child: GestureDetector(
                                   onTap: () {
-                                    _goLogin(userInfo);
+                                    _goLogin();
                                   },
                                   child: Row(
                                     children: <Widget>[
                                       // 用户头像
-                                      _buildAvatar(userInfo),
+                                      _buildAvatar(user),
                                       // 用户名称
                                       _buildUserName(
-                                        userInfo: userInfo,
-                                        guestInfo: guestInfo,
+                                        user: user,
                                       ),
                                       // 用户等级
                                       _buildUserLevel(
-                                        userInfo: userInfo,
-                                        guestInfo: guestInfo,
+                                        user: user,
                                       ),
                                     ],
                                   ),
@@ -132,8 +129,7 @@ class _HomeMineState extends State<HomeMine>
                       ),
                       // 我的消费品
                       _buildMineGoods(
-                        userInfo: userInfo,
-                        guestInfo: guestInfo,
+                        user: user,
                       ),
                       // 我的相关入口列表
                       Container(
@@ -187,8 +183,7 @@ class _HomeMineState extends State<HomeMine>
 
   // 用户名称
   Widget _buildUserName({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return Container(
       constraints: BoxConstraints(
@@ -198,7 +193,7 @@ class _HomeMineState extends State<HomeMine>
         horizontal: ScreenUtil().setWidth(20),
       ),
       child: Text(
-        userInfo?.uname ?? guestInfo.uname,
+        user.uname,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         style: TextStyle(
@@ -211,8 +206,7 @@ class _HomeMineState extends State<HomeMine>
 
   // 用户等级
   Widget _buildUserLevel({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -233,7 +227,7 @@ class _HomeMineState extends State<HomeMine>
               top: ScreenUtil().setWidth(10),
             ),
             child: Text(
-              'LV${userInfo?.ulevel ?? guestInfo.ulevel}',
+              'LV${user.ulevel}',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil().setSp(24),
@@ -286,31 +280,30 @@ class _HomeMineState extends State<HomeMine>
 
   // 我的消费品
   Widget _buildMineGoods({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_ciyuan.png',
-          text: '${userInfo?.cactive ?? guestInfo?.cactive}',
+          text: '${user.cactive}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_guobi.png',
-          text: '${userInfo?.cgold ?? guestInfo?.cgold}',
+          text: '${user.cgold}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_mengbi.png',
-          text: '${userInfo?.coins ?? guestInfo?.coins}',
+          text: '${user.coins}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_luobo.png',
-          text: '${userInfo?.recommend ?? guestInfo?.recommend}',
+          text: '${user.recommend}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_yuepiao.png',
-          text: '${userInfo?.cticket ?? guestInfo?.cticket}',
+          text: '${user.cticket}',
         ),
       ],
     );

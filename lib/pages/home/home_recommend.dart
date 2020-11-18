@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper.dart';
 import 'package:flutter_manhuatai/components/banner_swipper/banner_swipper.dart';
@@ -10,7 +10,6 @@ import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
 import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
-import 'package:provider/provider.dart';
 
 // TODO: 动态漫画的展示
 

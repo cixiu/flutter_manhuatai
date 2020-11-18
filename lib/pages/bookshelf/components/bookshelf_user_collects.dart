@@ -45,8 +45,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
   }
 
   Future<void> _handleRefresh() async {
-    // Store<AppState> store = StoreProvider.of(context);
-    // await getUserRecordAsyncAction(store, !_isLoading);
     var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
     var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
     await userRecordModel.getUserRecordAsyncAction(
@@ -283,36 +281,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
                 ),
               ),
             ),
-            // GestureDetector(
-            //   behavior: HitTestBehavior.opaque,
-            //   onTap: () {
-            //     showDialog(
-            //       context: context,
-            //       builder: (context) {
-            //         return CancelDialog(
-            //           title: '是否取消对《${item.comicName}》的订阅？',
-            //           confirm: () async {
-            //             await deleteOneCollect(
-            //               item: item,
-            //               store: store,
-            //             );
-            //           },
-            //         );
-            //       },
-            //     );
-            //   },
-            //   child: Container(
-            //     padding: EdgeInsets.only(
-            //       top: ScreenUtil().setWidth(30),
-            //       bottom: ScreenUtil().setWidth(30),
-            //       left: ScreenUtil().setWidth(30),
-            //     ),
-            //     child: Icon(
-            //       Icons.delete,
-            //       color: Colors.grey,
-            //     ),
-            //   ),
-            // )
           ],
         ),
       ),

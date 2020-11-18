@@ -2,19 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:provider/provider.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_info.dart';
 import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+
 import './components/input_phone.dart';
 import './components/input_validate_code.dart';
 import './components/img_code_dialog.dart';

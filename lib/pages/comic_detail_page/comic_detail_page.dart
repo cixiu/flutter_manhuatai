@@ -153,8 +153,6 @@ class _ComicDetailPageState extends State<ComicDetailPage>
     if (!this.mounted) {
       return;
     }
-    // Store<AppState> store = StoreProvider.of(context);
-    // await getUserRecordAsyncAction(store);
     var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
     var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
     await userRecordModel.getUserRecordAsyncAction(userInfoModel.user);

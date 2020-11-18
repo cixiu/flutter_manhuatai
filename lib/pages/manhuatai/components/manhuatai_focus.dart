@@ -1,18 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
-import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:redux/redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 
 import 'package:flutter_manhuatai/models/recommend_users.dart'
     as RecommendUsers;
@@ -21,6 +14,10 @@ import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/models/user_follow_line.dart'
     as UserFollowLine;
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 
 import 'package:flutter_manhuatai/components/load_more_widget/load_more_widget.dart';
 import 'package:flutter_manhuatai/components/satellite_header/satellite_header.dart';

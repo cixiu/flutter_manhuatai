@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
-import 'package:flutter_manhuatai/common/dao/comment.dart';
-import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
-import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
-import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
-import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
+import 'package:flutter_manhuatai/common/dao/comment.dart';
+import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
+import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
+import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';

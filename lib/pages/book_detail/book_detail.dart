@@ -3,14 +3,8 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/models/user_record.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
-import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
-import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:device_info/device_info.dart';
@@ -25,9 +19,10 @@ import 'package:flutter_manhuatai/models/get_book_info_by_id.dart'
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 
 class BookDetailPage extends StatefulWidget {
   final int bookId;

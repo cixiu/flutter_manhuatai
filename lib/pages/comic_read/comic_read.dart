@@ -8,8 +8,6 @@ import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 import 'package:provider/provider.dart';
-// import 'package:redux/redux.dart';
-// import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 

@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/pages/manhuatai/components/recommend_satellite_sliver_list.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:provider/provider.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 
 import 'package:flutter_manhuatai/models/search_author.dart' as SearchAuthor;
 import 'package:flutter_manhuatai/models/sort_list.dart' as SortList;
 import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
+import 'package:flutter_manhuatai/pages/manhuatai/components/recommend_satellite_sliver_list.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/models/recommend_satellite.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;

@@ -44,7 +44,6 @@ class _BookshelfUserReadsState extends State<BookshelfUserReads>
   }
 
   Future<void> _handleRefresh() async {
-    // Store<AppState> store = StoreProvider.of(context);
     var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
     var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
 

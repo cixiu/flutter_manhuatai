@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     as extended;
 
 import 'package:flutter_manhuatai/api/task.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 import 'package:flutter_manhuatai/common/model/task_info.dart';
 import 'package:flutter_manhuatai/common/model/task_process.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
-import 'package:provider/provider.dart';
 
 import 'components/task_limit_view.dart';
 import 'components/task_tab_view.dart';
