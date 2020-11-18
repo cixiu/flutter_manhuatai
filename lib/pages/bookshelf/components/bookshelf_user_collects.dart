@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:redux/redux.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
@@ -15,9 +14,8 @@ import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
-import 'package:flutter_manhuatai/store/user_reads.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
 
 class BookshelfUserCollects extends StatefulWidget {
@@ -47,13 +45,17 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
   }
 
   Future<void> _handleRefresh() async {
-    Store<AppState> store = StoreProvider.of(context);
-    await getUserRecordAsyncAction(store, !_isLoading);
+    var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    await userRecordModel.getUserRecordAsyncAction(
+      userInfoModel.user,
+      !_isLoading,
+    );
     if (!this.mounted) {
       return;
     }
 
-    _control.dataListLength = store.state.userCollects.length;
+    _control.dataListLength = userRecordModel.userCollects.length;
     setState(() {
       _isLoading = false;
     });
@@ -61,13 +63,13 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
 
   Future<void> deleteOneCollect({
     User_collect item,
-    Store<AppState> store,
   }) async {
     try {
       showLoading(context);
-      var userInfo = store.state.userInfo;
-      var guestInfo = store.state.guestInfo;
-      var user = userInfo.uid != null ? userInfo : guestInfo;
+      var userRecordModel =
+          Provider.of<UserRecordModel>(context, listen: false);
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
       String action = 'dels';
       int _comicId = item.comicId;
       var deviceid = await Utils.getDeviceId();
@@ -92,10 +94,7 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
         return collectB.updateTime - collectA.updateTime;
       });
 
-      store.dispatch(
-        UpdateUserCollectsAction(getUserRecordRes.userCollect),
-      );
-
+      userRecordModel.setUserCollects(getUserRecordRes.userCollect);
       hideLoading(context);
 
       if (status) {
@@ -113,9 +112,9 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return StoreBuilder<AppState>(
-      builder: (context, store) {
-        var userCollects = store.state.userCollects;
+    return Selector<UserRecordModel, List<User_collect>>(
+      selector: (context, userRecordModel) => userRecordModel.userCollects,
+      builder: (context, userCollects, _) {
         _control.dataListLength = userCollects?.length;
 
         return PullLoadWrapper(
@@ -130,7 +129,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
             return _buildCollectComicItem(
               context: context,
               item: item,
-              store: store,
             );
           },
         );
@@ -184,7 +182,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
   Widget _buildCollectComicItem({
     BuildContext context,
     User_collect item,
-    Store<AppState> store,
   }) {
     return GestureDetector(
       onTap: () async {
@@ -200,7 +197,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
               confirm: () async {
                 await deleteOneCollect(
                   item: item,
-                  store: store,
                 );
               },
             );
@@ -285,36 +281,6 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
                 ),
               ),
             ),
-            // GestureDetector(
-            //   behavior: HitTestBehavior.opaque,
-            //   onTap: () {
-            //     showDialog(
-            //       context: context,
-            //       builder: (context) {
-            //         return CancelDialog(
-            //           title: '是否取消对《${item.comicName}》的订阅？',
-            //           confirm: () async {
-            //             await deleteOneCollect(
-            //               item: item,
-            //               store: store,
-            //             );
-            //           },
-            //         );
-            //       },
-            //     );
-            //   },
-            //   child: Container(
-            //     padding: EdgeInsets.only(
-            //       top: ScreenUtil().setWidth(30),
-            //       bottom: ScreenUtil().setWidth(30),
-            //       left: ScreenUtil().setWidth(30),
-            //     ),
-            //     child: Icon(
-            //       Icons.delete,
-            //       color: Colors.grey,
-            //     ),
-            //   ),
-            // )
           ],
         ),
       ),

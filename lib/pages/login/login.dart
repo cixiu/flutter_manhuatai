@@ -2,17 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_info.dart';
 import 'package:flutter_manhuatai/utils/sp.dart';
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+
 import './components/input_phone.dart';
 import './components/input_validate_code.dart';
 import './components/img_code_dialog.dart';
@@ -48,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // 登录操作
-  void onPressLogin(Store<AppState> store) async {
+  void onPressLogin() async {
     // 无效的手机号码
     if (!AppConst.phoneReg.hasMatch(_phone)) {
       return _showToast();
@@ -74,9 +73,11 @@ class _LoginPageState extends State<LoginPage> {
         String token = response['data']['appToken'];
         var userInfoMap = await Api.getUserInfo(token: token);
         print('获取用户信息成功， $userInfoMap');
-        // 将登陆的用户信息存入缓存并放入redux中
+        // 将登陆的用户信息存入缓存并放入 provider_store 中
         var userInfo = await SpUtils.saveUserInfo(userInfoMap);
-        store.dispatch(UpdateUserInfoAction(userInfo));
+        var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+        userInfoModel.setUserInfo(userInfo);
+
         print('存储用户成功 $userInfo');
         hideLoading(context);
         Application.router.pop(context);
@@ -273,32 +274,28 @@ class _LoginPageState extends State<LoginPage> {
                 countSeconds: _countSeconds,
               ),
               // 登录按钮
-              StoreBuilder<AppState>(
-                builder: (context, store) {
-                  return Container(
-                    margin: EdgeInsets.only(
-                      top: 50.0,
+              Container(
+                margin: EdgeInsets.only(
+                  top: 50.0,
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                width: MediaQuery.of(context).size.width,
+                height: 45.0,
+                // child: Text,
+                child: FlatButton(
+                  color: Colors.blue,
+                  shape: StadiumBorder(),
+                  child: Text(
+                    '登录',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.white,
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 15.0),
-                    width: MediaQuery.of(context).size.width,
-                    height: 45.0,
-                    // child: Text,
-                    child: FlatButton(
-                      color: Colors.blue,
-                      shape: StadiumBorder(),
-                      child: Text(
-                        '登录',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                      onPressed: () {
-                        onPressLogin(store);
-                      },
-                    ),
-                  );
-                },
+                  ),
+                  onPressed: () {
+                    onPressLogin();
+                  },
+                ),
               ),
             ],
           ),

@@ -1,21 +1,22 @@
 import 'dart:async';
 
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
+import 'package:extended_text/extended_text.dart';
+
+import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
+import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
 import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
 import 'package:flutter_manhuatai/pages/comment_reply/comment_reply.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:flutter_manhuatai/components/comment_user_header/comment_user_header.dart';
-import 'package:flutter_manhuatai/components/post_item/post_special_text_span_builder.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart' as CommentUser;
-import 'package:oktoast/oktoast.dart';
 
 // typedef void SupportComment(SatelliteComment comment);
 
@@ -59,18 +60,19 @@ class _CommentContentItemState extends State<CommentContentItem> {
     BuildContext context,
     SatelliteComment comment,
   }) async {
-    var user = User(context);
-    if (!user.hasLogin) {
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    if (!userInfoModel.hasLogin) {
       showToast('点赞失败，请先登录');
       return;
     }
 
     var success = await Api.supportComment(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
-      userIdentifier: user.info.uid,
-      userLevel: user.info.ulevel,
+      type: user.type,
+      openid: user.openid,
+      authorization: user.authData.authcode,
+      userIdentifier: user.uid,
+      userLevel: user.ulevel,
       status: comment.status == 1 ? 0 : 1,
       ssid: comment.ssid,
       commentId: comment.id,

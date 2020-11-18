@@ -2,19 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
-import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/utils/utils.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_manhuatai/routes/routes.dart';
+import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/models/user_info.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_info.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 import 'components/mine_entry_list_widget.dart';
 
@@ -29,12 +27,13 @@ class _HomeMineState extends State<HomeMine>
   bool get wantKeepAlive => true;
 
   Future<void> onRefresh() async {
-    Store<AppState> store = StoreProvider.of(context);
-    await getUseroOrGuestInfo(store);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    await userInfoModel.getUseroOrGuestInfo();
   }
 
-  void _goLogin(UserInfo userInfo) {
-    if (userInfo.uname == null) {
+  void _goLogin() {
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    if (!userInfoModel.hasLogin) {
       Application.router.navigateTo(
         context,
         '/login',
@@ -58,11 +57,10 @@ class _HomeMineState extends State<HomeMine>
       body: RefreshIndicator(
         key: refreshIndicatorKey,
         onRefresh: onRefresh,
-        child: StoreBuilder<AppState>(
-          builder: (context, store) {
-            var userInfo = store.state.userInfo;
-            var guestInfo = store.state.guestInfo;
-            print(userInfo.uname);
+        child: Selector<UserInfoModel, UserInfo>(
+          selector: (context, userInfoModel) => userInfoModel.user,
+          builder: (context, user, _) {
+            print('当前用户： ${user.uname}');
 
             return CustomScrollView(
               physics: AlwaysScrollableScrollPhysics(),
@@ -107,21 +105,19 @@ class _HomeMineState extends State<HomeMine>
                                 alignment: Alignment.topCenter,
                                 child: GestureDetector(
                                   onTap: () {
-                                    _goLogin(userInfo);
+                                    _goLogin();
                                   },
                                   child: Row(
                                     children: <Widget>[
                                       // 用户头像
-                                      _buildAvatar(userInfo),
+                                      _buildAvatar(user),
                                       // 用户名称
                                       _buildUserName(
-                                        userInfo: userInfo,
-                                        guestInfo: guestInfo,
+                                        user: user,
                                       ),
                                       // 用户等级
                                       _buildUserLevel(
-                                        userInfo: userInfo,
-                                        guestInfo: guestInfo,
+                                        user: user,
                                       ),
                                     ],
                                   ),
@@ -133,8 +129,7 @@ class _HomeMineState extends State<HomeMine>
                       ),
                       // 我的消费品
                       _buildMineGoods(
-                        userInfo: userInfo,
-                        guestInfo: guestInfo,
+                        user: user,
                       ),
                       // 我的相关入口列表
                       Container(
@@ -188,8 +183,7 @@ class _HomeMineState extends State<HomeMine>
 
   // 用户名称
   Widget _buildUserName({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return Container(
       constraints: BoxConstraints(
@@ -199,7 +193,7 @@ class _HomeMineState extends State<HomeMine>
         horizontal: ScreenUtil().setWidth(20),
       ),
       child: Text(
-        userInfo?.uname ?? guestInfo.uname,
+        user.uname,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         style: TextStyle(
@@ -212,8 +206,7 @@ class _HomeMineState extends State<HomeMine>
 
   // 用户等级
   Widget _buildUserLevel({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -234,7 +227,7 @@ class _HomeMineState extends State<HomeMine>
               top: ScreenUtil().setWidth(10),
             ),
             child: Text(
-              'LV${userInfo?.ulevel ?? guestInfo.ulevel}',
+              'LV${user.ulevel}',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil().setSp(24),
@@ -287,31 +280,30 @@ class _HomeMineState extends State<HomeMine>
 
   // 我的消费品
   Widget _buildMineGoods({
-    UserInfo userInfo,
-    UserInfo guestInfo,
+    UserInfo user,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_ciyuan.png',
-          text: '${userInfo?.cactive ?? guestInfo?.cactive}',
+          text: '${user.cactive}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_guobi.png',
-          text: '${userInfo?.cgold ?? guestInfo?.cgold}',
+          text: '${user.cgold}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_mengbi.png',
-          text: '${userInfo?.coins ?? guestInfo?.coins}',
+          text: '${user.coins}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_luobo.png',
-          text: '${userInfo?.recommend ?? guestInfo?.recommend}',
+          text: '${user.recommend}',
         ),
         _getGiftItem(
           assetIcon: 'lib/images/mine/icon_mine_yuepiao.png',
-          text: '${userInfo?.cticket ?? guestInfo?.cticket}',
+          text: '${user.cticket}',
         ),
       ],
     );

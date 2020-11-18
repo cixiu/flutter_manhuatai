@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:redux/redux.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter_manhuatai/pages/home/home.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_info.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 /// 项目的启动页
 class LaunchPage extends StatefulWidget {
@@ -34,8 +32,8 @@ class _LaunchPageState extends State<LaunchPage> {
 
   // 获取登录的用户信息或者游客信息
   Future<void> _getUseroOrGuestInfo() async {
-    Store<AppState> store = StoreProvider.of(context);
-    await getUseroOrGuestInfo(store);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    await userInfoModel.getUseroOrGuestInfo();
   }
 
   @override

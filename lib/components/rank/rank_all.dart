@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/material.dart'
+;
 import 'rank_title.dart';
 import 'rank_item_img.dart';
 import 'package:flutter_manhuatai/models/rank_list.dart' as RankList;

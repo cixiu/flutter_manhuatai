@@ -1,22 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/components/custom_router/custom_router.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_manhuatai/models/user_record.dart';
 import 'package:flutter_manhuatai/pages/comic_read/comic_read.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:oktoast/oktoast.dart';
-import 'package:redux/redux.dart';
-import 'package:transparent_image/transparent_image.dart';
 
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 import 'package:flutter_manhuatai/components/image_wrapper/image_wrapper.dart';
 import 'package:flutter_manhuatai/components/score_star/score_star.dart';
 import 'package:flutter_manhuatai/utils/utils.dart';
@@ -40,33 +39,34 @@ class ComicDetailHeader extends StatelessWidget {
   Future<void> _setUserCollect(BuildContext context, bool hasCollected) async {
     try {
       showLoading(context);
-      var user = User(context);
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
       String action = hasCollected ? 'dels' : 'add';
       int _comicId = int.parse(comicId);
       var deviceid = await Utils.getDeviceId();
 
       var status = await Api.setUserCollect(
-        type: user.info.type,
-        openid: user.info.openid,
+        type: user.type,
+        openid: user.openid,
         deviceid: deviceid,
-        myUid: user.info.uid,
+        myUid: user.uid,
         action: action,
         comicId: _comicId,
         comicIdList: [_comicId],
       );
 
       var getUserRecordRes = await Api.getUserRecord(
-        type: user.info.type,
-        openid: user.info.openid,
+        type: user.type,
+        openid: user.openid,
         deviceid: deviceid,
-        myUid: user.info.uid,
+        myUid: user.uid,
       );
       getUserRecordRes.userCollect.sort((collectA, collectB) {
         return collectB.updateTime - collectA.updateTime;
       });
 
-      Store<AppState> store = StoreProvider.of(context);
-      store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+      var userRecordModel =
+          Provider.of<UserRecordModel>(context, listen: false);
+      userRecordModel.setUserCollects(getUserRecordRes.userCollect);
       hideLoading(context);
 
       String message = hasCollected ? '已取消收藏' : '收藏成功~~';
@@ -313,9 +313,10 @@ class ComicDetailHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              StoreConnector<AppState, List<User_collect>>(
-                converter: (store) => store.state.userCollects,
-                builder: (context, userCollects) {
+              Selector<UserRecordModel, List<User_collect>>(
+                selector: (context, userRecordModel) =>
+                    userRecordModel.userCollects,
+                builder: (context, userCollects, _) {
                   int collectIndex = userCollects.indexWhere((collect) {
                     return collect.comicId == int.parse(comicId);
                   });
@@ -351,9 +352,10 @@ class ComicDetailHeader extends StatelessWidget {
                   );
                 },
               ),
-              StoreConnector<AppState, List<User_read>>(
-                converter: (store) => store.state.userReads,
-                builder: (context, userReads) {
+              Selector<UserRecordModel, List<User_read>>(
+                selector: (context, userRecordModel) =>
+                    userRecordModel.userReads,
+                builder: (context, userReads, _) {
                   // 阅读历史的漫画章节
                   User_read hasReadedComic;
                   userReads.forEach((readComic) {

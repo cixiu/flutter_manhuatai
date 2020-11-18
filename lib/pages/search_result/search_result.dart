@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/pages/manhuatai/components/recommend_satellite_sliver_list.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
-import 'package:flutter_manhuatai/store/index.dart';
 
 import 'package:flutter_manhuatai/models/search_author.dart' as SearchAuthor;
 import 'package:flutter_manhuatai/models/sort_list.dart' as SortList;
 import 'package:flutter_manhuatai/models/get_channels_res.dart'
     as GetChannelsRes;
+import 'package:flutter_manhuatai/pages/manhuatai/components/recommend_satellite_sliver_list.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/models/recommend_satellite.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
@@ -58,14 +57,11 @@ class _SearchResultPageState extends State<SearchResultPage>
   }
 
   Future<void> handleRefresh() async {
-    Store<AppState> store = StoreProvider.of(context);
-    var userInfo = store.state.userInfo;
-    var guestInfo = store.state.guestInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
-    var authorization = userInfo.uid != null
-        ? userInfo.authData.authcode
-        : guestInfo.authData.authcode;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     List<Future<dynamic>> futures = List()
       ..add(Api.getSortList(
@@ -75,8 +71,8 @@ class _SearchResultPageState extends State<SearchResultPage>
         searchKey: widget.keyword,
       ))
       ..add(Api.getChannels(
-        userIdentifier: userInfo.uid ?? guestInfo.uid,
-        level: userInfo.uid != null ? userInfo.ulevel : guestInfo.ulevel,
+        userIdentifier: user.uid,
+        level: user.ulevel,
         keyword: widget.keyword,
       ))
       ..add(Api.getRelatedSatellite(
@@ -132,11 +128,10 @@ class _SearchResultPageState extends State<SearchResultPage>
     _isLoadingMore = true;
 
     page++;
-    Store<AppState> store = StoreProvider.of(context);
-    var guestInfo = store.state.guestInfo;
-    var userInfo = store.state.userInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
 
     print('加载更多');
     var getRecommendSatelliteRes = await Api.getRelatedSatellite(
@@ -162,14 +157,11 @@ class _SearchResultPageState extends State<SearchResultPage>
 
   Future<void> _supportSatellite(Satellite item, int index) async {
     // var item = _recommendSatelliteList[index];
-    Store<AppState> store = StoreProvider.of(context);
-    var guestInfo = store.state.guestInfo;
-    var userInfo = store.state.userInfo;
-    var type = userInfo.uid != null ? 'mkxq' : 'device';
-    var openid = userInfo.uid != null ? userInfo.openid : guestInfo.openid;
-    var authorization = userInfo.uid != null
-        ? userInfo.authData.authcode
-        : guestInfo.authData.authcode;
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    var user = userInfoModel.user;
+    var type = userInfoModel.hasLogin ? 'mkxq' : 'device';
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     var success = await Api.supportSatellite(
       type: type,

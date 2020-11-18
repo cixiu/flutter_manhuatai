@@ -7,7 +7,7 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.5+1
+version: 1.0.6+1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -21,12 +21,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   dio: ^3.0.10
   fluro: ^1.7.7
-  redux_dev_tools: ^0.4.0
-  flutter_redux_dev_tools: ^0.3.0
-  redux: ^3.0.0
-  flutter_redux: ^0.5.3
   flutter_spinkit: ^3.1.0
-  cached_network_image: ^2.0.0-rc.1
+  cached_network_image: ^2.3.3
   flutter_swiper: ^1.1.6
   shared_preferences: ^0.5.3+4
   oktoast: ^2.2.0
@@ -44,6 +40,7 @@ dependencies:
   sqflite: ^1.1.7+1
   webview_flutter: ^0.3.13
   flutter_webview_plugin: ^0.3.7
+  provider: ^4.3.2+2
 
 # dependency_overrides:
 #   path_provider: ^1.1.0

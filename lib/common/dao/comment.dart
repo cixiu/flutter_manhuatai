@@ -4,13 +4,14 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_manhuatai/api/api.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
 import 'package:flutter_manhuatai/common/model/chapter_info.dart';
 
 import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 import 'package:flutter_manhuatai/models/comment_user.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
 
 Future<List<CommonSatelliteComment>> getCommentListInfo({
   String type,
@@ -179,7 +180,7 @@ Future<void> addComment({
     showToast('还是写点什么吧');
     return;
   }
-  var user = User(context);
+  var user = Provider.of<UserInfoModel>(context, listen: false).user;
   String deviceTail = '';
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   if (Platform.isAndroid) {
@@ -196,12 +197,12 @@ Future<void> addComment({
   print(value);
 
   var response = await Api.addComment(
-    type: user.info.type,
-    openid: user.info.openid,
-    authorization: user.info.authData.authcode,
-    userLevel: user.info.ulevel,
-    userIdentifier: user.info.uid,
-    userName: user.info.uname,
+    type: user.type,
+    openid: user.openid,
+    authorization: user.authData.authcode,
+    userLevel: user.ulevel,
+    userIdentifier: user.uid,
+    userName: user.uname,
     replyName: isReply && isReplyDetail ? comment.uname : null,
     ssid: ssid,
     satelliteId: satelliteId,

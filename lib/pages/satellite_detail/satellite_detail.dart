@@ -1,24 +1,25 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
-import 'package:flutter_manhuatai/common/dao/comment.dart';
-import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
-import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
-import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
-import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
+import 'package:flutter_manhuatai/common/dao/comment.dart';
+import 'package:flutter_manhuatai/common/model/common_satellite_comment.dart';
+import 'package:flutter_manhuatai/components/comment_sliver_list/comment_sliver_list.dart';
+import 'package:flutter_manhuatai/components/comment_type_header/comment_type_header.dart';
+import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 import 'package:flutter_manhuatai/models/user_role_info.dart' as UserRoleInfo;
 import 'package:flutter_manhuatai/common/model/satellite.dart';
 import 'package:flutter_manhuatai/common/model/satellite_comment.dart';
 
 import 'package:flutter_manhuatai/components/common_sliver_persistent_header_delegate.dart/common_sliver_persistent_header_delegate.dart.dart';
 import 'package:flutter_manhuatai/components/comment_text_input/comment_text_input.dart';
+import 'package:provider/provider.dart';
 import 'components/satellite_detail_content_sliver_list.dart';
 
 /// 帖子详情页
@@ -79,10 +80,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       page = 1;
       _hasMore = true;
       _maxFirstScrollTop = null;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
 
       List<Future<dynamic>> futures = List()
         ..add(Api.getSatelliteDetail(
@@ -154,10 +155,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
     _isLoadingMore = true;
 
     page++;
-    var user = User(context);
-    var userType = user.info.type;
-    var openid = user.info.openid;
-    var authorization = user.info.authData.authcode;
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
+    var userType = user.type;
+    var openid = user.openid;
+    var authorization = user.authData.authcode;
 
     var fatherCommentList = await getCommentListInfo(
       type: _commentType == WhyFarther.hot ? 'hot' : 'new',
@@ -186,12 +187,12 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
 
   // 点赞帖子
   Future<void> _supportSatellite() async {
-    var user = User(context);
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
 
     var success = await Api.supportSatellite(
-      type: user.info.type,
-      openid: user.info.openid,
-      authorization: user.info.authData.authcode,
+      type: user.type,
+      openid: user.openid,
+      authorization: user.authData.authcode,
       satelliteId: _satellite.id,
       status: _satellite.issupport == 1 ? 0 : 1,
     );
@@ -241,10 +242,10 @@ class _SatelliteDetailPageState extends State<SatelliteDetailPage>
       });
       _hasMore = true;
       page = 1;
-      var user = User(context);
-      var userType = user.info.type;
-      var openid = user.info.openid;
-      var authorization = user.info.authData.authcode;
+      var user = Provider.of<UserInfoModel>(context, listen: false).user;
+      var userType = user.type;
+      var openid = user.openid;
+      var authorization = user.authData.authcode;
 
       var fatherCommentList = await getCommentListInfo(
         type: _commentType == WhyFarther.hot ? 'hot' : 'new',

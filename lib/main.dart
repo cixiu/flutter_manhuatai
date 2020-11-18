@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/services.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:oktoast/oktoast.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
-import 'package:flutter_manhuatai/store/index.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
 import 'package:flutter_manhuatai/routes/routes.dart';
 import 'package:flutter_manhuatai/pages/launch/launch_page.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var initialState = await initState();
-  final store = Store<AppState>(
-    rootReducer,
-    initialState: initialState,
-  );
+  var userInfoModel = UserInfoModel();
+  await userInfoModel.initModel();
   // await FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
   // await FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -26,14 +24,26 @@ main() async {
     systemNavigationBarIconBrightness: Brightness.light,
   ));
 
+  var providers = [
+    ChangeNotifierProvider(
+      create: (_) => userInfoModel,
+    ),
+    ChangeNotifierProvider(
+      create: (_) => UserRecordModel(),
+    ),
+  ];
+
   runApp(MyApp(
-    store: store,
+    providers: providers,
   ));
 }
 
 class MyApp extends StatelessWidget {
-  final Store<AppState> store;
-  MyApp({this.store}) {
+  final List<SingleChildWidget> providers;
+
+  MyApp({
+    this.providers,
+  }) {
     final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
@@ -43,8 +53,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
       position: ToastPosition.bottom,
-      child: StoreProvider(
-        store: store,
+      child: MultiProvider(
+        providers: providers,
         child: MaterialApp(
           title: '漫意话',
           theme: ThemeData(

@@ -3,10 +3,8 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/store/user_reads.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:device_info/device_info.dart';
@@ -21,9 +19,10 @@ import 'package:flutter_manhuatai/models/get_book_info_by_id.dart'
 import 'package:flutter_manhuatai/utils/utils.dart';
 import 'package:flutter_manhuatai/common/const/app_const.dart';
 import 'package:flutter_manhuatai/components/request_loading/request_loading.dart';
-import 'package:flutter_manhuatai/store/index.dart';
-import 'package:flutter_manhuatai/store/user_collects.dart';
 import 'package:flutter_manhuatai/routes/application.dart';
+import 'package:flutter_manhuatai/models/user_record.dart';
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
+import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 
 class BookDetailPage extends StatefulWidget {
   final int bookId;
@@ -59,8 +58,9 @@ class _BookDetailPageState extends State<BookDetailPage>
   Future<void> _handleRefresh() async {
     var getBookInfoByIdRes = await Api.getBookInfoById(bookId: widget.bookId);
     // 获取用户的收藏列表
-    Store<AppState> store = StoreProvider.of(context);
-    await getUserRecordAsyncAction(store);
+    var userRecordModel = Provider.of<UserRecordModel>(context, listen: false);
+    var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+    await userRecordModel.getUserRecordAsyncAction(userInfoModel.user);
     if (!this.mounted) {
       return;
     }
@@ -72,15 +72,15 @@ class _BookDetailPageState extends State<BookDetailPage>
 
   // 收藏或者取消收藏
   Future<void> _setUserCollect({
-    Store<AppState> store,
     int comicId,
     bool hasCollected,
   }) async {
     try {
       showLoading(context);
-      var guestInfo = store.state.guestInfo;
-      var userInfo = store.state.userInfo;
-      var user = userInfo.uid != null ? userInfo : guestInfo;
+      var userRecordModel =
+          Provider.of<UserRecordModel>(context, listen: false);
+      var userInfoModel = Provider.of<UserInfoModel>(context, listen: false);
+      var user = userInfoModel.user;
       String action = hasCollected ? 'dels' : 'add';
 
       String deviceid = '';
@@ -114,7 +114,7 @@ class _BookDetailPageState extends State<BookDetailPage>
         return collectB.updateTime - collectA.updateTime;
       });
 
-      store.dispatch(UpdateUserCollectsAction(getUserRecordRes.userCollect));
+      userRecordModel.setUserCollects(getUserRecordRes.userCollect);
       hideLoading(context);
 
       String message = hasCollected ? '已取消收藏' : '收藏成功~~';
@@ -171,9 +171,10 @@ class _BookDetailPageState extends State<BookDetailPage>
                           ),
                         ),
                       ),
-                      StoreConnector<AppState, Store<AppState>>(
-                        converter: (store) => store,
-                        builder: (ctx, store) {
+                      Selector<UserRecordModel, List<User_collect>>(
+                        selector: (context, userRecordModel) =>
+                            userRecordModel.userCollects,
+                        builder: (ctx, userCollects, _) {
                           return Container(
                             child: Swiper(
                               autoplay: false,
@@ -194,8 +195,8 @@ class _BookDetailPageState extends State<BookDetailPage>
                                         aspectRatio: '3:4',
                                       )
                                     : '${AppConst.img_host}/${item.imgUrl}';
-                                int collectIndex = store.state.userCollects
-                                    .indexWhere((collect) {
+                                int collectIndex =
+                                    userCollects.indexWhere((collect) {
                                   return collect.comicId == item.comicId;
                                 });
                                 // 是否已经收藏过漫画了
@@ -245,7 +246,6 @@ class _BookDetailPageState extends State<BookDetailPage>
                                                       HitTestBehavior.opaque,
                                                   onTap: () {
                                                     _setUserCollect(
-                                                      store: store,
                                                       comicId: item.comicId,
                                                       hasCollected:
                                                           hasCollected,

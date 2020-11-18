@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_manhuatai/common/const/user.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter_manhuatai/components/pull_load_wrapper/pull_load_wrapper.dart';
 import 'package:flutter_manhuatai/components/banner_swipper/banner_swipper.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_manhuatai/common/mixin/refresh_common_state.dart';
 
 import 'package:flutter_manhuatai/api/api.dart';
 import 'package:flutter_manhuatai/models/book_list.dart' as RecommendList;
+import 'package:flutter_manhuatai/provider_store/user_info_model.dart';
 
 // TODO: 动态漫画的展示
 
@@ -97,15 +98,15 @@ class _HomeRecommendState extends State<HomeRecommend>
     int page,
     bool isStreaming = false,
   }) async {
-    var user = User(context);
+    var user = Provider.of<UserInfoModel>(context, listen: false).user;
     RecommendList.BookList recommendList;
     if (isStreaming) {
       recommendList = await Api.getRecommendStreamingList(
-        userId: user.info.uid,
+        userId: user.uid,
       );
     } else {
       recommendList = await Api.getRecommenNewList(
-        userId: user.info.uid,
+        userId: user.uid,
         page: page,
       );
     }
