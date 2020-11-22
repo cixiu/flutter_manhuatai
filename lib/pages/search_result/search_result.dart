@@ -68,6 +68,9 @@ class _SearchResultPageState extends State<SearchResultPage>
         searchKey: widget.keyword,
       ))
       ..add(Api.searchAuthor(
+        openid: openid,
+        type: type,
+        authorization: authorization,
         searchKey: widget.keyword,
       ))
       ..add(Api.getChannels(
@@ -90,7 +93,7 @@ class _SearchResultPageState extends State<SearchResultPage>
     var getChannelsRes = result[2] as GetChannelsRes.GetChannelsRes;
     var getRelatedSatelliteRes = result[3] as RecommendSatellite;
     List<int> userids = [];
-    getRelatedSatelliteRes.data.list.forEach((item) {
+    getRelatedSatelliteRes.data?.list?.forEach((item) {
       userids.add(item.useridentifier);
     });
 

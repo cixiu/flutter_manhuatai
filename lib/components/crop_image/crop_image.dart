@@ -35,9 +35,9 @@ class CropImage extends StatelessWidget {
     if (item == null && imageList.length == 0) return Container();
 
     final double num300 =
-        autoSetSize ? ScreenUtil.getInstance().setWidth(300) : thumbWidth;
+        autoSetSize ? ScreenUtil().setWidth(300) : thumbWidth;
     final double num400 =
-        autoSetSize ? ScreenUtil.getInstance().setWidth(400) : thumbHeight;
+        autoSetSize ? ScreenUtil().setWidth(400) : thumbHeight;
     double height = num300;
     double width = num400;
 

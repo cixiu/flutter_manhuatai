@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
               ),
               brightness: Brightness.light,
               textTheme: TextTheme(
-                title: TextStyle(
+                headline6: TextStyle(
                   color: Colors.black,
                   fontSize: 18.0,
                 ),

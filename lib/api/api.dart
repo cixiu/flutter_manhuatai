@@ -426,15 +426,20 @@ class Api {
   /// 获取关键词相关的漫画作者
   static Future<SearchAuthor> searchAuthor({
     int page = 1,
-    int size = 3,
+    int size = 10,
+    String openid,
+    String type,
     String searchKey,
+    String authorization,
   }) async {
-    final String url = 'https://kanmanapi-main.321mh.com/v1/comic/searchauthor';
+    final String url = 'https://community-new.321mh.com/v1/user/searchuser';
 
     Map<String, dynamic> params = {
       'page': page,
       'size': size,
-      'search_key': searchKey,
+      'openid': openid,
+      'type': type,
+      'keyword': searchKey,
       'platformname': 'android',
       'productname': 'mht',
     };
@@ -442,6 +447,11 @@ class Api {
     Map<String, dynamic> response = await HttpRequest.get(
       url,
       params: params,
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authorization',
+        },
+      ),
     );
 
     return SearchAuthor.fromJson(response);

@@ -38,9 +38,11 @@ class _LaunchPageState extends State<LaunchPage> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance =
-        ScreenUtil(width: 750, height: 1334, allowFontScaling: true)
-          ..init(context);
+    ScreenUtil.init(
+      context,
+      designSize: Size(750, 1334),
+      allowFontScaling: false,
+    );
 
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
