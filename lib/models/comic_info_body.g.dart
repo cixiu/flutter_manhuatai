@@ -40,7 +40,7 @@ ComicInfoBody _$ComicInfoBodyFromJson(Map<String, dynamic> json) {
     json['comic_media'] as String,
     json['site_status'] as String,
     json['shoucang'] as int,
-    json['renqi'] as int,
+    json['renqi'] as String,
     (json['comic_chapter'] as List)
         ?.map((e) => e == null
             ? null

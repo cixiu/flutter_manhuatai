@@ -215,12 +215,14 @@ class Api {
   /// 获取指定漫画的主体信息
   static Future<Map<String, dynamic>> getComicInfoBody({
     @required String comicId,
+    String fromPage,
   }) async {
     final String url =
-        'https://getcomicinfo-globalapi.yyhao.com/app_api/v5/getcomicinfo_body/';
+        'https://comic.321mh.com/app_api/v5/getcomicinfo_body/';
 
     Map<String, dynamic> response = await HttpRequest.get(url, params: {
       'comic_id': comicId,
+      'from_page': fromPage,
       'platformname': 'android',
       'productname': 'mht',
     });

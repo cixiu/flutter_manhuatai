@@ -39,7 +39,8 @@ var userTaskListHandler = Handler(
 var comicDetailHandler = Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     String comicId = params['comicId']?.first;
-    return ComicDetailPage(comicId: comicId);
+    String fromPage = params['fromPage']?.first;
+    return ComicDetailPage(comicId: comicId, fromPage: fromPage);
   },
 );
 

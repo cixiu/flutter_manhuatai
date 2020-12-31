@@ -172,13 +172,13 @@ class ComicDetailHeader extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              ScoreStar(score: influenceData.score),
+                              ScoreStar(score: influenceData.score ?? '0'),
                               Container(
                                 margin: EdgeInsets.only(
                                   left: ScreenUtil().setWidth(6),
                                 ),
                                 child: Text(
-                                  '${influenceData.score}',
+                                  '${influenceData.score ?? 0}',
                                   style: TextStyle(
                                     fontSize: ScreenUtil().setSp(24),
                                     color: Color(0xfff9ea19),
@@ -195,7 +195,7 @@ class ComicDetailHeader extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  '人气 ${Utils.formatNumber(influenceData.thistotalHeat)}',
+                                  '人气 ${influenceData.thistotalHeat == null ? 0 : Utils.formatNumber(influenceData.thistotalHeat)}',
                                   style: TextStyle(
                                     fontSize: ScreenUtil().setSp(24),
                                     color: Colors.white70,
@@ -343,7 +343,7 @@ class ComicDetailHeader extends StatelessWidget {
                             child: _buildTabText(
                               text: hasCollected ? '已收藏' : '收藏',
                               subText:
-                                  '${Utils.formatNumber(influenceData.collect)}',
+                                  '${influenceData.collect == null ? 0 : Utils.formatNumber(influenceData.collect)}',
                             ),
                           ),
                         ],

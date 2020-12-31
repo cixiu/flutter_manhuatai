@@ -24,9 +24,11 @@ import 'package:flutter_manhuatai/provider_store/user_record_model.dart';
 /// 漫画详情
 class ComicDetailPage extends StatefulWidget {
   final String comicId;
+  final String fromPage;
 
   ComicDetailPage({
     @required this.comicId,
+    this.fromPage = '',
   });
 
   @override
@@ -100,7 +102,10 @@ class _ComicDetailPageState extends State<ComicDetailPage>
 
   // 获取指定漫画的主体信息
   Future<void> _getComicInfoBody() async {
-    var response = await Api.getComicInfoBody(comicId: widget.comicId);
+    var response = await Api.getComicInfoBody(
+      comicId: widget.comicId,
+      fromPage: widget.fromPage,
+    );
     var _comicInfoBody = ComicInfoBody.fromJson(response);
     if (this.mounted) {
       setState(() {
@@ -289,18 +294,22 @@ class _ComicDetailPageState extends State<ComicDetailPage>
                           ),
                         ),
                         // 总人气和周人气
-                        ComicDetailHeat(
-                          influenceData: influenceData,
-                        ),
+                        influenceData.pv == null
+                            ? Container()
+                            : ComicDetailHeat(
+                                influenceData: influenceData,
+                              ),
                         // 作者&角色
                         ComicDetailRole(
                           comicInfoRole: comicInfoRole.data,
                         ),
                         // 粉丝打call
-                        ComicDetailFans(
-                          influenceData: influenceData,
-                          insiderFansList: insiderFansList,
-                        ),
+                        influenceData.pv == null
+                            ? Container()
+                            : ComicDetailFans(
+                                influenceData: influenceData,
+                                insiderFansList: insiderFansList,
+                              ),
                       ],
                     ),
                   ),
@@ -342,7 +351,7 @@ class _ComicDetailPageState extends State<ComicDetailPage>
       ),
       bottomNavigationBar: isShowAll
           ? ComicDetailChapterBottom(
-              collect: influenceData.collect,
+              collect: influenceData.collect ?? '0',
               comicCommentCount: comicCommentCount.toString(),
               onTapCloseAll: _onTapShowAll,
             )

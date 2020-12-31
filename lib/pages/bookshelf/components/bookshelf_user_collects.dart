@@ -186,7 +186,7 @@ class _BookshelfUserCollectsState extends State<BookshelfUserCollects>
     return GestureDetector(
       onTap: () async {
         await Application.router
-            .navigateTo(context, '/comic/detail/${item.comicId}');
+            .navigateTo(context, '/comic/detail/${item.comicId}?fromPage=collection');
       },
       onLongPress: () {
         showDialog(

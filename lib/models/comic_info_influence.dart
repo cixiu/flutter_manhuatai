@@ -140,7 +140,12 @@ part 'comic_info_influence.g.dart';
 
   Call_data(this.showCall,this.copyrightType,this.defaultPrice,this.showBonus,this.pv,this.uv,this.collect,this.share,this.comment,this.reward,this.gift,this.ticket,this.recommend,this.score,this.currmonBonus,this.lastmonBonus,this.thisweekHeat,this.thisweekHeatRank,this.upriseRank,this.thistotalHeat,this.thistotalHeatRank,);
 
-  factory Call_data.fromJson(Map<String, dynamic> srcJson) => _$Call_dataFromJson(srcJson);
+  factory Call_data.fromJson(Map<String, dynamic> srcJson) {
+    if (srcJson['pv'] == null || srcJson['pv'] == 0) {
+      return _$Call_dataFromJson({});
+    }
+    return _$Call_dataFromJson(srcJson);
+  }
 
   Map<String, dynamic> toJson() => _$Call_dataToJson(this);
 

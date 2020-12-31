@@ -83,7 +83,7 @@ class ComicInfoBody extends Object {
   int shoucang;
 
   @JsonKey(name: 'renqi')
-  int renqi;
+  String renqi;
 
   @JsonKey(name: 'comic_chapter')
   List<Comic_chapter> comicChapter;
